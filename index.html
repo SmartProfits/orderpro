@@ -136,35 +136,22 @@
   // Reference to the messages in the database
   const messagesRef = ref(db, 'messages');
 
-  // Send message function
-  function sendMessage() {
-      const message = chatInput.value;
-      if (message.trim()) {
-          push(messagesRef, { text: message });
-          chatInput.value = '';  // Clear input after sending
-          chatInput.focus();     // Keep focus on the input
-      }
-  }
-
-  // Event listeners for click and touch
-  sendBtn.addEventListener('click', sendMessage);
-  sendBtn.addEventListener('touchstart', sendMessage);  // Support touch
-
-  // Listen for "Enter" key press
-  chatInput.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();  // Prevent form submission or page reload
-      sendMessage();       // Send the message
+  // Send message
+  sendBtn.addEventListener('click', () => {
+    const message = chatInput.value;
+    if (message.trim()) {
+      push(messagesRef, { text: message });
+      chatInput.value = '';  // Clear input field after sending
     }
   });
 
-  // Display new messages in the chat box
+  // Display new messages
   onChildAdded(messagesRef, (data) => {
-      const message = data.val().text;
-      const messageElement = document.createElement('div');
-      messageElement.textContent = message;
-      chatBox.appendChild(messageElement);
-      chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the bottom of chat
+    const message = data.val().text;
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    chatBox.appendChild(messageElement);
+    chatBox.scrollTop = chatBox.scrollHeight;  // Scroll to the bottom
   });
 </script>
 
