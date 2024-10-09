@@ -189,8 +189,7 @@ input[type="number"] {
         <label><input type="radio" name="store" value="*Ole-Ole*" onclick="toggleItems()"> Ole-Ole</label>
     </div>
 
-    <h3>选择目录</h3> <input type="text" id="productSearch" placeholder="搜索商品..." oninput="searchProduct()" autocomplete="off">
-<div id="suggestions"></div> <!-- 用于显示自动补全的结果 -->
+    <h3>选择目录</h3>
 
 <div class="category-container">
     <label><input type="radio" name="category" value="BanHeang" onclick="showCategory()">BanHeang</label>
@@ -200,9 +199,11 @@ input[type="number"] {
     <label><input type="radio" name="category" value="Coffee" onclick="showCategory()">Coffee</label>
     <label><input type="radio" name="category" value="Amplang" onclick="showCategory()">Amplang</label>
     <label><input type="radio" name="category" value="Other" onclick="showCategory()">Other</label>
+    
 </div>
 
-
+<input type="text" id="productSearch" placeholder="搜索商品..." oninput="searchProduct()" autocomplete="off">
+<div id="suggestions"></div>
     <h3>选择商品（没输入数量默认是1）</h3>
     <div id="productList"></div>
 
@@ -287,7 +288,8 @@ input[type="number"] {
                 { id: 82, name: "Salted Egg Fish Skin" },
                 { id: 83, name: "Salted Egg Fish Skin Spicy" },
                 { id: 84, name: "Salted Egg Salmon Skin" },
-                { id: 94, name: "Musang King Durian Candy" }
+                { id: 94, name: "Musang King Durian Candy" },
+                { id: 124, name: "HT Dried Fruit Mango📌" }
             ],
             Chocolate: [
                 { id: 108, name: "AD Chocolate Durian", unit: 'pc'},
@@ -299,7 +301,9 @@ input[type="number"] {
                 { id: 114, name: "AD Chocolate Banana", unit: 'pc'},
                 { id: 115, name: "AD Chocolate Tiramisu", unit: 'pc'},
                 { id: 116, name: "AD Chocolate Mint", unit: 'pc'},
-                { id: 117, name: "AD Chocolate Rambutan", unit: 'pc'},
+                { id: 117, name: "AD Chocolate Mangosteen", unit: 'pc'},
+                { id: 126, name: "AD Chocolate Coconut", unit: 'pc'},
+                { id: 127, name: "AD Chocolate Rambutan", unit: 'pc'},
                 { id: 118, name: "AD Chocolate Soursup", unit: 'pc'}
             ],
             Sotong: [
@@ -329,7 +333,8 @@ input[type="number"] {
                 { id: 99, name: "Kopi Tenom Silver" },
                 { id: 100, name: "Kopi Tenom Gold" },
                 { id: 101, name: "Kopi Tenom Blue" },
-                { id: 102, name: "Kopi Tenom Green" }
+                { id: 102, name: "Kopi Tenom Green" },
+                { id: 125, name: "Kopi Tenom Red📌" }
             ],
             Amplang: [
                 { id: 96, name: "Amplang Ikan" },
