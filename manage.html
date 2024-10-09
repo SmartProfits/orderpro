@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>库存管理</title>
+</head>
+<body>
+    <h1>库存管理页面</h1>
+
+    <div id="stockList"></div>
+    <button onclick="saveStock()">保存库存信息</button>
+
+    <script>
+        // 商品信息
+        const products = [
+            { id: 1, name: "Tambun Original" },
+            { id: 2, name: "Tambun Pandan" },
+            { id: 3, name: "Tambun White Lotus" },
+            { id: 4, name: "Tau Sar Pheah" },
+            // 其他商品...
+        ];
+
+        // 加载商品信息并显示输入框
+        function loadProducts() {
+            const stockList = document.getElementById('stockList');
+            stockList.innerHTML = '';
+
+            products.forEach(product => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <label for="stock${product.id}">${product.name}</label>
+                    <input type="number" id="stock${product.id}" value="${getStock(product.id) || 0}">
+                `;
+                stockList.appendChild(div);
+            });
+        }
+
+        // 从 localStorage 获取库存
+        function getStock(id) {
+            let stockData = JSON.parse(localStorage.getItem('stockData')) || {};
+            return stockData[id] || 0;
+        }
+
+        // 保存库存到 localStorage
+        function saveStock() {
+            let stockData = {};
+            products.forEach(product => {
+                const stock = document.getElementById(`stock${product.id}`).value;
+                stockData[product.id] = stock;
+            });
+
+            localStorage.setItem('stockData', JSON.stringify(stockData));
+            alert('库存已保存');
+        }
+
+        window.onload = loadProducts;
+    </script>
+</body>
+</html>
