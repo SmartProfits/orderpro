@@ -13,67 +13,67 @@
             --snow-white: #fff;
         }
 
-       .snowflake {
-        color: #fff;
-        font-size: 1.5em;
-        font-family: Arial, sans-serif;
-        text-shadow: 0 0 5px #000;
-        position: fixed;
-        z-index: 9999;
-        pointer-events: none;
-        animation: fall linear infinite;
+      .snowflake {
+    color: rgba(255, 255, 255, 0.6); /* 降低雪花不透明度 */
+    font-size: 1.2em; /* 稍微减小雪花大小 */
+    font-family: Arial, sans-serif;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.1); /* 柔化阴影 */
+    position: fixed;
+    z-index: -1; /* 将雪花置于内容之后 */
+    pointer-events: none;
+    animation: fall linear infinite;
+    will-change: transform; /* 优化动画性能 */
+}
+
+@keyframes fall {
+    0% {
+        top: -10%;
+        transform: translateX(0) rotate(0deg);
+        opacity: 0.8;
     }
-    
-
-    /* 为每个雪花设置不同的动画持续时间和延迟 */
-    .snowflake:nth-child(1) { left: 10%; animation-duration: 10s; animation-delay: -1s; }
-    .snowflake:nth-child(2) { left: 20%; animation-duration: 12s; animation-delay: -2s; }
-    .snowflake:nth-child(3) { left: 30%; animation-duration: 8s; animation-delay: -3s; }
-    .snowflake:nth-child(4) { left: 40%; animation-duration: 15s; animation-delay: -4s; }
-    .snowflake:nth-child(5) { left: 50%; animation-duration: 11s; animation-delay: -5s; }
-    .snowflake:nth-child(6) { left: 60%; animation-duration: 9s; animation-delay: -6s; }
-    .snowflake:nth-child(7) { left: 70%; animation-duration: 13s; animation-delay: -7s; }
-    .snowflake:nth-child(8) { left: 80%; animation-duration: 14s; animation-delay: -8s; }
-    .snowflake:nth-child(9) { left: 90%; animation-duration: 10s; animation-delay: -9s; }
-    .snowflake:nth-child(10) { left: 95%; animation-duration: 12s; animation-delay: -10s; }
-    .snowflake:nth-child(11) { left: 15%; animation-duration: 11s; animation-delay: -1.5s; }
-    .snowflake:nth-child(12) { left: 25%; animation-duration: 13s; animation-delay: -2.5s; }
-    .snowflake:nth-child(13) { left: 35%; animation-duration: 9s; animation-delay: -3.5s; }
-    .snowflake:nth-child(14) { left: 45%; animation-duration: 14s; animation-delay: -4.5s; }
-    .snowflake:nth-child(15) { left: 55%; animation-duration: 10s; animation-delay: -5.5s; }
-    .snowflake:nth-child(16) { left: 65%; animation-duration: 12s; animation-delay: -6.5s; }
-    .snowflake:nth-child(17) { left: 75%; animation-duration: 11s; animation-delay: -7.5s; }
-    .snowflake:nth-child(18) { left: 85%; animation-duration: 13s; animation-delay: -8.5s; }
-    .snowflake:nth-child(19) { left: 92%; animation-duration: 9s; animation-delay: -9.5s; }
-    .snowflake:nth-child(20) { left: 98%; animation-duration: 14s; animation-delay: -10.5s; }
-
-    @keyframes fall {
-        0% {
-            top: -10%;
-            transform: translateX(0) rotate(0deg);
-        }
-        25% {
-            transform: translateX(15px) rotate(45deg);
-        }
-        50% {
-            transform: translateX(-15px) rotate(-45deg);
-        }
-        75% {
-            transform: translateX(15px) rotate(45deg);
-        }
-        100% {
-            top: 100%;
-            transform: translateX(-15px) rotate(-45deg);
-        }
+    20% {
+        transform: translateX(15px) rotate(45deg);
+        opacity: 0.9;
     }
+    40% {
+        transform: translateX(-15px) rotate(-45deg);
+        opacity: 0.8;
+    }
+    60% {
+        transform: translateX(15px) rotate(45deg);
+        opacity: 0.7;
+    }
+    80% {
+        transform: translateX(-15px) rotate(-45deg);
+        opacity: 0.6;
+    }
+    100% {
+        top: 110%;
+        transform: translateX(0) rotate(0deg);
+        opacity: 0.5;
+    }
+}
 
+/* 调整雪花动画时间和延迟，使其更加自然 */
+.snowflake:nth-child(1) { left: 5%; animation-duration: 15s; animation-delay: -2s; }
+.snowflake:nth-child(2) { left: 15%; animation-duration: 12s; animation-delay: -1s; }
+.snowflake:nth-child(3) { left: 25%; animation-duration: 13s; animation-delay: -3s; }
+.snowflake:nth-child(4) { left: 35%; animation-duration: 14s; animation-delay: -4s; }
+.snowflake:nth-child(5) { left: 45%; animation-duration: 16s; animation-delay: -5s; }
+.snowflake:nth-child(6) { left: 55%; animation-duration: 13s; animation-delay: -6s; }
+.snowflake:nth-child(7) { left: 65%; animation-duration: 15s; animation-delay: -7s; }
+.snowflake:nth-child(8) { left: 75%; animation-duration: 14s; animation-delay: -2s; }
+.snowflake:nth-child(9) { left: 85%; animation-duration: 12s; animation-delay: -3s; }
+.snowflake:nth-child(10) { left: 95%; animation-duration: 13s; animation-delay: -4s; }
+
+/* 减少雪花数量，只保留10个 */
        
 
         body {
             font-family: Arial, sans-serif;
             padding: 15px;
             margin: 0;
-            background-color: var(--christmas-green);
+            background-color: #0a2818;
             color: var(--snow-white);
             transition: background-color 0.3s, color 0.3s;
         }
@@ -368,6 +368,7 @@ input[type="number"] {
     <div class="snowflake">❆</div>
     <div class="snowflake">❅</div>
     <div class="snowflake">❆</div>
+    
 </div>
     <!-- 圣诞装饰 -->
     <div class="christmas-decorations">
