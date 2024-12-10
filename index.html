@@ -227,6 +227,24 @@
     align-items: center;
     gap: 5px;
 }
+.music-toggle-btn {
+    background-color: var(--christmas-red);
+    color: var(--snow-white);
+    padding: 10px 20px;
+    margin: 10px 0;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    border: 2px solid var(--christmas-gold);
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.music-toggle-btn:hover {
+    transform: scale(1.02);
+    background-color: #a01830;
+}
 
 #productList div {
     display: flex;
@@ -365,14 +383,19 @@ input[type="number"] {
     </div>
 
     <!-- 模式切换按钮 -->
-    <button class="toggle-mode-btn" onclick="toggleDarkMode()">切换至黑暗模式</button>
+    <!-- 在这个位置添加 -->
+<button class="toggle-mode-btn" onclick="toggleDarkMode()">切换至黑暗模式</button>
 
-
-    <h1>🎄 Stock Order 🎄</h1>
-    <audio controls>
+<!-- 添加新的音频控制 -->
+<audio id="backgroundMusic" loop>
     <source src="https://github.com/SmartProfits/orderpro/raw/refs/heads/main/1.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
 </audio>
+<button id="musicToggle" class="music-toggle-btn" onclick="toggleMusic()">
+    🔇 关闭音乐
+</button>
+
+<h1>🎄 Stock Order 🎄</h1>
+    
     
     
     <div class="container">
@@ -759,13 +782,21 @@ input[type="number"] {
 
         // 页面加载时初始化
         window.onload = function() {
-            const savedMode = localStorage.getItem('dark-mode');
-            if (savedMode === 'enabled') {
-                document.body.classList.add('dark-mode');
-                document.querySelector('.toggle-mode-btn').textContent = '🌞 Light Mode';
-            }
-            toggleItems();
-        }
+    const savedMode = localStorage.getItem('dark-mode');
+    if (savedMode === 'enabled') {
+        document.body.classList.add('dark-mode');
+        document.querySelector('.toggle-mode-btn').textContent = '🌞 Light Mode';
+    }
+    toggleItems();
+    
+    // 添加自动播放音乐
+    const music = document.getElementById('backgroundMusic');
+    music.play().catch(function(error) {
+        console.log("自动播放失败：", error);
+        isMusicPlaying = false;
+        document.getElementById('musicToggle').innerHTML = '🔈 播放音乐';
+    });
+}
         div.innerHTML = `
     <input type="checkbox" id="item${product.id}" onchange="saveItem(${product.id}, '${product.name}')">
     <label for="item${product.id}">${product.name}</label>
@@ -807,6 +838,58 @@ div.innerHTML = `
         <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
     </div>
 `;
+// ... existing code ...
+
+// 修改音乐控制相关的代码
+// 修改音乐控制相关的代码
+let isMusicPlaying = false; // 初始状态设为 false
+
+function toggleMusic() {
+    const music = document.getElementById('backgroundMusic');
+    const musicBtn = document.getElementById('musicToggle');
+    
+    try {
+        if (music.paused) {
+            // 如果音乐是暂停状态，就播放
+            music.play().then(() => {
+                isMusicPlaying = true;
+                musicBtn.innerHTML = '🔇 关闭音乐';
+            }).catch((error) => {
+                console.log("播放失败：", error);
+                isMusicPlaying = false;
+                musicBtn.innerHTML = '🔈 播放音乐';
+            });
+        } else {
+            // 如果音乐正在播放，就暂停
+            music.pause();
+            music.currentTime = 0; // 重置音乐播放位置
+            isMusicPlaying = false;
+            musicBtn.innerHTML = '🔈 播放音乐';
+        }
+    } catch (error) {
+        console.error("音乐控制错误：", error);
+        isMusicPlaying = false;
+        musicBtn.innerHTML = '🔈 播放音乐';
+    }
+}
+
+// 修改 window.onload 函数
+window.onload = function() {
+    const savedMode = localStorage.getItem('dark-mode');
+    if (savedMode === 'enabled') {
+        document.body.classList.add('dark-mode');
+        document.querySelector('.toggle-mode-btn').textContent = '🌞 Light Mode';
+    }
+    toggleItems();
+    
+    // 初始化音乐控制
+    const music = document.getElementById('backgroundMusic');
+    const musicBtn = document.getElementById('musicToggle');
+    music.pause(); // 确保初始状态是暂停的
+    music.currentTime = 0;
+    isMusicPlaying = false;
+    musicBtn.innerHTML = '🔈 播放音乐';
+}
     </script>
 
     <p class="contact-info">🎄 If you have any questions or need to add new products, please contact me (Mark). 🎄</p>
