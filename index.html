@@ -711,6 +711,26 @@ input[type="number"] {
             }
             toggleItems();
         }
+        div.innerHTML = `
+    <input type="checkbox" id="item${product.id}" onchange="saveItem(${product.id}, '${product.name}')">
+    <label for="item${product.id}">${product.name}</label>
+    <div class="quantity-control">
+        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+        <input type="number" id="quantity${product.id}" min="1" value="${defaultQuantity}" onchange="saveQuantity(${product.id})">
+        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+    </div>
+`;
+
+// 在 selectProduct 函数中也要修改相应的 HTML
+div.innerHTML = `
+    <input type="checkbox" id="item${product.id}" checked onchange="saveItem(${product.id}, '${product.name}')">
+    <label for="item${product.id}">${product.name}</label>
+    <div class="quantity-control">
+        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+        <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
+        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+    </div>
+`;
     </script>
 
     <p class="contact-info">🎄 If you have any questions or need to add new products, please contact me (Mark). 🎄</p>
