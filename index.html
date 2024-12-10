@@ -844,33 +844,31 @@ div.innerHTML = `
 // 修改音乐控制相关的代码
 let isMusicPlaying = false;
 
+// 修改音乐控制函数
 function toggleMusic() {
     const music = document.getElementById('backgroundMusic');
     const musicBtn = document.getElementById('musicToggle');
     
-    try {
-        if (music.paused) {
-            // 如果音乐是暂停状态，尝试播放
-            music.play().then(() => {
+    if (!music.paused) {
+        // 如果音乐正在播放，就暂停
+        music.pause();
+        music.currentTime = 0;
+        isMusicPlaying = false;
+        musicBtn.innerHTML = '🔈 播放音乐';
+    } else {
+        // 如果音乐是暂停状态，尝试播放
+        const playPromise = music.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
                 isMusicPlaying = true;
                 musicBtn.innerHTML = '🔇 关闭音乐';
-            }).catch((error) => {
+            }).catch(error => {
                 console.log("播放失败：", error);
                 isMusicPlaying = false;
                 musicBtn.innerHTML = '🔈 播放音乐';
-                alert('请点击"播放音乐"按钮来开始播放');
             });
-        } else {
-            // 如果音乐正在播放，就暂停
-            music.pause();
-            music.currentTime = 0;
-            isMusicPlaying = false;
-            musicBtn.innerHTML = '🔈 播放音乐';
         }
-    } catch (error) {
-        console.error("音乐控制错误：", error);
-        isMusicPlaying = false;
-        musicBtn.innerHTML = '🔈 播放音乐';
     }
 }
 
@@ -882,21 +880,28 @@ window.onload = function() {
         document.querySelector('.toggle-mode-btn').textContent = '🌞 Light Mode';
     }
     toggleItems();
-    
-    // 初始化音乐控制
+
+    // 添加一个自动播放的尝试
     const music = document.getElementById('backgroundMusic');
     const musicBtn = document.getElementById('musicToggle');
     
-    // 不再尝试自动播放，而是等待用户交互
-    music.pause();
-    music.currentTime = 0;
-    isMusicPlaying = false;
-    musicBtn.innerHTML = '🔈 播放音乐';
-    
-    // 可以添加一个提示
-    setTimeout(() => {
-        alert('点击"播放音乐"按钮来播放背景音乐');
-    }, 1000);
+    // 尝试自动播放
+    document.addEventListener('click', function initAudioAutoplay() {
+        const playPromise = music.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                isMusicPlaying = true;
+                musicBtn.innerHTML = '🔇 关闭音乐';
+                // 移除事件监听器，因为我们只需要它执行一次
+                document.removeEventListener('click', initAudioAutoplay);
+            }).catch(error => {
+                console.log("自动播放失败：", error);
+                isMusicPlaying = false;
+                musicBtn.innerHTML = '🔈 播放音乐';
+            });
+        }
+    }, { once: true }); // 使用 once 选项确保事件监听器只执行一次
 }
     </script>
 
