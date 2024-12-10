@@ -5,6 +5,69 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Airport Stock Request</title>
 		<style>
+       
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.loader {
+    position: relative;
+    display: flex;
+}
+
+.loader span {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    background: #eaeef0;
+    margin: 0 5px;
+    border: 5px solid #eaeef0;
+    border-radius: 50%;
+    box-shadow: -8px -8px 15px rgba(255, 255, 255, 1),
+                8px 8px 15px rgba(0, 0, 0, 0.2),
+                inset 3px 3px 5px rgba(0, 0, 0, 0.1),
+                inset -1px -1px 5px rgba(255, 255, 255, 1);
+}
+
+.loader span::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #5c89ff;
+    border-radius: 50%;
+    box-shadow: inset 3px 3px 5px rgba(0, 0, 0, 0.1),
+                inset -1px -1px 5px rgba(255, 255, 255, 1);
+    transform: scale(0);
+    animation: animateDots 3.5s linear infinite, animateColor 5s linear infinite;
+    animation-delay: calc(var(--i) * 0.2s);
+}
+
+@keyframes animateDots {
+    0%, 9.99%, 70.001%
+    {
+        transform: scale(0);
+    }
+    10%, 70%
+    {
+        transform: scale(1);
+    }
+}
+
+@keyframes animateColor {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+    100% {
+        filter: hue-rotate(360deg);
+    }
+}
 						        body {
 						            font-family: Arial, sans-serif;
 						            padding: 15px;
@@ -99,10 +162,10 @@
 						}
 
 						        h1 {
-						            font-size: 2.5rem;
+						            font-size: 4rem;
 						            font-weight: bold;
 						            text-align: center;
-						            margin-bottom: 110px;
+						         
 						        }
 
 						        #result {
@@ -190,7 +253,7 @@
 						            border: none;
 						            border-radius: 50%; /* 圆形按钮 */
 						            cursor: pointer;
-						            font-size: 1.2rem;
+						            font-size: 2rem;
 						            display: inline-flex;
 						            justify-content: center;
 						            align-items: center;
@@ -224,54 +287,29 @@
 			                    input[type="number"] {
 			    width: 40px; /* 你可以根据需要调整为任何合适的大小 */
 			    padding: 5px; /* 调整内边距以使输入框看起来更舒适 */
-			    margin-left: 10px; /* 留出与其他元素的间距 */
-			    text-align: right; /* 保持数字靠右对齐 */
+			    margin-left: 10px;
+                margin-right: 10px;/* 留出与其他元素的间距 */
+			    text-align: middle; /* 保持数字靠右对齐 */
 			   }
-
-
-.header-bg {
-  background-color: rgba(256, 256, 256, 0.8);
-  border-radius: 44% 56% 53% 47% / 56% 37% 63% 44%;
-  width: 300px;
-  height: 266px;
-  margin: 40px auto 20px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  animation: border-move 10s linear infinite forwards;
-  filter: drop-shadow(0 0 1rem white);
-}
-
-.header {
-  font-size: 40px;
-  color: #222;
-  align-self: center;
-  text-transform: uppercase;
-}
-
-@keyframes border-move{
-  0%{ border-radius:44% 56% 53% 47% / 56% 37% 63% 44%; }
-  10%{ border-radius:55% 45% 66% 34% / 60% 53% 47% 40%; }
-  20%{ border-radius:53% 47% 56% 47% / 53% 56% 44% 47%; }
-  30%{ border-radius:60% 40% 50% 50% / 44% 50% 50% 56%; }
-  40%{ border-radius:52% 48% 40% 60% / 52% 59% 41% 48% ; }
-  50%{ border-radius:58% 42% 41% 59% / 43% 72% 28% 57% ; }
-  60%{ border-radius:63% 34% 41% 66% / 58% 55% 45% 42% ; }
-  70%{ border-radius:66% 37% 34% 59% / 70% 39% 61% 30% ; }
-  80%{ border-radius:57% 43% 59% 41% / 53% 55% 45% 47%;}
-  90%{ border-radius:43% 57% 61% 39% / 62% 38% 62% 38% ; }
-  100%{ border-radius:44% 56% 53% 47% / 56% 37% 63% 44%; }
-}
-               
 		</style>
 	</head>
 	<body>
 		<!-- 模式切换按钮 -->
 		<button class="toggle-mode-btn" onclick="toggleDarkMode()">切换至黑暗模式</button>
-        
 
-		<div class="header-bg">
-  <div class="header">Stock Order</div>
+		<h1>Stock Order</h1>
+        <div class="container">
+  <div class="loader">
+    <span style="--i:0;"></span>
+    <span style="--i:1;"></span>
+    <span style="--i:2;"></span>
+    <span style="--i:3;"></span>
+    <span style="--i:4;"></span>
+  </div>
+</div>
+<div>
+    <input type="checkbox" id="addOnCheckbox" />
+    <label for="addOnCheckbox">Add On</label>
 </div>
 
 		<h3>选择店铺</h3>
@@ -307,79 +345,86 @@
 			        // 分类商品
 			        const categories = {
 			            BanHeang: [
-			                { id: 1, name: "Tambun Original" },
-			                { id: 2, name: "Tambun Pandan" },
-			                { id: 3, name: "Tambun White Lotus" },
-			                { id: 4, name: "Tau Sar Pheah" },
-			                { id: 5, name: "Heong Pheah" },
-			                { id: 6, name: "Beh Teh Saw" },
-			                { id: 7, name: "Phong Pheah" },
-			                { id: 8, name: "Pepper Biscuit" },
-			                { id: 9, name: "Hup Toh Soh" },
-			                { id: 10, name: "Omlette Crisp Chocolate" },
-			                { id: 11, name: "Omlette Crisp Pandan" },
-			                { id: 12, name: "Kai Chai Biscuit" },
-			                { id: 13, name: "Almond Slice" },
-			                { id: 14, name: "Almond Slice Salted Egg" },
-			                { id: 15, name: "Durian Crisp" },
-			                { id: 16, name: "Coconut Crisp" },
-			                { id: 17, name: "Salted Fish Crisp" },
-			                { id: 18, name: "Salted Egg Crisp" },
-			                { id: 19, name: "Cheese Crisp" },
-			                { id: 20, name: "Chic Kut Teh" },
-			                { id: 21, name: "Ginger Slice" },
-			                { id: 26, name: "Dried Mango" },
-			                { id: 27, name: "Kacang Tumbuk" },
-			                { id: 28, name: "Gula Kacang" },
-			                { id: 29, name: "Black Sesame Peanut" },
-			                { id: 30, name: "Shat Kek Ma" },
-			                { id: 31, name: "Shat Kek Ma (Brown Sugar)" },
-			                { id: 32, name: "Coconut Biscuits" },
-			                { id: 33, name: "BH Freeze Dried Durian" },
-			                { id: 34, name: "BH Freeze Dried Mango" },
-			                { id: 36, name: "Butter Cookies" },
-			                { id: 37, name: "Chocolate Cookies" },
-			                { id: 38, name: "Raisin Cookies" },
-			                { id: 39, name: "Almond Cookies" },
-			                { id: 40, name: "Pineapple Tart" },
-			                { id: 41, name: "Red Bean Mochi" },
-			                { id: 42, name: "Peanut Mochi" },
-			                { id: 43, name: "Green Tea Mochi" },
-			                { id: 44, name: "Durian Mochi" },
-			                { id: 45, name: "Yam Mochi" },
-			                { id: 46, name: "Mochi Milk Yam Filling" },
-			                { id: 47, name: "Mochi Milk Mango Filling" },
-			                { id: 48, name: "Mochi Milk Green Tea" },
-			                { id: 52, name: "Fillet Cracker With Anchovy" },
-			                { id: 53, name: "Fillet Cracker With Seaweed" },
-			                { id: 54, name: "Sakura Shrimp" },
-			                { id: 60, name: "Frugurt Yogurt Blueberry" },
-			                { id: 61, name: "Frugurt Yogurt Peach" },
-			                { id: 62, name: "Frugurt Yogurt Mango" },
-			                { id: 63, name: "Durian Pudding" },
-			                { id: 64, name: "Coconut Pudding" },
+			                { id: 1, name: "BH Tambun Original" },
+			                { id: 2, name: "BH Tambun Pandan" },
+			                { id: 3, name: "BH Tambun White Lotus" },
+			                { id: 4, name: "BH Tau Sar Pheah" },
+			                { id: 5, name: "BH Heong Pheah" },
+			                { id: 6, name: "BH Beh Teh Saw" },
+			                { id: 7, name: "BH Phong Pheah" },
+			                { id: 8, name: "BH Pepper Biscuit" },
+			                { id: 9, name: "BH Hup Toh Soh" },
+			                { id: 10, name: "BH Omlette Crisp Chocolate" },
+			                { id: 11, name: "BH Omlette Crisp Pandan" },
+			                { id: 12, name: "BH Kai Chai Biscuit" },
+			                { id: 13, name: "BH Almond Slice" },
+			                { id: 14, name: "BH Almond Slice Salted Egg" },
+			                { id: 15, name: "BH Durian Crisp" },
+			                { id: 16, name: "BH Coconut Crisp" },
+			                { id: 17, name: "BH Salted Fish Crisp" },
+			                { id: 18, name: "BH Salted Egg Crisp" },
+			                { id: 19, name: "BH Cheese Crisp" },
+			                { id: 20, name: "BH Chic Kut Teh" },
+			                { id: 21, name: "BH Ginger Slice" },
+			                { id: 26, name: "BH Dried Mango" },
+			                { id: 27, name: "BH Kacang Tumbuk" },
+			                { id: 28, name: "BH Gula Kacang" },
+			                { id: 29, name: "BH Black Sesame Peanut" },
+			                { id: 30, name: "BH Shat Kek Ma" },
+			                { id: 31, name: "BH Shat Kek Ma (Brown Sugar)" },
+			                { id: 32, name: "BH Coconut Biscuits" },
+			                { id: 33, name: "BH FD Durian 50g" },
+			                { id: 34, name: "BH FD Mango 50g" },
+                            { id: 129, name: "BH FD Durian 30g" },
+			                { id: 36, name: "BH Butter Cookies" },
+			                { id: 37, name: "BH Chocolate Cookies" },
+			                { id: 38, name: "BH Raisin Cookies" },
+			                { id: 39, name: "BH Almond Cookies" },
+			                { id: 40, name: "BH Pineapple Tart" },
+			                { id: 41, name: "BH Red Bean Mochi" },
+			                { id: 42, name: "BH Peanut Mochi" },
+			                { id: 43, name: "BH Green Tea Mochi" },
+			                { id: 44, name: "BH Durian Mochi" },
+			                { id: 45, name: "BH Yam Mochi" },
+			                { id: 46, name: "BH Mochi Milk Yam Filling" },
+			                { id: 47, name: "BH Mochi Milk Mango Filling" },
+			                { id: 48, name: "BH Mochi Milk Green Tea" },
+			                { id: 52, name: "BH Fillet Cracker With Anchovy" },
+			                { id: 53, name: "BH Fillet Cracker With Seaweed" },
+			                { id: 54, name: "BH Sakura Shrimp" },
+			                { id: 60, name: "BH Frugurt Yogurt Blueberry" },
+			                { id: 61, name: "BH Frugurt Yogurt Peach" },
+			                { id: 62, name: "BH Frugurt Yogurt Mango" },
+			                { id: 63, name: "BH Durian Pudding" },
+			                { id: 64, name: "BH Coconut Pudding" },
 			                { id: 65, name: "BH Dodol Durian" },
 			                { id: 66, name: "BH Dodol Coconut" },
 			                { id: 67, name: "BH Dodol Pandan" },
-			                { id: 68, name: "Durian Beh Teh Saw" },
+			                { id: 68, name: "BH Durian Beh Teh Saw" },
 
 			            ],
 			            HopHup: [
-			                { id: 70, name: "Musang King Tart" },
-			                { id: 71, name: "Mango Tart" },
-			                { id: 72, name: "Durian Wafer Roll" },
-			                { id: 73, name: "Omelette Durian" },
+			                { id: 70, name: "HT Durian Tart" },
+			                { id: 71, name: "HT Mango Tart" },
+			                { id: 72, name: "HT Durian Wafer Roll" },
+                            { id: 130, name: "HT Mango Wafer Roll🆕" },
+			                { id: 73, name: "HT Omelette Durian" },
 			                { id: 76, name: "HT Coconut Ori Cookies" },
 			                { id: 77, name: "HT Coconut Pandan Cookies" },
+                            { id: 135, name: "HT Dodol Original🆕" },
 			                { id: 78, name: "HT Dodol Kopi" },
-			                { id: 79, name: "HT Dodol Durian" },
+			                { id: 135, name: "HT Dodol Durian" },
 			                { id: 80, name: "HT Freeze Dried Mango" },
 			                { id: 81, name: "HT Freeze Dried Durian" },
 			                { id: 82, name: "Salted Egg Fish Skin" },
 			                { id: 83, name: "Salted Egg Fish Skin Spicy" },
 			                { id: 84, name: "Salted Egg Salmon Skin" },
 			                { id: 94, name: "Musang King Durian Candy" },
-			                { id: 126, name: "HT Dried Fruit Mango " }
+			                { id: 126, name: "HT Durian Cookies🆕" },
+                            { id: 131, name: "Fish Chips Classic🆕" },
+                            { id: 132, name: "Salted Egg Fish Chips🆕" },
+                            { id: 133, name: "Salted Egg Fish Chips Mala🆕" },
+                            
 			            ],
 			           Chocolate: [
 			    { id: 108, name: "AD Chocolate Durian", unit: 'pc', defaultQuantity: 50 },
@@ -537,31 +582,90 @@
 			        }
 
 			function generateText() {
-			    let result = '';
-			    let selectedStore = document.querySelector('input[name="store"]:checked');
-			    if (selectedStore) {
-			        result += 'Kedai: ' + selectedStore.value + '\n\n';
-			    } else {
-			        result += 'Kedai: 未选择\n';
-			    }
+    let result = '';
+    let selectedStore = document.querySelector('input[name="store"]:checked');
+    let hasAddOn = document.getElementById('addOnCheckbox').checked;
 
-			    // 遍历所有已选择的产品
-			    for (const [id, quantity] of Object.entries(selectedItems)) {
-			        const product = Object.values(categories).flat().find(p => p.id == id);
-			        if (product) {
-			            const unit = product.unit === 'pc' ? 'pc' : 'ctn';
-			            result += product.name + ' - ' + quantity + ' ' + unit + '\n';
-			        }
-			    }
+    // 添加店铺信息
+    if (selectedStore) {
+        result += '🏪 Kedai: ' + selectedStore.value;
+        if (hasAddOn) {
+            result += ' 💥Add On💥';
+        }
+        result += '\n\n';
+    } else {
+        result += '🏪 Kedai: 未选择\n';
+    }
 
-			    result += '\nAirport Stock Order: smartprofits.github.io/order/';
-			    document.getElementById('result').innerText = result;
+    // 按分类整理已选商品
+    const categorizedItems = {};
+    Object.keys(categories).forEach(category => {
+        categorizedItems[category] = [];
+    });
 
-			    // 清空商品列表
-			    document.getElementById('productList').innerHTML = '';
+    // 找出最长的商品名称长度，用于对齐
+    let maxLength = 0;
+    for (const [id, quantity] of Object.entries(selectedItems)) {
+        for (const [category, products] of Object.entries(categories)) {
+            const product = products.find(p => p.id == id);
+            if (product) {
+                maxLength = Math.max(maxLength, product.name.length);
+                break;
+            }
+        }
+    }
 
-			    return result;
-			}
+    // 将选中的商品按分类整理
+    for (const [id, quantity] of Object.entries(selectedItems)) {
+        for (const [category, products] of Object.entries(categories)) {
+            const product = products.find(p => p.id == id);
+            if (product) {
+                const unit = product.unit === 'pc' ? 'pc' : 'ctn';
+                categorizedItems[category].push({
+                    name: product.name,
+                    quantity: quantity,
+                    unit: unit
+                });
+                break;
+            }
+        }
+    }
+
+    // 按分类输出商品
+    for (const [category, items] of Object.entries(categorizedItems)) {
+        if (items.length > 0) {
+            // 使用表情符号来标识不同分类
+            const categoryEmoji = getCategoryEmoji(category);
+            result += `\n${categoryEmoji} ${category} ${categoryEmoji}\n`;
+            result += `${'─'.repeat(20)}\n`; // 分隔线
+
+            items.forEach(item => {
+                // 使用空格补齐商品名称，使数量对齐
+                const paddedName = item.name.padEnd(maxLength + 2, ' ');
+                result += `📦 ${paddedName}${item.quantity} ${item.unit}\n`;
+            });
+        }
+    }
+
+    result += '\n🔗 Airport Stock Order:\n    smartprofits.github.io/order/';
+    document.getElementById('result').innerText = result;
+    document.getElementById('productList').innerHTML = '';
+    return result;
+}
+
+// 为不同分类添加相应的表情符号
+function getCategoryEmoji(category) {
+    const emojiMap = {
+        'BanHeang': '🍪',
+        'HopHup': '🥮',
+        'Chocolate': '🍫',
+        'Sotong': '🦑',
+        'Coffee': '☕',
+        'Amplang': '🐟',
+        'Other': '🎁'
+    };
+    return emojiMap[category] || '📦';
+}
 
 
 
@@ -663,8 +767,6 @@
 			}
 
 
-
-			        // 其他代码省略...
 		</script>
 
 		<p class="contact-info">If you have any questions or need to add new products, please contact me (Mark).</p>
