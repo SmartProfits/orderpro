@@ -842,7 +842,7 @@ div.innerHTML = `
 
 // 修改音乐控制相关的代码
 // 修改音乐控制相关的代码
-let isMusicPlaying = false; // 初始状态设为 false
+let isMusicPlaying = false;
 
 function toggleMusic() {
     const music = document.getElementById('backgroundMusic');
@@ -850,7 +850,7 @@ function toggleMusic() {
     
     try {
         if (music.paused) {
-            // 如果音乐是暂停状态，就播放
+            // 如果音乐是暂停状态，尝试播放
             music.play().then(() => {
                 isMusicPlaying = true;
                 musicBtn.innerHTML = '🔇 关闭音乐';
@@ -858,11 +858,12 @@ function toggleMusic() {
                 console.log("播放失败：", error);
                 isMusicPlaying = false;
                 musicBtn.innerHTML = '🔈 播放音乐';
+                alert('请点击"播放音乐"按钮来开始播放');
             });
         } else {
             // 如果音乐正在播放，就暂停
             music.pause();
-            music.currentTime = 0; // 重置音乐播放位置
+            music.currentTime = 0;
             isMusicPlaying = false;
             musicBtn.innerHTML = '🔈 播放音乐';
         }
@@ -885,10 +886,17 @@ window.onload = function() {
     // 初始化音乐控制
     const music = document.getElementById('backgroundMusic');
     const musicBtn = document.getElementById('musicToggle');
-    music.pause(); // 确保初始状态是暂停的
+    
+    // 不再尝试自动播放，而是等待用户交互
+    music.pause();
     music.currentTime = 0;
     isMusicPlaying = false;
     musicBtn.innerHTML = '🔈 播放音乐';
+    
+    // 可以添加一个提示
+    setTimeout(() => {
+        alert('点击"播放音乐"按钮来播放背景音乐');
+    }, 1000);
 }
     </script>
 
