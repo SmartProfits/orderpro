@@ -221,7 +221,54 @@
             border: 1px solid var(--christmas-gold);
         }
 
-        .quantity-control {
+       .quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#productList div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.quantity-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--christmas-red);
+    color: var(--snow-white);
+    border: 1px solid var(--christmas-gold);
+    padding: 0;
+    line-height: 1;
+}
+
+input[type="number"] {
+    width: 50px;
+    height: 30px;
+    text-align: center;
+    margin: 0 5px;
+    padding: 0 5px;
+    border: 1px solid var(--christmas-gold);
+    border-radius: 4px;
+}
+
+/* 确保复选框和标签的对齐 */
+#productList input[type="checkbox"] {
+    margin: 0;
+    vertical-align: middle;
+}
+
+#productList label {
+    margin-right: auto;
     display: flex;
     align-items: center;
     gap: 5px;
@@ -712,6 +759,27 @@ input[type="number"] {
             toggleItems();
         }
         div.innerHTML = `
+    <input type="checkbox" id="item${product.id}" onchange="saveItem(${product.id}, '${product.name}')">
+    <label for="item${product.id}">${product.name}</label>
+    <div class="quantity-control">
+        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+        <input type="number" id="quantity${product.id}" min="1" value="${defaultQuantity}" onchange="saveQuantity(${product.id})">
+        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+    </div>
+`;
+
+// 在 selectProduct 函数中也要修改相应的 HTML
+div.innerHTML = `
+    <input type="checkbox" id="item${product.id}" checked onchange="saveItem(${product.id}, '${product.name}')">
+    <label for="item${product.id}">${product.name}</label>
+    <div class="quantity-control">
+        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+        <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
+        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+    </div>
+    
+`;
+div.innerHTML = `
     <input type="checkbox" id="item${product.id}" onchange="saveItem(${product.id}, '${product.name}')">
     <label for="item${product.id}">${product.name}</label>
     <div class="quantity-control">
