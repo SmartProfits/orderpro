@@ -23,6 +23,7 @@
         pointer-events: none;
         animation: fall linear infinite;
     }
+    
 
     /* 为每个雪花设置不同的动画持续时间和延迟 */
     .snowflake:nth-child(1) { left: 10%; animation-duration: 10s; animation-delay: -1s; }
@@ -334,6 +335,7 @@ input[type="number"] {
     </style>
 </head>
 <body>
+
     <!-- 添加雪花效果 -->
 <div class="snowflakes" aria-hidden="true">
     <div class="snowflake">❅</div>
@@ -365,7 +367,13 @@ input[type="number"] {
     <!-- 模式切换按钮 -->
     <button class="toggle-mode-btn" onclick="toggleDarkMode()">切换至黑暗模式</button>
 
-    <h1>🎄 Stock Order 🎄</h1>
+
+    <h1>🎄Stock Order🎄</h1>
+    <audio controls>
+    <source src="https://github.com/SmartProfits/orderpro/blob/main/1.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+    
     
     <div class="container">
         <div class="loader">
