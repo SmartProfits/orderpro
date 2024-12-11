@@ -1,6 +1,4 @@
-        <script>
-        // 分类商品
-			        const categories = {
+ const categories = {
     BanHeang: [
         { id: 101, name: "BH Tambun Original" },
         { id: 102, name: "BH Tambun Pandan" },
@@ -444,4 +442,3 @@ window.onload = function() {
         }
     }, { once: true }); // 使用 once 选项确保事件监听器只执行一次
 }
-    </script>
