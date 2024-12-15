@@ -467,7 +467,7 @@ function loadQuantitiesFromSheet() {
                     const stock = stockMap[productName];
                     if (stock !== undefined) {
                         // 在商品名称后添加库存数量
-                        label.innerHTML = `${productName} <span style="color: #666; font-size: 0.7em;">(Stock: ${stock})</span>`;
+                        label.innerHTML = `${productName} <span style="color: #666; font-size: 1em;">(Stock:${stock})</span>`;
                     }
                 });
             } catch (error) {
