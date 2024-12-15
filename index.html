@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Airport Stock Request</title>
@@ -435,153 +436,192 @@ input[type="number"] {
 
     <div id="result"></div>
         <script>
+         const SHEET_ID = '你的表格ID';
+const SHEET_NAME = 'Sheet1'; // 如果你的表格页面名称不是 Sheet1，请修改这里
+
+function loadQuantitiesFromSheet() {
+    const SHEET_ID = '1QUB8R0-gtwNhdiPYU2rwFf_UKrGyyqCQHzIQ7AxKFLI';
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+    
+    fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            try {
+                const jsonData = JSON.parse(data.substr(47).slice(0, -2));
+                const rows = jsonData.table.rows;
+                
+                // 创建一个映射来存储商品名称和库存数量
+                const stockMap = {};
+                rows.forEach(row => {
+                    if(row.c[0] && row.c[1]) {
+                        const productName = row.c[0].v;
+                        const stockQuantity = row.c[1].v;
+                        stockMap[productName] = stockQuantity;
+                    }
+                });
+
+                // 更新所有商品标签显示库存数量
+                const labels = document.querySelectorAll('#productList label');
+                labels.forEach(label => {
+                    const productName = label.textContent;
+                    const stock = stockMap[productName];
+                    if (stock !== undefined) {
+                        // 在商品名称后添加库存数量
+                        label.innerHTML = `${productName} <span style="color: #666; font-size: 0.9em;">(Stock: ${stock})</span>`;
+                    }
+                });
+            } catch (error) {
+                console.error('解析数据错误:', error);
+            }
+        })
+        .catch(error => console.error('获取数据失败:', error));
+}
         // 分类商品
-       const categories = {
-			            BanHeang: [
-			                { id: 1, name: "BH Tambun Original" },
-			                { id: 2, name: "BH Tambun Pandan" },
-			                { id: 3, name: "BH Tambun White Lotus" },
-			                { id: 4, name: "BH Tau Sar Pheah" },
-			                { id: 5, name: "BH Heong Pheah" },
-			                { id: 6, name: "BH Beh Teh Saw" },
-			                { id: 7, name: "BH Phong Pheah" },
-			                { id: 8, name: "BH Pepper Biscuit" },
-			                { id: 9, name: "BH Hup Toh Soh" },
-			                { id: 10, name: "BH Omlette Crisp Chocolate" },
-			                { id: 11, name: "BH Omlette Crisp Pandan" },
-			                { id: 12, name: "BH Kai Chai Biscuit" },
-			                { id: 13, name: "BH Almond Slice" },
-			                { id: 14, name: "BH Almond Slice Salted Egg" },
-			                { id: 15, name: "BH Durian Crisp" },
-			                { id: 16, name: "BH Coconut Crisp" },
-			                { id: 17, name: "BH Salted Fish Crisp" },
-			                { id: 18, name: "BH Salted Egg Crisp" },
-			                { id: 19, name: "BH Cheese Crisp" },
-			                { id: 20, name: "BH Chic Kut Teh" },
-			                { id: 21, name: "BH Ginger Slice" },
-			                { id: 26, name: "BH Dried Mango" },
-			                { id: 27, name: "BH Kacang Tumbuk" },
-			                { id: 28, name: "BH Gula Kacang" },
-			                { id: 29, name: "BH Black Sesame Peanut" },
-			                { id: 30, name: "BH Shat Kek Ma" },
-			                { id: 31, name: "BH Shat Kek Ma (Brown Sugar)" },
-			                { id: 32, name: "BH Coconut Biscuits" },
-			                { id: 33, name: "BH FD Durian 50g" },
-			                { id: 34, name: "BH FD Mango 50g" },
-                            { id: 129, name: "BH FD Durian 30g" },
-			                { id: 36, name: "BH Butter Cookies" },
-			                { id: 37, name: "BH Chocolate Cookies" },
-			                { id: 38, name: "BH Raisin Cookies" },
-			                { id: 39, name: "BH Almond Cookies" },
-			                { id: 40, name: "BH Pineapple Tart" },
-			                { id: 41, name: "BH Red Bean Mochi" },
-			                { id: 42, name: "BH Peanut Mochi" },
-			                { id: 43, name: "BH Green Tea Mochi" },
-			                { id: 44, name: "BH Durian Mochi" },
-			                { id: 45, name: "BH Yam Mochi" },
-			                { id: 46, name: "BH Mochi Milk Yam Filling" },
-			                { id: 47, name: "BH Mochi Milk Mango Filling" },
-			                { id: 48, name: "BH Mochi Milk Green Tea" },
-			                { id: 52, name: "BH Fillet Cracker With Anchovy" },
-			                { id: 53, name: "BH Fillet Cracker With Seaweed" },
-			                { id: 54, name: "BH Sakura Shrimp" },
-			                { id: 60, name: "BH Frugurt Yogurt Blueberry" },
-			                { id: 61, name: "BH Frugurt Yogurt Peach" },
-			                { id: 62, name: "BH Frugurt Yogurt Mango" },
-			                { id: 63, name: "BH Durian Pudding" },
-			                { id: 64, name: "BH Coconut Pudding" },
-			                { id: 65, name: "BH Dodol Durian" },
-			                { id: 66, name: "BH Dodol Coconut" },
-			                { id: 67, name: "BH Dodol Pandan" },
-			                { id: 68, name: "BH Durian Beh Teh Saw" },
+			        const categories = {
+    BanHeang: [
+        { id: 101, name: "BH Tambun Original" },
+        { id: 102, name: "BH Tambun Pandan" },
+        { id: 103, name: "BH Tambun White Lotus" },
+        { id: 104, name: "BH Tau Sar Pheah" },
+        { id: 105, name: "BH Heong Pheah" },
+        { id: 106, name: "BH Beh Teh Saw" },
+        { id: 107, name: "BH Phong Pheah" },
+        { id: 108, name: "BH Pepper Biscuit" },
+        { id: 109, name: "BH Hup Toh Soh" },
+        { id: 110, name: "BH Omlette Crisp Chocolate" },
+        { id: 111, name: "BH Omlette Crisp Pandan" },
+        { id: 112, name: "BH Kai Chai Biscuit" },
+        { id: 113, name: "BH Almond Slice" },
+        { id: 114, name: "BH Almond Slice Salted Egg" },
+        { id: 115, name: "BH Durian Crisp" },
+        { id: 116, name: "BH Coconut Crisp" },
+        { id: 117, name: "BH Salted Fish Crisp" },
+        { id: 118, name: "BH Salted Egg Crisp" },
+        { id: 119, name: "BH Cheese Crisp" },
+        { id: 120, name: "BH Chic Kut Teh" },
+        { id: 121, name: "BH Ginger Slice" },
+        { id: 122, name: "BH Dried Mango" },
+        { id: 123, name: "BH Kacang Tumbuk" },
+        { id: 124, name: "BH Gula Kacang" },
+        { id: 125, name: "BH Black Sesame Peanut" },
+        { id: 126, name: "BH Shat Kek Ma" },
+        { id: 127, name: "BH Shat Kek Ma (Brown Sugar)" },
+        { id: 128, name: "BH Coconut Biscuits" },
+        { id: 129, name: "BH FD Durian 50g" },
+        { id: 130, name: "BH FD Mango 50g" },
+        { id: 131, name: "BH FD Durian 30g" },
+        { id: 132, name: "BH Butter Cookies" },
+        { id: 133, name: "BH Chocolate Cookies" },
+        { id: 134, name: "BH Raisin Cookies" },
+        { id: 135, name: "BH Almond Cookies" },
+        { id: 136, name: "BH Pineapple Tart" },
+        { id: 137, name: "BH Red Bean Mochi" },
+        { id: 138, name: "BH Peanut Mochi" },
+        { id: 139, name: "BH Green Tea Mochi" },
+        { id: 140, name: "BH Durian Mochi" },
+        { id: 141, name: "BH Yam Mochi" },
+        { id: 142, name: "BH Mochi Milk Yam Filling" },
+        { id: 143, name: "BH Mochi Milk Mango Filling" },
+        { id: 144, name: "BH Mochi Milk Green Tea" },
+        { id: 145, name: "BH Sotong Cuttlefish" },
+        { id: 146, name: "BH Gula Cuttlefish" },
+        { id: 147, name: "BH Satay Fish" },
+        { id: 148, name: "BH Fillet Cracker With Anchovy" },
+        { id: 149, name: "BH Fillet Cracker With Seaweed" },
+        { id: 150, name: "BH Sakura Shrimp" },
+        { id: 151, name: "BH Frugurt Yogurt Blueberry" },
+        { id: 152, name: "BH Frugurt Yogurt Peach" },
+        { id: 153, name: "BH Frugurt Yogurt Mango" },
+        { id: 154, name: "BH Durian Pudding" },
+        { id: 155, name: "BH Coconut Pudding" },
+        { id: 156, name: "BH Dodol Durian" },
+        { id: 157, name: "BH Dodol Coconut" },
+        { id: 158, name: "BH Dodol Pandan" },
+        { id: 159, name: "BH Durian Beh Teh Saw" }
+    ],
+    HopHup: [
+        { id: 201, name: "HT Durian Tart" },
+        { id: 202, name: "HT Mango Tart" },
+        { id: 203, name: "HT Durian Wafer Roll" },
+        { id: 204, name: "HT Mango Wafer Roll🆕" },
+        { id: 205, name: "HT Omelette Durian" },
+        { id: 206, name: "HT Coconut Ori Cookies" },
+        { id: 207, name: "HT Coconut Pandan Cookies" },
+        { id: 208, name: "HT Dodol Original🆕" },
+        { id: 209, name: "HT Dodol Kopi" },
+        { id: 210, name: "HT Dodol Durian" },
+        { id: 211, name: "HT Freeze Dried Mango" },
+        { id: 212, name: "HT Freeze Dried Durian" },
+        { id: 213, name: "Salted Egg Fish Skin" },
+        { id: 214, name: "Salted Egg Fish Skin Spicy" },
+        { id: 215, name: "Salted Egg Salmon Skin" },
+        { id: 216, name: "Musang King Durian Candy" },
+        { id: 217, name: "HT Durian Cookies🆕" },
+        { id: 218, name: "Fish Chips Classic🆕" },
+        { id: 219, name: "Salted Egg Fish Chips🆕" },
+        { id: 220, name: "Salted Egg Fish Chips Mala🆕" }
+    ],
+    Chocolate: [
+        { id: 301, name: "AD Chocolate Durian", unit: 'pc', defaultQuantity: 50 },
+        { id: 302, name: "AD Chocolate Sabah Tea", unit: 'pc', defaultQuantity: 50 },
+        { id: 303, name: "AD Chocolate Mango", unit: 'pc', defaultQuantity: 50 },
+        { id: 304, name: "AD Chocolate Chili", unit: 'pc', defaultQuantity: 50 },
+        { id: 305, name: "AD Chocolate Dark", unit: 'pc', defaultQuantity: 50 },
+        { id: 306, name: "AD Chocolate Coffee", unit: 'pc', defaultQuantity: 50 },
+        { id: 307, name: "AD Chocolate Banana", unit: 'pc', defaultQuantity: 50 },
+        { id: 308, name: "AD Chocolate Tiramisu", unit: 'pc', defaultQuantity: 50 },
+        { id: 309, name: "AD Chocolate Mint", unit: 'pc', defaultQuantity: 50 },
+        { id: 310, name: "AD Chocolate Rambutan", unit: 'pc', defaultQuantity: 50 },
+        { id: 311, name: "AD Chocolate Soursup", unit: 'pc', defaultQuantity: 50 },
+        { id: 312, name: "AD Chocolate Coconut", unit: 'pc', defaultQuantity: 50 },
+        { id: 313, name: "AD Chocolate Mangosteen", unit: 'pc', defaultQuantity: 50 }
+    ],
+    Sotong: [
+        { id: 401, name: "Cuttlefish Red" },
+        { id: 402, name: "Cuttlefish Lemon" },
+        { id: 403, name: "Cuttlefish Honey" },
+        { id: 404, name: "Cuttlefish Floss Original" },
+        { id: 405, name: "Cuttlefish Massive" },
+        { id: 406, name: "Cuttlefish Whole" },
+        { id: 407, name: "Cuttlefish Roasted" },
+        { id: 408, name: "Cuttlefish Chili" },
+        { id: 409, name: "Cuttle Fish Slices🆕" },
+        { id: 410, name: "Cuttle Fish Sugar🆕" },
+        { id: 411, name: "Five Star Cuttlefish" }
+    ],
+    Coffee: [
+        { id: 501, name: "BH W/Coffee(Mini)" },
+        { id: 502, name: "BH W/Coffee(Mini)No Sugar" },
+        { id: 503, name: "BH Durian W/Coffee(Mini)" },
+        { id: 504, name: "BH Teh Tarik(Mini)" },
+        { id: 505, name: "BH W/Coffee" },
+        { id: 506, name: "BH W/Coffee No Sugar" },
+        { id: 507, name: "BH Kopi O 2in1" },
+        { id: 508, name: "BH Kopi O No Sugar" },
+        { id: 509, name: "BH Teh Tarik" },
+        { id: 510, name: "BH Durian White Coffee" },
+        { id: 511, name: "Kopi Tenom Silver" },
+        { id: 512, name: "Kopi Tenom Gold" },
+        { id: 513, name: "Kopi Tenom Blue" },
+        { id: 514, name: "Kopi Tenom Green" },
+        { id: 515, name: "Kopi Tenom Red" }
+    ],
+    Amplang: [
+        { id: 601, name: "Amplang Ikan" },
+        { id: 602, name: "Amplang Udang" },
+        { id: 603, name: "Amplang Sotong" }
+    ],
+    Other: [
+        { id: 701, name: "Fruity Gummy Assorted" },
+        { id: 702, name: "Fruity Gummy Mango" },
+        { id: 703, name: "Durian Kuih" },
+        { id: 704, name: "Anchovy Blue" },
+        { id: 705, name: "Anchovy Green" },
+        { id: 706, name: "Anchovy Red" },
+        { id: 707, name: "Anchovy Yellow" }
+    ]
+};
 
-			            ],
-			            HopHup: [
-			                { id: 70, name: "HT Durian Tart" },
-			                { id: 71, name: "HT Mango Tart" },
-			                { id: 72, name: "HT Durian Wafer Roll" },
-                            { id: 130, name: "HT Mango Wafer Roll🆕" },
-			                { id: 73, name: "HT Omelette Durian" },
-			                { id: 76, name: "HT Coconut Ori Cookies" },
-			                { id: 77, name: "HT Coconut Pandan Cookies" },
-                            { id: 135, name: "HT Dodol Original🆕" },
-			                { id: 78, name: "HT Dodol Kopi" },
-			                { id: 135, name: "HT Dodol Durian" },
-			                { id: 80, name: "HT Freeze Dried Mango" },
-			                { id: 81, name: "HT Freeze Dried Durian" },
-			                { id: 82, name: "Salted Egg Fish Skin" },
-			                { id: 83, name: "Salted Egg Fish Skin Spicy" },
-			                { id: 84, name: "Salted Egg Salmon Skin" },
-			                { id: 94, name: "Musang King Durian Candy" },
-			                { id: 126, name: "HT Durian Cookies🆕" },
-                            { id: 131, name: "Fish Chips Classic🆕" },
-                            { id: 132, name: "Salted Egg Fish Chips🆕" },
-                            { id: 133, name: "Salted Egg Fish Chips Mala🆕" },
-                            
-			            ],
-			           Chocolate: [
-			    { id: 108, name: "AD Chocolate Durian", unit: 'pc', defaultQuantity: 50 },
-			    { id: 109, name: "AD Chocolate Sabah Tea", unit: 'pc', defaultQuantity: 50 },
-			    { id: 110, name: "AD Chocolate Mango", unit: 'pc', defaultQuantity: 50 },
-			    { id: 111, name: "AD Chocolate Chili", unit: 'pc', defaultQuantity: 50 },
-			    { id: 112, name: "AD Chocolate Dark", unit: 'pc', defaultQuantity: 50 },
-			    { id: 113, name: "AD Chocolate Coffee", unit: 'pc', defaultQuantity: 50 },
-			    { id: 114, name: "AD Chocolate Banana", unit: 'pc', defaultQuantity: 50 },
-			    { id: 115, name: "AD Chocolate Tiramisu", unit: 'pc', defaultQuantity: 50 },
-			    { id: 116, name: "AD Chocolate Mint", unit: 'pc', defaultQuantity: 50 },
-			    { id: 117, name: "AD Chocolate Rambutan", unit: 'pc', defaultQuantity: 50 },
-			    { id: 118, name: "AD Chocolate Soursup", unit: 'pc', defaultQuantity: 50 },
-			    { id: 127, name: "AD Chocolate Coconut", unit: 'pc', defaultQuantity: 50 },
-			    { id: 128, name: "AD Chocolate Mangosteen", unit: 'pc', defaultQuantity: 50 }
-			],
-
-			            Sotong: [
-			                { id: 85, name: "Cuttlefish Red" },
-			                { id: 86, name: "Cuttlefish Lemon" },
-			                { id: 87, name: "Cuttlefish Honey" },
-			                { id: 88, name: "Cuttlefish Floss Original" },
-			                { id: 89, name: "Cuttlefish Massive" },
-			                { id: 90, name: "Cuttlefish Whole" },
-			                { id: 91, name: "Cuttlefish Roasted" },
-			                { id: 92, name: "Cuttlefish Chili" },
-			                { id: 93, name: "Five Star Cuttlefish" },
-			                { id: 49, name: "BH Sotong Cuttlefish" },
-			                { id: 50, name: "BH Gula Cuttlefish" },
-			                { id: 51, name: "BH Satay Fish" },
-			            ],
-			            Coffee: [
-			                { id: 22, name: "BH W/Coffee(Mini)" },
-			                { id: 23, name: "BH W/Coffee(Mini)No Sugar" },
-			                { id: 25, name: "BH Durian W/Coffee(Mini)" },
-			                { id: 24, name: "BH Teh Tarik(Mini)" },
-			                { id: 55, name: "BH W/Coffee" },
-			                { id: 119, name: "BH W/Coffee No Sugar" },
-			                { id: 56, name: "BH Kopi O 2in1" },
-			                { id: 57, name: "BH Kopi O No Sugar" },
-			                { id: 58, name: "BH Teh Tarik" },
-			                { id: 59, name: "BH Durian White Coffee" },
-			                { id: 99, name: "Kopi Tenom Silver" },
-			                { id: 100, name: "Kopi Tenom Gold" },
-			                { id: 101, name: "Kopi Tenom Blue" },
-			                { id: 102, name: "Kopi Tenom Green" },
-			                { id: 125, name: "Kopi Tenom Red " }
-			            ],
-			            Amplang: [
-			                { id: 96, name: "Amplang Ikan" },
-			                { id: 97, name: "Amplang Udang" },
-			                { id: 98, name: "Amplang Sotong" }
-			            ],
-			            Other: [
-			                { id: 106, name: "Fruity Gummy Assorted" },
-			                { id: 124, name: "Fruity Gummy Mango" },
-			                { id: 69, name: "Durian Kuih" },
-			                { id: 120, name: "Anchovy Blue" },
-			                { id: 121, name: "Anchovy Green" },
-			                { id: 122, name: "Anchovy Red" },
-			                { id: 123, name: "Anchovy Yellow" },
-
-			            ]
-			        };
 
 
         let selectedItems = {};
@@ -880,6 +920,31 @@ window.onload = function() {
             });
         }
     }, { once: true }); // 使用 once 选项确保事件监听器只执行一次
+}
+function loadProducts(products) {
+    const productList = document.getElementById('productList');
+    productList.innerHTML = '';
+
+    products.forEach(product => {
+        const div = document.createElement('div');
+        const isChecked = selectedItems[product.id] ? 'checked' : '';
+        
+        div.innerHTML = `
+            <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
+            <label for="item${product.id}">${product.name}</label>
+            <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+            <input type="number" 
+                   id="quantity${product.id}" 
+                   min="1" 
+                   value="${selectedItems[product.id] || 1}" 
+                   readonly>
+            <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+        `;
+        productList.appendChild(div);
+    });
+
+    // 加载并显示库存数量
+    loadQuantitiesFromSheet();
 }
     </script>
 
