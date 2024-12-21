@@ -118,6 +118,9 @@
   background: var(--clr-three);
 }
 
+.neon-button__4::before {
+  background: var(--clr-four);
+}
 .neon-button::after {
   content: "";
   position: absolute;
@@ -145,6 +148,10 @@
   background-color: var(--clr-three);
 }
 
+.neon-button__4::after {
+  box-shadow: 0 0 2em 0.5em var(--clr-four);
+  background-color: var(--clr-four);
+}
 .neon-button:hover::before,
 .neon-button:focus::before {
   opacity: 1;
@@ -503,13 +510,13 @@
 		<h3>Catogory</h3>
 
 		<div class="category-container">
-			<button class="category-btn" data-value="BanHeang" onclick="selectCategory(this)">BanHeang</button>
-			<button class="category-btn" data-value="HopHup" onclick="selectCategory(this)">HopHup</button>
-			<button class="category-btn" data-value="Chocolate" onclick="selectCategory(this)">Chocolate</button>
-			<button class="category-btn" data-value="Sotong" onclick="selectCategory(this)">Sotong</button>
-			<button class="category-btn" data-value="Coffee" onclick="selectCategory(this)">Coffee</button>
-			<button class="category-btn" data-value="Amplang" onclick="selectCategory(this)">Amplang</button>
-			<button class="category-btn" data-value="Other" onclick="selectCategory(this)">Other</button>
+			<a href="#" class="category-btn neon-button neon-button__4" data-value="BanHeang" onclick="selectCategory(this)">BanHeang</a>
+			<a href="#" class="category-btn neon-button neon-button__4" data-value="HopHup" onclick="selectCategory(this)">HopHup</a>
+			<a href="#" class="category-btn neon-button neon-button__4" data-value="Chocolate" onclick="selectCategory(this)">Chocolate</a>
+			<a href="#" class="category-btn neon-button neon-button__4" data-value="Sotong" onclick="selectCategory(this)">Sotong</a>
+			<a href="#" class="category-btn neon-button neon-button__4" data-value="Coffee" onclick="selectCategory(this)">Coffee</a>
+			<a href="#" class="category-btn neon-button neon-button__4" data-value="Amplang" onclick="selectCategory(this)">Amplang</a>
+			<a href="#" class="category-btn neon-button neon-button__4" data-value="Other" onclick="selectCategory(this)">Other</a>
 		</div>
 
 		<input type="text" id="productSearch" placeholder="Search..." oninput="searchProduct()" autocomplete="off" />
