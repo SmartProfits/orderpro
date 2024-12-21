@@ -3,475 +3,389 @@
 	<head>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 		<title>Airport Stock Request</title>
 		<style>
 
-:root {
-  --clr-one: rgb(255, 20, 147);
-  --clr-two: rgb(127, 255, 0);
-  --clr-three: rgb(138, 43, 226);
-  --clr-bg: #1d1e22;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-}
 
 
+			        :root {
+			            --christmas-red: #c41e3a;
+			            --christmas-green: #165b33;
+			            --christmas-gold: #ffd700;
+			            --snow-white: #fff;
+			        }
 
-.container {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: column;
-  flex-wrap: wrap;
-}
 
-.buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-}
+			      .snowflake {
+			    color: rgba(255, 255, 255, 0.6);
+			    font-size: 1.2em;
+			    font-family: Arial, sans-serif;
+			    text-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+			    position: fixed;
+			    z-index: -1;
+			    pointer-events: none;
+			    animation: fall linear infinite;
+			    will-change: transform;
+			}
 
-.neon-button {
-  font-size: 1rem;
+			@keyframes fall {
+			    0% {
+			        top: -10%;
+			        transform: translateX(0) rotate(0deg);
+			        opacity: 0.8;
+			    }
+			    20% {
+			        transform: translateX(15px) rotate(45deg);
+			        opacity: 0.9;
+			    }
+			    40% {
+			        transform: translateX(-15px) rotate(-45deg);
+			        opacity: 0.8;
+			    }
+			    60% {
+			        transform: translateX(15px) rotate(45deg);
+			        opacity: 0.7;
+			    }
+			    80% {
+			        transform: translateX(-15px) rotate(-45deg);
+			        opacity: 0.6;
+			    }
+			    100% {
+			        top: 110%;
+			        transform: translateX(0) rotate(0deg);
+			        opacity: 0.5;
+			    }
+			}
 
-  display: inline-block;
-  cursor: pointer;
-  text-decoration: none;
-  padding: 0.5em 1em;
-  margin: 2rem;
-  border-radius: 0.25em;
-  position: relative;
-}
+			/* 调整雪花动画时间和延迟，使其更加自然 */
+			.snowflake:nth-child(1) { left: 5%; animation-duration: 15s; animation-delay: -2s; }
+			.snowflake:nth-child(2) { left: 15%; animation-duration: 12s; animation-delay: -1s; }
+			.snowflake:nth-child(3) { left: 25%; animation-duration: 13s; animation-delay: -3s; }
+			.snowflake:nth-child(4) { left: 35%; animation-duration: 14s; animation-delay: -4s; }
+			.snowflake:nth-child(5) { left: 45%; animation-duration: 16s; animation-delay: -5s; }
+			.snowflake:nth-child(6) { left: 55%; animation-duration: 13s; animation-delay: -6s; }
+			.snowflake:nth-child(7) { left: 65%; animation-duration: 15s; animation-delay: -7s; }
+			.snowflake:nth-child(8) { left: 75%; animation-duration: 14s; animation-delay: -2s; }
+			.snowflake:nth-child(9) { left: 85%; animation-duration: 12s; animation-delay: -3s; }
+			.snowflake:nth-child(10) { left: 95%; animation-duration: 13s; animation-delay: -4s; }
 
-.neon-button__1 {
-  color: var(--clr-one);
-  border: var(--clr-one) 0.125em solid;
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em --clr-one;
-  box-shadow: inset 0 0 0.5em 0 var(--clr-one), 0 0 0.5em 0 var(--clr-one);
-}
 
-.neon-button__2 {
-  color: var(--clr-two);
-  border: var(--clr-two) 0.125em solid;
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em --clr-two;
-  box-shadow: inset 0 0 0.5em 0 var(--clr-two), 0 0 0.5em 0 var(--clr-two);
-}
+			/* 减少雪花数量，只保留10个 */
 
-.neon-button__3 {
-  color: var(--clr-three);
-  border: var(--clr-three) 0.125em solid;
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em --clr-three;
-  box-shadow: inset 0 0 0.5em 0 var(--clr-three), 0 0 0.5em 0 var(--clr-three);
-}
 
-.neon-button::before {
-  content: "";
-  position: absolute;
-  top: 120%;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transform: perspective(1.5em) rotateX(45deg) scale(0.8, 0.3);
-  filter: blur(1.5em);
-  opacity: 0.7;
-  pointer-events: none;
-}
+			        body {
+			            font-family: Arial, sans-serif;
+			            padding: 15px;
+			            margin: 0;
+			            background-color: #0a2818;
+			            color: var(--snow-white);
+			            transition: background-color 0.3s, color 0.3s;
+			        }
 
-.neon-button.active::before {
-  animation: scalingShadow 0.5s ease-in-out;
-}
+			        /* 圣诞装饰 */
+			        .christmas-decorations {
+			            position: fixed;
+			            width: 100%;
+			            height: 100%;
+			            pointer-events: none;
+			            z-index: -1;
+			        }
 
-@keyframes scalingShadow {
-  0% {
-    top: 120%;
-    transform: perspective(1.5em) rotateX(45deg) scale(0.8, 0.3);
-  }
-  50% {
-    top: 165%;
-    transform: perspective(1.5em) rotateX(45deg) scale(0.75, 0.3);
-  }
-  100% {
-    top: 120%;
-    transform: perspective(1.5em) rotateX(45deg) scale(0.8, 0.3);
-  }
-}
+			        .christmas-tree {
+			            position: fixed;
+			            bottom: 20px;
+			            right: 20px;
+			            font-size: 40px;
+			            z-index: 1000;
+			        }
 
-.neon-button__1::before {
-  background: var(--clr-one);
-}
 
-.neon-button__2::before {
-  background: var(--clr-two);
-}
 
-.neon-button__3::before {
-  background: var(--clr-three);
-}
+			        .category-container {
+			            display: grid;
+			            grid-template-columns: repeat(3, 1fr);
+			            gap: 10px;
+			            margin-bottom: 20px;
+			        }
 
-.neon-button::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  opacity: 0;
-  z-index: -1;
-  transition: opacity 100ms linear;
-}
+			        #productList div {
+			            display: flex;
+			            justify-content: space-between;
+			            align-items: center;
+			            margin-bottom: 15px;
+			            background: rgba(255, 255, 255, 0.1);
+			            padding: 10px;
+			            border-radius: 8px;
+			            border: 1px solid var(--christmas-gold);
+			        }
 
-.neon-button__1::after {
-  box-shadow: 0 0 2em 0.5em var(--clr-one);
-  background-color: var(--clr-one);
-}
+			        #suggestions {
+			            border: 1px solid var(--christmas-gold);
+			            max-height: 150px;
+			            overflow-y: auto;
+			            background-color: rgba(255, 255, 255, 0.9);
+			            position: absolute;
+			            width: 220px;
+			            z-index: 10;
+			            border-radius: 4px;
+			        }
 
-.neon-button__2::after {
-  box-shadow: 0 0 2em 0.5em var(--clr-two);
-  background-color: var(--clr-two);
-}
+			        #suggestions div {
+			            padding: 8px;
+			            cursor: pointer;
+			            color: var(--christmas-green);
+			        }
 
-.neon-button__3::after {
-  box-shadow: 0 0 2em 0.5em var(--clr-three);
-  background-color: var(--clr-three);
-}
+			        #suggestions div:hover {
+			            background-color: var(--christmas-red);
+			            color: var(--snow-white);
+			        }
 
-.neon-button:hover::before,
-.neon-button:focus::before {
-  opacity: 1;
-}
+			        input[type="number"] {
+			            width: 60px;
+			            margin: 0 10px;
+			            text-align: center;
+			            background: rgba(255, 255, 255, 0.9);
+			            border: 1px solid var(--christmas-gold);
+			            border-radius: 4px;
+			            padding: 5px;
+			        }
 
-.neon-button:hover::after,
-.neon-button:focus::after {
-  opacity: 1;
-}
+			        #productSearch {
+			            width: 210px;
+			            padding: 8px;
+			            font-size: 1.2rem;
+			            border-radius: 5px;
+			            border: 2px solid var(--christmas-gold);
+			            background: rgba(255, 255, 255, 0.9);
+			        }
 
-.neon-button:hover,
-.neon-button:focus {
-  outline: none;
-  color: var(--clr-bg);
-  text-shadow: none;
-}
 
-.active {
-  animation: animate 0.5s ease-in-out;
-}
 
-@keyframes animate {
-  0% {
-    transform: translateY(0%);
-  }
-  50% {
-    transform: translateY(-40%);
-  }
-  100% {
-    transform: translateY(0%);
-  }
-}
+			        h1 {
+			            font-size: 4rem;
+			            font-weight: bold;
+			            text-align: center;
+			            color: var(--christmas-red);
+			            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+			            margin: 20px 0;
+			        }
 
-			.container {
+			        #result {
+			            width: 100%;
+			            height: 150px;
+			            border: 2px solid var(--christmas-gold);
+			            padding: 10px;
+			            margin-top: 10px;
+			            white-space: pre-wrap;
+			            overflow: auto;
+			            font-size: 1.1rem;
+			            background: rgba(255, 255, 255, 0.1);
+			            border-radius: 8px;
+			            color: var(--snow-white);
+			        }
+
+			        button {
+			            padding: 12px 18px;
+			            font-size: 1.1rem;
+			            margin: 10px 0;
+			            cursor: pointer;
+			            width: 100%;
+			            border: none;
+			            border-radius: 8px;
+			            background-color: var(--christmas-red);
+			            color: var(--snow-white);
+			            border: 2px solid var(--christmas-gold);
+			            transition: all 0.3s ease;
+			        }
+
+			        button:hover {
+			            transform: scale(1.02);
+			            background-color: #a01830;
+			        }
+
+			        .whatsapp-button {
+			            background-color: #25D366;
+			        }
+
+
+			        .contact-info {
+			            font-size: 1rem;
+			            font-style: italic;
+			            text-align: center;
+			            background: rgba(255, 255, 255, 0.1);
+			            padding: 15px;
+			            border-radius: 8px;
+			            margin: 20px 0;
+			            border: 1px solid var(--christmas-gold);
+			        }
+
+			       .quantity-control {
+			    display: flex;
+			    align-items: center;
+			    gap: 5px;
+			}
+			.music-toggle-btn {
+			    background-color: var(--christmas-red);
+			    color: var(--snow-white);
+			    padding: 10px 20px;
+			    margin: 10px 0;
+			    cursor: pointer;
+			    border: none;
+			    border-radius: 5px;
+			    font-size: 1rem;
+			    border: 2px solid var(--christmas-gold);
+			    transition: all 0.3s ease;
+			    width: 100%;
+			}
+
+			.music-toggle-btn:hover {
+			    transform: scale(1.02);
+			    background-color: #a01830;
+			}
+
+			#productList div {
+			    display: flex;
+			    align-items: center;
+			    gap: 10px;
+			    margin-bottom: 15px;
+			}
+
+			.quantity-btn {
+			    width: 30px;
+			    height: 30px;
+			    border: none;
+			    border-radius: 50%;
+			    cursor: pointer;
+			    font-size: 1.5rem;
 			    display: flex;
 			    justify-content: center;
 			    align-items: center;
-			    width: 100%;
+			    background-color: var(--christmas-red);
+			    color: var(--snow-white);
+			    border: 1px solid var(--christmas-gold);
+			    padding: 0;
+			    line-height: 1;
 			}
 
-			#productList label span {
-			    margin-left: 8px;
-			    color: #666;
-			    font-size: 0.9em;
-			    font-weight: normal;
-			}
-			.loader {
-			    position: relative;
-			    display: flex;
-			}
-
-			.loader span {
-			    position: relative;
+			input[type="number"] {
 			    width: 50px;
-			    height: 50px;
-			    background: #eaeef0;
+			    height: 30px;
+			    text-align: center;
 			    margin: 0 5px;
-			    border: 5px solid #eaeef0;
+			    padding: 0 5px;
+			    border: 1px solid var(--christmas-gold);
+			    border-radius: 4px;
+			}
+
+			/* 确保复选框和标签的对齐 */
+			#productList input[type="checkbox"] {
+			    margin: 0;
+			    vertical-align: middle;
+			}
+
+			#productList label {
+			    margin-right: auto;
+			    display: flex;
+			    align-items: center;
+			    gap: 5px;
+			}
+
+			#productList div {
+			    display: flex;
+			    align-items: center;
+			    gap: 10px;
+			    margin-bottom: 15px;
+			}
+
+			.quantity-btn {
+			    width: 30px;
+			    height: 30px;
+			    border: none;
 			    border-radius: 50%;
-			    box-shadow: -8px -8px 15px rgba(255, 255, 255, 1),
-			                8px 8px 15px rgba(0, 0, 0, 0.2),
-			                inset 3px 3px 5px rgba(0, 0, 0, 0.1),
-			                inset -1px -1px 5px rgba(255, 255, 255, 1);
+			    cursor: pointer;
+			    font-size: 1.5rem;
+			    display: flex;
+			    justify-content: center;
+			    align-items: center;
+			    background-color: var(--christmas-red);
+			    color: var(--snow-white);
+			    border: 1px solid var(--christmas-gold);
+			    padding: 0;
+			    line-height: 1;
 			}
 
-			.loader span::before {
-			    content: "";
-			    position: absolute;
-			    top: 0;
-			    left: 0;
-			    width: 100%;
-			    height: 100%;
-			    background: #5c89ff;
-			    border-radius: 50%;
-			    box-shadow: inset 3px 3px 5px rgba(0, 0, 0, 0.1),
-			                inset -1px -1px 5px rgba(255, 255, 255, 1);
-			    transform: scale(0);
-			    animation: animateDots 3.5s linear infinite, animateColor 5s linear infinite;
-			    animation-delay: calc(var(--i) * 0.2s);
+			input[type="number"] {
+			    width: 25px;
+			    height: 30px;
+			    text-align: center;
+			    margin: 0 5px;
+			    padding: 0 5px;
+			    border: 1px solid var(--christmas-gold);
+			    border-radius: 4px;
 			}
 
-			@keyframes animateDots {
-			    0%, 9.99%, 70.001%
-			    {
-			        transform: scale(0);
-			    }
-			    10%, 70%
-			    {
-			        transform: scale(1);
-			    }
+			/* 确保复选框和标签的对齐 */
+			#productList input[type="checkbox"] {
+			    margin: 0;
+			    vertical-align: middle;
 			}
 
-			@keyframes animateColor {
-			    0% {
-			        filter: hue-rotate(0deg);
-			    }
-			    100% {
-			        filter: hue-rotate(360deg);
-			    }
+			#productList label {
+			    margin-right: auto;
+			    display: flex;
+			    align-items: center;
+			    gap: 5px;
 			}
-									        body {
-									            font-family: Arial, sans-serif;
-									            padding: 15px;
-									            margin: 0;
-									            background-color: #FCEEDD; /* 柔和的浅灰背景 */
-									            color: #333; /* 深色字体提升对比度 */
-									            transition: background-color 0.3s, color 0.3s; /* 添加过渡效果 */
-									        }
 
+			        .quantity-btn:hover {
+			            transform: scale(1.1);
+			            background-color: #a01830;
+			        }
 
-									        /* 黑暗模式 */
-									        body.dark-mode {
-									            background-color: #1c1c1c; /* 深灰色背景 */
-									            color: #e0e0e0; /* 浅色字体 */
-									        }
-
-									        /* 添加一个容器类来包含目录的label */
-									        .category-container {
-									            display: grid;
-									            grid-template-columns: repeat(3, 1fr); /* 每行3列，每列平分宽度 */
-									            gap: 10px; /* 项目之间的间距 */
-									            margin-bottom: 20px;
-									        }
-
-									        body.dark-mode #result {
-									            background-color: #333; /* 黑暗模式下的结果框颜色 */
-									            color: #e0e0e0; /* 浅色字体 */
-									        }
-
-									        body.dark-mode button {
-									            background-color: #444; /* 按钮背景颜色 */
-									            color: #e0e0e0; /* 按钮字体颜色 */
-									        }
-
-									        body.dark-mode .whatsapp-button {
-									            background-color: #075e54; /* 深色WhatsApp绿色 */
-									            color: #e0e0e0; /* 按钮字体颜色 */
-									        }
-
-									        /* 为每个商品项设置 flexbox 布局 */
-									        #productList div {
-									            display: flex;
-									            justify-content: space-between; /* 商品名称和输入框分布两侧 */
-									            align-items: center; /* 垂直居中对齐 */
-									            margin-bottom: 15px; /* 保持每个商品项之间的间距 */
-									        }
-
-									        /* 商品名称部分自适应占据左边空间 */
-									        #productList label {
-									            flex-grow: 1; /* 自动扩展，占据可用空间 */
-									            margin-right: 10px; /* 给输入框预留间距 */
-
-
-									        }
-
-									        #suggestions {
-									            border: 1px solid #ccc;
-									            max-height: 150px;
-									            overflow-y: auto;
-									            background-color: white;
-									            position: absolute;
-									            width: 220px;
-									            z-index: 10;
-									        }
-
-									        #suggestions div {
-									    padding: 4px; /* 调整上下的 padding 来减少间隔 */
-									    line-height: 0.6; /* 调小 line-height 以减少上下间距 */
-									    cursor: pointer;
-									    color: #333; /* 设置字体颜色为深灰色 */
-									}
-
-									}
-
-
-									        #suggestions div:hover {
-									            background-color: #f0f0f0;
-									        }
-
-									        /* 调整输入框大小并对齐右边 */
-									        input[type="number"] {
-									            width: 80px;
-									            margin-left: 10px;
-									            text-align: right; /* 使数字靠右显示 */
-									        }
-									        #productSearch {
-									    width: 210px; /* 调整为100%以适应容器宽度 */
-									    padding: 5px; /* 增加内边距以增大点击区域 */
-									    font-size: 1.2rem; /* 调整字体大小 */
-									    border-radius: 5px; /* 使边框圆润 */
-									    border: 1px solid #ccc; /* 设置边框颜色 */
-									}
-
-									        h1 {
-									            font-size: 4rem;
-									            font-weight: bold;
-									            text-align: center;
-
-									        }
-
-									        #result {
-									            width: 100%;
-									            height: 150px;
-									            border: 1px solid #ccc;
-									            padding: 10px;
-									            margin-top: 10px;
-									            white-space: pre-wrap;
-									            overflow: auto;
-									            font-size: 1.1rem;
-									            background-color: #fff;
-									            border-radius: 8px;
-									        }
-
-									        div {
-									            margin-bottom: 15px;
-									        }
-
-									        label {
-									            font-size: 1.1rem;
-									        }
-
-									        input[type="number"], input[type="checkbox"] {
-									            font-size: 1rem;
-									        }
-
-									        button {
-									            padding: 12px 18px;
-									            font-size: 1.1rem;
-									            margin: 10px 0;
-									            cursor: pointer;
-									            width: 100%;
-									            border: none;
-									            border-radius: 8px;
-									        }
-
-									        /* WhatsApp 绿色按钮样式 */
-									        .whatsapp-button {
-									            background-color: #25D366; /* WhatsApp绿色 */
-									            color: white; /* 白色文字 */
-									        }
-
-									        /* 切换模式按钮样式 */
-									        .toggle-mode-btn {
-									            background-color: #007bff;
-									            color: white;
-									            padding: 10px 20px;
-									            margin-bottom: 20px;
-									            cursor: pointer;
-									            border: none;
-									            border-radius: 5px;
-									            font-size: 1rem;
-									        }
-
-									        .contact-info {
-									            font-size: 1rem;
-									            font-style: italic;
-									            color: #555; /* 稍微浅一点的颜色 */
-									            text-align: center;
-									            background-color: #f9f9f9; /* 柔和的背景色 */
-									            padding: 10px;
-									            border-radius: 8px;
-									            margin-bottom: 20px; /* 增加与下方内容的间距 */
-									            border: 1px solid #ddd; /* 添加浅色边框 */
-									        }
-
-									        @media (max-width: 768px) {
-									            h1 {
-									                font-size: 3rem;
-									            }
-
-									            body {
-									                padding: 10px;
-									            }
-
-									            button {
-									                padding: 10px 15px;
-									            }
-									        }
-
-									        .quantity-btn {
-									            width: 30px;
-									            height: 30px;
-									            border: none;
-									            border-radius: 50%; /* 圆形按钮 */
-									            cursor: pointer;
-									            font-size: 2rem;
-									            display: inline-flex;
-									            justify-content: center;
-									            align-items: center;
-									        }
-
-									        .quantity-btn:nth-child(3) {
-									            background-color: #4CAF50 ; /* 青色 */
-									            color: white;
-									        }
-
-									        .quantity-btn:nth-child(5) {
-									            background-color: #F44336; /* 红色 */
-									            color: white;
-									        }
-						                    .quantity-btn:hover {
-						    transform: scale(1.1); /* 放大按钮 */
-						    transition: transform 0.2s ease; /* 添加过渡效果 */
-						}
-						.quantity-btn:active {
-						    transform: scale(0.95); /* 按下时缩小按钮 */
-						    transition: transform 0.1s ease;
-						}
-						.quantity-btn {
-						    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-						}
-						.quantity-btn {
-						    transition: background-color 0.3s ease, color 0.3s ease;
-						}
-
-
-						                    input[type="number"] {
-						    width: 40px; /* 你可以根据需要调整为任何合适的大小 */
-						    padding: 5px; /* 调整内边距以使输入框看起来更舒适 */
-						    margin-left: 10px;
-			                margin-right: 10px;/* 留出与其他元素的间距 */
-						    text-align: middle; /* 保持数字靠右对齐 */
-						   }
+			        @media (max-width: 768px) {
+			            h1 { font-size: 2rem; }
+			            body { padding: 10px; }
+			            button { padding: 10px 15px; }
+			        }
 		</style>
 	</head>
 	<body>
-		<!-- 模式切换按钮 -->
-		<button class="toggle-mode-btn" onclick="toggleDarkMode()">切换至黑暗模式</button>
+		<div class="snowflakes" aria-hidden="true">
+			<div class="snowflake">❅</div>
+			<div class="snowflake">❆</div>
+			<div class="snowflake">❅</div>
+			<div class="snowflake">❆</div>
+			<div class="snowflake">❅</div>
+			<div class="snowflake">❆</div>
+			<div class="snowflake">❅</div>
+			<div class="snowflake">❆</div>
+			<div class="snowflake">❅</div>
+			<div class="snowflake">❆</div>
+			<div class="snowflake">❅</div>
+			<div class="snowflake">❆</div>
+			<div class="snowflake">❅</div>
+			<div class="snowflake">❆</div>
+			<div class="snowflake">❅</div>
+			<div class="snowflake">❆</div>
+			<div class="snowflake">❅</div>
+			<div class="snowflake">❆</div>
+			<div class="snowflake">❅</div>
+			<div class="snowflake">❆</div>
+		</div>
 
-		<h1>Stock Order</h1>
+		<audio id="backgroundMusic" loop>
+			<source src="https://github.com/SmartProfits/orderpro/raw/refs/heads/main/1.mp3" type="audio/mpeg" />
+		</audio>
+		<button id="musicToggle" class="music-toggle-btn" onclick="toggleMusic()">
+			🔇 关闭音乐
+		</button>
+		<div style="text-align: center; margin-top: 5px; font-size: 0.9em; color: var(--snow-white);">
+			提示：点击页面任意位置开始播放背景音乐
+		</div>
+		<h1>🎄Stock Order🎄</h1>
+
 		<div class="container">
 			<div class="loader">
 				<span style="--i:0;"></span>
@@ -481,49 +395,42 @@
 				<span style="--i:4;"></span>
 			</div>
 		</div>
+
 		<div>
 			<input type="checkbox" id="addOnCheckbox" />
 			<label for="addOnCheckbox">Add On</label>
 		</div>
 
-		<h3>SHOP</h3>
-		<div class="store-buttons">
-			<button class="store-btn neon-button neon-button__1" data-value="*JKL*" onclick="selectStore(this)">JKL</button>
-			<button class="store-btn" data-value="*JKL*" onclick="selectStore(this)">JKL</button>
-			<button class="store-btn" data-value="*TOM*" onclick="selectStore(this)">TOM</button>
-			<button class="store-btn" data-value="*Ole-Ole*" onclick="selectStore(this)">Ole-Ole</button>
-    <a href="#" class="store-btn neon-button neon-button__1" data-value="*JKL*" onclick="selectStore(this)">JKL</a>
-    <a href="#" class="neon-button neon-button__2">Hover on me</a>
-    <a href="#" class="neon-button neon-button__3">Hover on me</a>
-    <button class="store-btn neon-button neon-button__1" data-value="*JKL*" onclick="selectStore(this)">JKL</button>
-
+		<h3>选择店铺</h3>
+		<div>
+			<label><input type="radio" name="store" value="*JKL*" onclick="toggleItems()" /> JKL</label>
+			<label><input type="radio" name="store" value="*TOM*" onclick="toggleItems()" /> TOM</label>
+			<label><input type="radio" name="store" value="*Ole-Ole*" onclick="toggleItems()" /> Ole-Ole</label>
 		</div>
 
-		<h3>Catogory</h3>
-
+		<h3>选择目录</h3>
 		<div class="category-container">
-			<button class="category-btn" data-value="BanHeang" onclick="selectCategory(this)">BanHeang</button>
-			<button class="category-btn" data-value="HopHup" onclick="selectCategory(this)">HopHup</button>
-			<button class="category-btn" data-value="Chocolate" onclick="selectCategory(this)">Chocolate</button>
-			<button class="category-btn" data-value="Sotong" onclick="selectCategory(this)">Sotong</button>
-			<button class="category-btn" data-value="Coffee" onclick="selectCategory(this)">Coffee</button>
-			<button class="category-btn" data-value="Amplang" onclick="selectCategory(this)">Amplang</button>
-			<button class="category-btn" data-value="Other" onclick="selectCategory(this)">Other</button>
+			<label><input type="radio" name="category" value="BanHeang" onclick="showCategory()" />BanHeang</label>
+			<label><input type="radio" name="category" value="HopHup" onclick="showCategory()" />HopHup</label>
+			<label><input type="radio" name="category" value="Chocolate" onclick="showCategory()" />Chocolate</label>
+			<label><input type="radio" name="category" value="Sotong" onclick="showCategory()" />Sotong</label>
+			<label><input type="radio" name="category" value="Coffee" onclick="showCategory()" />Coffee</label>
+			<label><input type="radio" name="category" value="Amplang" onclick="showCategory()" />Amplang</label>
+			<label><input type="radio" name="category" value="Other" onclick="showCategory()" />Other</label>
 		</div>
 
-		<input type="text" id="productSearch" placeholder="Search..." oninput="searchProduct()" autocomplete="off" />
+		<input type="text" id="productSearch" placeholder="搜索商品..." oninput="searchProduct()" autocomplete="off" />
 		<div id="suggestions"></div>
-		<h3>Select items (default quantity is 1）</h3>
+		<h3>选择商品（没输入数量默认是1）</h3>
 		<div id="productList"></div>
 
-		<button onclick="generateText()">Generate</button>
-		<button class="whatsapp-button" onclick="copyAndSendWhatsApp()">Copy And Paste to WhatsApp</button>
+		<button onclick="generateText()">生成文字</button>
+		<button class="whatsapp-button" onclick="copyAndSendWhatsApp()">复制并发送至WhatsApp</button>
 
 		<div id="result"></div>
-
 		<script>
-			        const SHEET_ID = '你的表格ID';
-			const SHEET_NAME = 'Sheet1'; // 如果你的表格页面名称不是 Sheet1，请修改这里
+			         const SHEET_ID = '你的表格ID';
+			const SHEET_NAME = 'Sheet1';
 
 			function loadQuantitiesFromSheet() {
 			    const SHEET_ID = '1QUB8R0-gtwNhdiPYU2rwFf_UKrGyyqCQHzIQ7AxKFLI';
@@ -536,7 +443,7 @@
 			                const jsonData = JSON.parse(data.substr(47).slice(0, -2));
 			                const rows = jsonData.table.rows;
 
-			                // 创建一个映射来存储商品名称和库存数量
+
 			                const stockMap = {};
 			                rows.forEach(row => {
 			                    if(row.c[0] && row.c[1]) {
@@ -546,14 +453,14 @@
 			                    }
 			                });
 
-			                // 更新所有商品标签显示库存数量
+
 			                const labels = document.querySelectorAll('#productList label');
 			                labels.forEach(label => {
 			                    const productName = label.textContent;
 			                    const stock = stockMap[productName];
 			                    if (stock !== undefined) {
-			                        // 在商品名称后添加库存数量
-			                        label.innerHTML = `${productName} <span style="color: blue; font-size: 0.9em;">(Stock: ${stock})</span>`;
+
+			                        label.innerHTML = `${productName} <span style="color: yellow; font-size: 1em;">(Stock:${stock})</span>`;
 			                    }
 			                });
 			            } catch (error) {
@@ -562,7 +469,7 @@
 			        })
 			        .catch(error => console.error('获取数据失败:', error));
 			}
-						        // 分类商品
+
 						        const categories = {
 			    BanHeang: [
 			        { id: 101, name: "BH Tambun Original" },
@@ -596,6 +503,9 @@
 			        { id: 129, name: "BH FD Durian 50g" },
 			        { id: 130, name: "BH FD Mango 50g" },
 			        { id: 131, name: "BH FD Durian 30g" },
+                    { id: 160, name: "BH FD Mango 30g" },
+                    { id: 161, name: "BH FD Cempedak 25g" },
+                    { id: 162, name: "BH FD Jackfruit 30g" },
 			        { id: 132, name: "BH Butter Cookies" },
 			        { id: 133, name: "BH Chocolate Cookies" },
 			        { id: 134, name: "BH Raisin Cookies" },
@@ -623,17 +533,20 @@
 			        { id: 156, name: "BH Dodol Durian" },
 			        { id: 157, name: "BH Dodol Coconut" },
 			        { id: 158, name: "BH Dodol Pandan" },
-			        { id: 159, name: "BH Durian Beh Teh Saw" }
+			        { id: 159, name: "BH Durian Beh Teh Saw" },
+                    { id: 163, name: "Fruity Marshmallow" },
+                    { id: 164, name: "Matcha Marshmallow" },
+                    { id: 165, name: "Durian Marshmallow" },
 			    ],
 			    HopHup: [
 			        { id: 201, name: "HT Durian Tart" },
 			        { id: 202, name: "HT Mango Tart" },
 			        { id: 203, name: "HT Durian Wafer Roll" },
-			        { id: 204, name: "HT Mango Wafer Roll🆕" },
+			        { id: 204, name: "HT Mango Wafer Roll" },
 			        { id: 205, name: "HT Omelette Durian" },
 			        { id: 206, name: "HT Coconut Ori Cookies" },
 			        { id: 207, name: "HT Coconut Pandan Cookies" },
-			        { id: 208, name: "HT Dodol Original🆕" },
+			        { id: 208, name: "HT Dodol Original" },
 			        { id: 209, name: "HT Dodol Kopi" },
 			        { id: 210, name: "HT Dodol Durian" },
 			        { id: 211, name: "HT Freeze Dried Mango" },
@@ -642,10 +555,10 @@
 			        { id: 214, name: "Salted Egg Fish Skin Spicy" },
 			        { id: 215, name: "Salted Egg Salmon Skin" },
 			        { id: 216, name: "Musang King Durian Candy" },
-			        { id: 217, name: "HT Durian Cookies🆕" },
-			        { id: 218, name: "Fish Chips Classic🆕" },
-			        { id: 219, name: "Salted Egg Fish Chips🆕" },
-			        { id: 220, name: "Salted Egg Fish Chips Mala🆕" }
+			        { id: 217, name: "HT Durian Cookies" },
+			        { id: 218, name: "Fish Chips Classic" },
+			        { id: 219, name: "Salted Egg Fish Chips" },
+			        { id: 220, name: "Salted Egg Fish Chips Mala" }
 			    ],
 			    Chocolate: [
 			        { id: 301, name: "AD Chocolate Durian", unit: 'pc', defaultQuantity: 50 },
@@ -671,8 +584,8 @@
 			        { id: 406, name: "Cuttlefish Whole" },
 			        { id: 407, name: "Cuttlefish Roasted" },
 			        { id: 408, name: "Cuttlefish Chili" },
-			        { id: 409, name: "Cuttle Fish Slices🆕" },
-			        { id: 410, name: "Cuttle Fish Sugar🆕" },
+			        { id: 409, name: "Cuttle Fish Slices" },
+			        { id: 410, name: "Cuttle Fish Sugar" },
 			        { id: 411, name: "Five Star Cuttlefish" }
 			    ],
 			    Coffee: [
@@ -704,12 +617,311 @@
 			        { id: 704, name: "Anchovy Blue" },
 			        { id: 705, name: "Anchovy Green" },
 			        { id: 706, name: "Anchovy Red" },
-			        { id: 707, name: "Anchovy Yellow" }
+			        { id: 707, name: "Anchovy Yellow" },
+                    { id: 708, name: "Prawn Cracker 500g" },
+                    { id: 709, name: "Fish Maw" }
 			    ]
 			};
 
-						        let selectedItems = {};
 
+
+			        let selectedItems = {};
+
+			        function loadProducts(products) {
+			            const productList = document.getElementById('productList');
+			            productList.innerHTML = '';
+
+			            products.forEach(product => {
+			                const defaultQuantity = product.defaultQuantity || 1;
+			                const div = document.createElement('div');
+			                div.innerHTML = `
+			                    <input type="checkbox" id="item${product.id}" onchange="saveItem(${product.id}, '${product.name}')">
+			                    <label for="item${product.id}">${product.name}</label>
+			                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+			                    <input type="number" id="quantity${product.id}" min="1" value="${defaultQuantity}" onchange="saveQuantity(${product.id})">
+			                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+			                `;
+			                productList.appendChild(div);
+
+			                if (selectedItems[product.id]) {
+			                    document.getElementById('item' + product.id).checked = true;
+			                    document.getElementById('quantity' + product.id).value = selectedItems[product.id];
+			                }
+			            });r
+			        }
+
+			        function saveItem(id, name) {
+			            const checkbox = document.getElementById('item' + id);
+			            const quantity = document.getElementById('quantity' + id).value || 1;
+
+			            if (checkbox.checked) {
+			                selectedItems[id] = quantity;
+			            } else {
+			                delete selectedItems[id];
+			            }
+			        }
+
+			        function saveQuantity(id) {
+			            const quantity = document.getElementById('quantity' + id).value || 1;
+			            if (selectedItems[id]) {
+			                selectedItems[id] = quantity;
+			            }
+			        }
+
+			        function changeQuantity(id, change) {
+			            const quantityInput = document.getElementById('quantity' + id);
+			            let currentQuantity = parseInt(quantityInput.value) || 1;
+			            currentQuantity = Math.max(1, currentQuantity + change);
+			            quantityInput.value = currentQuantity;
+			            saveQuantity(id);
+			        }
+
+			        function toggleItems() {
+			            let selectedStore = document.querySelector('input[name="store"]:checked');
+			            let checkboxes = document.querySelectorAll('#productList input[type="checkbox"]');
+			            let quantities = document.querySelectorAll('#productList input[type="number"]');
+
+			            if (selectedStore) {
+			                checkboxes.forEach(checkbox => checkbox.disabled = false);
+			                quantities.forEach(quantity => quantity.disabled = false);
+			            } else {
+			                checkboxes.forEach(checkbox => checkbox.disabled = true);
+			                quantities.forEach(quantity => quantity.disabled = true);
+			            }
+			        }
+
+			        function showCategory() {
+			            let selectedCategory = document.querySelector('input[name="category"]:checked');
+			            if (selectedCategory) {
+			                let categoryValue = selectedCategory.value;
+			                let productsToShow = categories[categoryValue];
+			                if (productsToShow) {
+			                    loadProducts(productsToShow);
+			                }
+			            }
+			            toggleItems();
+			        }
+
+			        function generateText() {
+			            let result = '';
+			            let selectedStore = document.querySelector('input[name="store"]:checked');
+			            let hasAddOn = document.getElementById('addOnCheckbox').checked;
+
+			            if (selectedStore) {
+			                result += '🎄 Kedai: ' + selectedStore.value;
+			                if (hasAddOn) {
+			                    result += ' 💥Add On💥';
+			                }
+			                result += '\n\n';
+			            } else {
+			                result += '🎄 Kedai: 未选择\n';
+			            }
+
+			            const categorizedItems = {};
+			            Object.keys(categories).forEach(category => {
+			                categorizedItems[category] = [];
+			            });
+
+			            for (const [id, quantity] of Object.entries(selectedItems)) {
+			                for (const [category, products] of Object.entries(categories)) {
+			                    const product = products.find(p => p.id == id);
+			                    if (product) {
+			                        const unit = product.unit === 'pc' ? 'pc' : 'ctn';
+			                        categorizedItems[category].push({
+			                            name: product.name,
+			                            quantity: quantity,
+			                            unit: unit
+			                        });
+			                        break;
+			                    }
+			                }
+			            }
+
+			            for (const [category, items] of Object.entries(categorizedItems)) {
+			                if (items.length > 0) {
+			                    result += `\n=== ${category} ===\n`;
+			                    items.forEach(item => {
+			                        result += `${item.name} - ${item.quantity} ${item.unit}\n`;
+			                    });
+			                }
+			            }
+
+			            result += '\n🎄 Airport Stock Order: smartprofits.github.io/order/ 🎄';
+			            document.getElementById('result').innerText = result;
+			            return result;
+			        }
+
+			        function copyAndSendWhatsApp() {
+   let text = generateText();
+   navigator.clipboard.writeText(text).then(() => {
+       alert('文字已复制，现在跳转到WhatsApp群组');
+       // 使用特定的群组链接
+       const groupLink = "https://chat.whatsapp.com/FwwLA8M62mPK1N1jZj6BJw";
+       // 构建带有文本的 URL
+       let whatsappURL = `${groupLink}?text=${encodeURIComponent(text)}`;
+       window.location.href = whatsappURL;
+   }).catch(err => {
+       console.error('无法复制', err);
+   });
+
+
+
+
+			        function searchProduct() {
+			            const searchText = document.getElementById('productSearch').value.toLowerCase();
+			            const suggestionsContainer = document.getElementById('suggestions');
+			            suggestionsContainer.innerHTML = '';
+
+			            if (searchText.length === 0) return;
+
+			            const allProducts = Object.values(categories).flat();
+			            const matchingProducts = allProducts.filter(product =>
+			                product.name.toLowerCase().includes(searchText)
+			            );
+
+			            matchingProducts.forEach(product => {
+			                const div = document.createElement('div');
+			                div.textContent = product.name;
+			                div.onclick = () => selectProduct(product);
+			                suggestionsContainer.appendChild(div);
+			            });
+			        }
+
+			        function selectProduct(product) {
+			            const productSearch = document.getElementById('productSearch');
+			            productSearch.value = '';
+			            const productList = document.getElementById('productList');
+			            productList.innerHTML = '';
+
+			            const div = document.createElement('div');
+			            div.innerHTML = `
+			                <input type="checkbox" id="item${product.id}" checked onchange="saveItem(${product.id}, '${product.name}')">
+			                <label for="item${product.id}">${product.name}</label>
+			                <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+			                <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
+			                <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+			            `;
+			            productList.appendChild(div);
+
+			            saveItem(product.id, product.name);
+			            document.getElementById('suggestions').innerHTML = '';
+			        }
+
+
+			        window.onload = function() {
+
+
+
+			    const music = document.getElementById('backgroundMusic');
+			    music.play().catch(function(error) {
+			        console.log("自动播放失败：", error);
+			        isMusicPlaying = false;
+			        document.getElementById('musicToggle').innerHTML = '🔈 播放音乐';
+			    });
+			}
+			        div.innerHTML = `
+			    <input type="checkbox" id="item${product.id}" onchange="saveItem(${product.id}, '${product.name}')">
+			    <label for="item${product.id}">${product.name}</label>
+			    <div class="quantity-control">
+			        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+			        <input type="number" id="quantity${product.id}" min="1" value="${defaultQuantity}" onchange="saveQuantity(${product.id})">
+			        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+			    </div>
+			`;
+
+
+			div.innerHTML = `
+			    <input type="checkbox" id="item${product.id}" checked onchange="saveItem(${product.id}, '${product.name}')">
+			    <label for="item${product.id}">${product.name}</label>
+			    <div class="quantity-control">
+			        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+			        <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
+			        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+			    </div>
+
+			`;
+			div.innerHTML = `
+			    <input type="checkbox" id="item${product.id}" onchange="saveItem(${product.id}, '${product.name}')">
+			    <label for="item${product.id}">${product.name}</label>
+			    <div class="quantity-control">
+			        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+			        <input type="number" id="quantity${product.id}" min="1" value="${defaultQuantity}" onchange="saveQuantity(${product.id})">
+			        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+			    </div>
+			`;
+
+
+			div.innerHTML = `
+			    <input type="checkbox" id="item${product.id}" checked onchange="saveItem(${product.id}, '${product.name}')">
+			    <label for="item${product.id}">${product.name}</label>
+			    <div class="quantity-control">
+			        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+			        <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
+			        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+			    </div>
+			`;
+
+			let isMusicPlaying = false;
+
+
+			function toggleMusic() {
+			    const music = document.getElementById('backgroundMusic');
+			    const musicBtn = document.getElementById('musicToggle');
+
+			    if (!music.paused) {
+
+			        music.pause();
+			        music.currentTime = 0;
+			        isMusicPlaying = false;
+			        musicBtn.innerHTML = '🔈 播放音乐';
+			    } else {
+
+			        const playPromise = music.play();
+
+			        if (playPromise !== undefined) {
+			            playPromise.then(() => {
+			                isMusicPlaying = true;
+			                musicBtn.innerHTML = '🔇 关闭音乐';
+			            }).catch(error => {
+			                console.log("播放失败：", error);
+			                isMusicPlaying = false;
+			                musicBtn.innerHTML = '🔈 播放音乐';
+			            });
+			        }
+			    }
+			}
+
+
+			window.onload = function() {
+			    const savedMode = localStorage.getItem('dark-mode');
+			    if (savedMode === 'enabled') {
+			        document.body.classList.add('dark-mode');
+			        document.querySelector('.toggle-mode-btn').textContent = '🌞 Light Mode';
+			    }
+			    toggleItems();
+
+
+			    const music = document.getElementById('backgroundMusic');
+			    const musicBtn = document.getElementById('musicToggle');
+
+
+			    document.addEventListener('click', function initAudioAutoplay() {
+			        const playPromise = music.play();
+
+			        if (playPromise !== undefined) {
+			            playPromise.then(() => {
+			                isMusicPlaying = true;
+			                musicBtn.innerHTML = '🔇 关闭音乐';
+
+			                document.removeEventListener('click', initAudioAutoplay);
+			            }).catch(error => {
+			                console.log("自动播放失败：", error);
+			                isMusicPlaying = false;
+			                musicBtn.innerHTML = '🔈 播放音乐';
+			            });
+			        }
+			    }, { once: true });
+			}
 			function loadProducts(products) {
 			    const productList = document.getElementById('productList');
 			    productList.innerHTML = '';
@@ -732,296 +944,16 @@
 			        productList.appendChild(div);
 			    });
 
-			    // 加载并显示库存数量
+
 			    loadQuantitiesFromSheet();
 			}
-						        function saveItem(id, name) {
-						            const checkbox = document.getElementById('item' + id);
-						            const quantity = document.getElementById('quantity' + id).value || 1;
-
-						            if (checkbox.checked) {
-						                selectedItems[id] = quantity;
-						            } else {
-						                delete selectedItems[id]; // 如果取消勾选，就删除该商品
-						            }
-						        }
-
-						        function saveQuantity(id) {
-						            const quantity = document.getElementById('quantity' + id).value || 1;
-						            if (selectedItems[id]) {
-						                selectedItems[id] = quantity; // 更新数量
-						            }
-						        }
-
-						        function changeQuantity(id, change) {
-						            const quantityInput = document.getElementById('quantity' + id);
-						            let currentQuantity = parseInt(quantityInput.value) || 1; // 默认值为1
-
-						            // 更新数量并确保不小于1
-						            currentQuantity = Math.max(1, currentQuantity + change);
-						            quantityInput.value = currentQuantity;
-
-						            saveQuantity(id); // 保存更新的数量
-						        }
-						                function toggleItems() {
-						            let selectedStore = document.querySelector('.store-btn.active');
-						            let checkboxes = document.querySelectorAll('#productList input[type="checkbox"]');
-						            let quantities = document.querySelectorAll('#productList input[type="number"]');
-
-						            if (selectedStore) {
-						                checkboxes.forEach(checkbox => checkbox.disabled = false);
-						                quantities.forEach(quantity => quantity.disabled = false);
-						            } else {
-						                checkboxes.forEach(checkbox => checkbox.disabled = true);
-						                quantities.forEach(quantity => quantity.disabled = true);
-						            }
-						        }
-
-						        function showCategory() {
-						            let selectedCategory = document.querySelector('input[name="category"]:checked');
-
-						            if (selectedCategory) {
-						                let categoryValue = selectedCategory.value;
-						                let productsToShow = categories[categoryValue];
-
-						                if (productsToShow) {
-						                    loadProducts(productsToShow); // 根据选择的目录加载商品
-						                } else {
-						                    console.error("没有找到该分类的商品");
-						                }
-						            } else {
-						                console.error("没有选中任何分类");
-						            }
-
-						            toggleItems(); // 确保激活商品选择框
-						        }
-
-						function generateText() {
-			    let result = '';
-			    let selectedStore = document.querySelector('.store-btn.active');
-			    let hasAddOn = document.getElementById('addOnCheckbox').checked;
-
-			    if (selectedStore) {
-			        result += 'Kedai: ' + selectedStore.getAttribute('data-value');
-			        if (hasAddOn) {
-			            result += ' 💥Add On💥';
-			        }
-			        result += '\n\n';
-			    } else {
-			        result += 'Kedai: 未选择\n';
-			    }
-
-			    // 按分类整理已选商品
-			    const categorizedItems = {};
-
-			    // 初始化所有分类
-			    Object.keys(categories).forEach(category => {
-			        categorizedItems[category] = [];
-			    });
-
-			    // 将选中的商品按分类整理
-			    for (const [id, quantity] of Object.entries(selectedItems)) {
-			        // 查找商品所属的分类
-			        for (const [category, products] of Object.entries(categories)) {
-			            const product = products.find(p => p.id == id);
-			            if (product) {
-			                const unit = product.unit === 'pc' ? 'pc' : 'ctn';
-			                categorizedItems[category].push({
-			                    name: product.name,
-			                    quantity: quantity,
-			                    unit: unit
-			                });
-			                break;
-			            }
-			        }
-			    }
-
-			    // 按分类输出商品
-			    for (const [category, items] of Object.entries(categorizedItems)) {
-			        if (items.length > 0) {
-			            result += `\n=== ${category} ===\n`;
-			            items.forEach(item => {
-			                result += `${item.name} - ${item.quantity} ${item.unit}\n`;
-			            });
-			        }
-			    }
-
-			    result += '\nAirport Stock Order: smartprofits.github.io/order/';
-			    document.getElementById('result').innerText = result;
-
-			    // 清空商品列表
-			    document.getElementById('productList').innerHTML = '';
-
-			    return result;
-			}
-
-
-
-						        function copyAndSendWhatsApp() {
-						            let text = generateText();
-						            navigator.clipboard.writeText(text).then(() => {
-						                alert('文字已复制，现在跳转到WhatsApp');
-						                let whatsappURL = `https://wa.me/?text=${encodeURIComponent(text)}`;
-						                window.location.href = whatsappURL;
-						            }).catch(err => {
-						                console.error('无法复制', err);
-						            });
-						        }
-
-						        // 检查是否已经选择了模式，并设置默认模式
-
-
-						        function toggleDarkMode() {
-						            const isDarkModeEnabled = document.body.classList.toggle('dark-mode');
-						            const toggleButton = document.querySelector('.toggle-mode-btn');
-
-						            if (isDarkModeEnabled) {
-						                toggleButton.textContent = 'Light Mode🌞';
-						                localStorage.setItem('dark-mode', 'enabled');
-						            } else {
-						                toggleButton.textContent = 'Dark Mode🌙';
-						                localStorage.setItem('dark-mode', 'disabled');
-						            }
-						        }
-						function searchProduct() {
-						    const searchText = document.getElementById('productSearch').value.toLowerCase();
-						    const suggestionsContainer = document.getElementById('suggestions');
-						    suggestionsContainer.innerHTML = ''; // 清空之前的建议
-
-						    if (searchText.length === 0) return; // 如果没有输入，不显示建议
-
-						    // 获取所有分类中的商品
-						    const allProducts = Object.values(categories).flat();
-
-						    // 根据输入的内容筛选出匹配的商品
-						    const matchingProducts = allProducts.filter(product => product.name.toLowerCase().includes(searchText));
-
-						    // 显示匹配的商品作为建议
-						    matchingProducts.forEach(product => {
-						        const div = document.createElement('div');
-						        div.textContent = product.name;
-						        div.onclick = () => selectProduct(product); // 点击建议后选择该商品
-						        suggestionsContainer.appendChild(div);
-						    });
-						}
-
-						function selectProduct(product) {
-			    const productSearch = document.getElementById('productSearch');
-			    productSearch.value = '';
-			    const productList = document.getElementById('productList');
-			    productList.innerHTML = '';
-
-			    // 创建新的商品选择框
-			    const div = document.createElement('div');
-			    div.innerHTML = `
-			        <input type="checkbox" id="item${product.id}" checked onchange="saveItem(${product.id}, '${product.name}')">
-			        <label for="item${product.id}">${product.name}</label>
-			        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
-			        <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
-			        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
-			    `;
-			    productList.appendChild(div);
-
-			    // 保存新选择的商品
-			    saveItem(product.id, product.name);
-
-			    // 立即为这个特定商品加载库存信息
-			    loadStockForProduct(product.name);
-
-			    document.getElementById('suggestions').innerHTML = '';
-			}
-
-			// 新增函数：只为特定商品加载库存信息
-			function loadStockForProduct(productName) {
-			    const SHEET_ID = '1QUB8R0-gtwNhdiPYU2rwFf_UKrGyyqCQHzIQ7AxKFLI';
-			    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
-
-			    fetch(url)
-			        .then(response => response.text())
-			        .then(data => {
-			            try {
-			                const jsonData = JSON.parse(data.substr(47).slice(0, -2));
-			                const rows = jsonData.table.rows;
-
-			                // 查找特定商品的库存
-			                const stockInfo = rows.find(row =>
-			                    row.c[0] && row.c[0].v === productName
-			                );
-
-			                if (stockInfo && stockInfo.c[1]) {
-			                    const stock = stockInfo.c[1].v;
-			                    // 更新特定商品的标签
-			                    const label = document.querySelector(`label[for="item${product.id}"]`);
-			                    if (label) {
-			                        label.innerHTML = `${productName} <span style="color: #666; font-size: 0.9em;">(Stock:${stock})</span>`;
-			                    }
-			                }
-			            } catch (error) {
-			                console.error('解析数据错误:', error);
-			            }
-			        })
-			        .catch(error => console.error('获取数据失败:', error));
-			}
-
-
-
-						// 在页面加载时设置默认语言
-			window.onload = function() {
-			    const savedMode = localStorage.getItem('dark-mode');
-			    if (savedMode === 'enabled') {
-			        document.body.classList.add('dark-mode');
-			        document.querySelector('.toggle-mode-btn').textContent = '切换至正常模式';
-			    }
-			    toggleItems(); // 初始化商品选择框
-
-			    // 添加定时刷新
-			    setInterval(loadQuantitiesFromSheet, 30000);
-			}
-
-
-						        // 其他代码省略...
-
-			function selectStore(button) {
-			    // 移除其他按钮的活动状态
-			    document.querySelectorAll('.store-btn').forEach(btn => btn.classList.remove('active'));
-			    // 添加当前按钮的活动状态
-			    button.classList.add('active');
-			    // 保存选中的商店值
-			    const storeValue = button.getAttribute('data-value');
-			    // 触发原有的切换功能
-			    toggleItems();
-			}
-
-			function selectCategory(button) {
-			    // 移除其他按钮的活动状态
-			    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-			    // 添加当前按钮的活动状态
-			    button.classList.add('active');
-			    // 获取分类值并显示对应商品
-			    const categoryValue = button.getAttribute('data-value');
-			    showCategoryByValue(categoryValue);
-			}
-            const links = document.querySelectorAll("a");
-
-links.forEach((link) => {
-  link.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.target.classList.add("active");
-    setTimeout(() => {
-      event.target.classList.remove("active");
-    }, 500);
-  });
-});
-
-			function showCategoryByValue(categoryValue) {
-			    if (categoryValue && categories[categoryValue]) {
-			        loadProducts(categories[categoryValue]);
-			    }
-			    toggleItems();
-			}
-            
 		</script>
 
-		<p class="contact-info">If you have any questions or need to add new products, please contact me (Mark).</p>
+		<p class="contact-info">
+			🎅 If you have any questions or need to add new products, please contact me (Mark).
+			<br />
+			🎁 Merry Christmas and Happy New Year! 🎄
+			<br />
+		</p>
 	</body>
 </html>
