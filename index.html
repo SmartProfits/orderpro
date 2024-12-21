@@ -753,14 +753,21 @@
 
 function copyAndSendWhatsApp() {
    let text = generateText();
-   navigator.clipboard.writeText(text).then(() => {
-       if (confirm('文字已复制到剪贴板。是否跳转到WhatsApp群组？')) {
-           window.location.href = 'https://chat.whatsapp.com/FwwLA8M62mPK1N1jZj6BJw';
+   navigator.clipboard.writeText(text)
+       .then(() => {
+           // 先提示用户文字已复制
+           alert('文字已复制到剪贴板，请在群组中粘贴');
+           // 短暂延迟后跳转到 WhatsApp 群组
+           setTimeout(() => {
+               window.location.href = 'https://chat.whatsapp.com/FwwLA8M62mPK1N1jZj6BJw';
+           }, 1000); // 延迟1秒，让用户有时间看到提示
+       })
+       .catch(err => {
+           console.error('无法复制', err);
+           alert('复制失败，请手动复制');
+       });
        }
-   }).catch(err => {
-       console.error('无法复制', err);
-   });
-}
+
 
 
 
