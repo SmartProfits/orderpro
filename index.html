@@ -1,1049 +1,825 @@
 <!DOCTYPE html>
 <html lang="zh">
-	<head>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Airport Stock Request</title>
-		<style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashier Tools</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 15px;
+            margin: 0;
+            background-color: #1c1c1c;
+            color: #e0e0e0;
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-:root {
-  --clr-one: rgb(240, 8, 8 );
-  --clr-two: rgb(255, 216, 0 );
-  --clr-three: rgb(255, 131, 0 );
-  --clr-four: rgb(182, 0, 255 );
-  --clr-bg: #1d1e22;
+        body.dark-mode {
+            background-color: #1c1c1c;
+            color: #e0e0e0;
+        }
+
+        .category-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #suggestions {
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: white;
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+}
+
+.contact-info {
+    font-size: 1rem; /* 字体大小 */
+    font-style: italic; /* 斜体 */
+    color: #555; /* 浅灰色字体 */
+    text-align: center; /* 居中对齐 */
+    background-color: #f9f9f9; /* 柔和的背景色 */
+    padding: 10px; /* 内边距 */
+    border-radius: 8px; /* 圆角边框 */
+    margin-bottom: 20px; /* 与下方内容的间距 */
+    border: 1px solid #ddd; /* 浅色边框 */
 }
 
 
-
-
-
-.container {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-direction: column;
-  flex-wrap: wrap;
+#suggestions div {
+    padding: 8px;
+    cursor: pointer;
+    color: #333;
 }
 
-.buttons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
+#suggestions div:hover {
+    background-color: #f0f0f0;
 }
+#productList div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
 
-.neon-button {
-  font-size: 1rem;
-
-  display: inline-block;
-  cursor: pointer;
-  text-decoration: none;
-  padding: 0.5em 1em;
-  margin: 2rem;
-  border-radius: 0.25em;
-  position: relative;
-}
-
-.neon-button__1 {
-  color: var(--clr-one);
-  border: var(--clr-one) 0.125em solid;
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em --clr-one;
-  box-shadow: inset 0 0 0.5em 0 var(--clr-one), 0 0 0.5em 0 var(--clr-one);
-}
-
-.neon-button__2 {
-  color: var(--clr-two);
-  border: var(--clr-two) 0.125em solid;
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em --clr-two;
-  box-shadow: inset 0 0 0.5em 0 var(--clr-two), 0 0 0.5em 0 var(--clr-two);
-}
-
-.neon-button__3 {
-  color: var(--clr-three);
-  border: var(--clr-three) 0.125em solid;
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em --clr-three;
-  box-shadow: inset 0 0 0.5em 0 var(--clr-three), 0 0 0.5em 0 var(--clr-three);
-}
-
-.neon-button__4 {
-  color: var(--clr-four:);
-  border: var(--clr-four:) 0.125em solid;
-  text-shadow: 0 0 0.125em hsl(0 0% 100% / 0.3), 0 0 0.45em --clr-four;
-  box-shadow: inset 0 0 0.5em 0 var(--clr-four), 0 0 0.5em 0 var(--clr-four);
-}
-
-.neon-button::before {
-  content: "";
-  position: absolute;
-  top: 120%;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transform: perspective(1.5em) rotateX(45deg) scale(0.8, 0.3);
-  filter: blur(1.5em);
-  opacity: 0.7;
-  pointer-events: none;
-}
-
-.neon-button.active::before {
-  animation: scalingShadow 0.5s ease-in-out;
-}
-
-@keyframes scalingShadow {
-  0% {
-    top: 120%;
-    transform: perspective(1.5em) rotateX(45deg) scale(0.8, 0.3);
-  }
-  50% {
-    top: 165%;
-    transform: perspective(1.5em) rotateX(45deg) scale(0.75, 0.3);
-  }
-  100% {
-    top: 120%;
-    transform: perspective(1.5em) rotateX(45deg) scale(0.8, 0.3);
-  }
-}
-
-.neon-button__1::before {
-  background: var(--clr-one);
-}
-
-.neon-button__2::before {
-  background: var(--clr-two);
-}
-
-.neon-button__3::before {
-  background: var(--clr-three);
-}
-
-.neon-button__4::before {
-  background: var(--clr-four);
-}
-.neon-button::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  opacity: 0;
-  z-index: -1;
-  transition: opacity 100ms linear;
-}
-
-.neon-button__1::after {
-  box-shadow: 0 0 2em 0.5em var(--clr-one);
-  background-color: var(--clr-one);
-}
-
-.neon-button__2::after {
-  box-shadow: 0 0 2em 0.5em var(--clr-two);
-  background-color: var(--clr-two);
-}
-
-.neon-button__3::after {
-  box-shadow: 0 0 2em 0.5em var(--clr-three);
-  background-color: var(--clr-three);
-}
-
-.neon-button__4::after {
-  box-shadow: 0 0 2em 0.5em var(--clr-four);
-  background-color: var(--clr-four);
-}
-.neon-button:hover::before,
-.neon-button:focus::before {
-  opacity: 1;
-}
-
-.neon-button:hover::after,
-.neon-button:focus::after {
-  opacity: 1;
-}
-
-.neon-button:hover,
-.neon-button:focus {
-  outline: none;
-  color: var(--clr-bg);
-  text-shadow: none;
-}
-
-.active {
-  animation: animate 0.5s ease-in-out;
-}
-
-@keyframes animate {
-  0% {
-    transform: translateY(0%);
-  }
-  50% {
-    transform: translateY(-40%);
-  }
-  100% {
-    transform: translateY(0%);
-  }
-}
-
-			.container {
-			    display: flex;
-			    justify-content: center;
-			    align-items: center;
-			    width: 100%;
-			}
-
-			#productList label span {
-			    margin-left: 8px;
-			    color: #666;
-			    font-size: 0.9em;
-			    font-weight: normal;
-			}
-			.loader {
-			    position: relative;
-			    display: flex;
-			}
-
-			.loader span {
-			    position: relative;
-			    width: 50px;
-			    height: 50px;
-			    background: #eaeef0;
-			    margin: 0 5px;
-			    border: 5px solid #eaeef0;
-			    border-radius: 50%;
-			    box-shadow: 
-			                8px 8px 15px rgba(0, 0, 0, 0.2),
-			                inset 3px 3px 5px rgba(0, 0, 0, 0.1),
-			                inset -1px -1px 5px rgba(255, 255, 255, 1);
-			}
-
-			.loader span::before {
-			    content: "";
-			    position: absolute;
-			    top: 0;
-			    left: 0;
-			    width: 100%;
-			    height: 100%;
-			    background: #5c89ff;
-			    border-radius: 50%;
-			    box-shadow: inset 3px 3px 5px rgba(0, 0, 0, 0.1),
-			                inset -1px -1px 5px rgba(255, 255, 255, 1);
-			    transform: scale(0);
-			    animation: animateDots 3.5s linear infinite, animateColor 5s linear infinite;
-			    animation-delay: calc(var(--i) * 0.2s);
-			}
-
-			@keyframes animateDots {
-			    0%, 9.99%, 70.001%
-			    {
-			        transform: scale(0);
-			    }
-			    10%, 70%
-			    {
-			        transform: scale(1);
-			    }
-			}
-
-			@keyframes animateColor {
-			    0% {
-			        filter: hue-rotate(0deg);
-			    }
-			    100% {
-			        filter: hue-rotate(360deg);
-			    }
-			}
-									        body {
-									            font-family: Arial, sans-serif;
-									            padding: 15px;
-									            margin: 0;
-									            background-color: #FCEEDD; /* 柔和的浅灰背景 */
-									            color: #333; /* 深色字体提升对比度 */
-									            transition: background-color 0.3s, color 0.3s; /* 添加过渡效果 */
-									        }
-
-
-									        /* 黑暗模式 */
-									        body.dark-mode {
-									            background-color: #1c1c1c; /* 深灰色背景 */
-									            color: #e0e0e0; /* 浅色字体 */
-									        }
-
-									        /* 添加一个容器类来包含目录的label */
-									        .category-container {
-									            display: grid;
-									            grid-template-columns: repeat(3, 1fr); /* 每行3列，每列平分宽度 */
-									            gap: 10px; /* 项目之间的间距 */
-									            margin-bottom: 20px;
-									        }
-
-									        body.dark-mode #result {
-									            background-color: #333; /* 黑暗模式下的结果框颜色 */
-									            color: #e0e0e0; /* 浅色字体 */
-									        }
-
-									        body.dark-mode button {
-									            background-color: #444; /* 按钮背景颜色 */
-									            color: #e0e0e0; /* 按钮字体颜色 */
-									        }
-
-									        body.dark-mode .whatsapp-button {
-									            background-color: #075e54; /* 深色WhatsApp绿色 */
-									            color: #e0e0e0; /* 按钮字体颜色 */
-									        }
-
-									        /* 为每个商品项设置 flexbox 布局 */
-									        #productList div {
-									            display: flex;
-									            justify-content: space-between; /* 商品名称和输入框分布两侧 */
-									            align-items: center; /* 垂直居中对齐 */
-									            margin-bottom: 15px; /* 保持每个商品项之间的间距 */
-									        }
-
-									        /* 商品名称部分自适应占据左边空间 */
-									        #productList label {
-									            flex-grow: 1; /* 自动扩展，占据可用空间 */
-									            margin-right: 10px; /* 给输入框预留间距 */
-
-
-									        }
-
-									        #suggestions {
-									            border: 1px solid #ccc;
-									            max-height: 150px;
-									            overflow-y: auto;
-									            background-color: white;
-									            position: absolute;
-									            width: 220px;
-									            z-index: 10;
-									        }
-
-									        #suggestions div {
-									    padding: 4px; /* 调整上下的 padding 来减少间隔 */
-									    line-height: 0.6; /* 调小 line-height 以减少上下间距 */
-									    cursor: pointer;
-									    color: #333; /* 设置字体颜色为深灰色 */
-									}
-
-									}
-
-
-									        #suggestions div:hover {
-									            background-color: #f0f0f0;
-									        }
-
-									        /* 调整输入框大小并对齐右边 */
-									        input[type="number"] {
-									            width: 80px;
-									            margin-left: 10px;
-									            text-align: right; /* 使数字靠右显示 */
-									        }
-									        #productSearch {
-									    width: 210px; /* 调整为100%以适应容器宽度 */
-									    padding: 5px; /* 增加内边距以增大点击区域 */
-									    font-size: 1.2rem; /* 调整字体大小 */
-									    border-radius: 5px; /* 使边框圆润 */
-									    border: 1px solid #ccc; /* 设置边框颜色 */
-									}
-
-									        h1 {
-									            font-size: 4rem;
-									            font-weight: bold;
-									            text-align: center;
-
-									        }
-
-									        #result {
-									            width: 100%;
-									            height: 150px;
-									            border: 1px solid #ccc;
-									            padding: 10px;
-									            margin-top: 10px;
-									            white-space: pre-wrap;
-									            overflow: auto;
-									            font-size: 1.1rem;
-									            background-color: #fff;
-									            border-radius: 8px;
-									        }
-
-									        div {
-									            margin-bottom: 15px;
-									        }
-
-									        label {
-									            font-size: 1.1rem;
-									        }
-
-									        input[type="number"], input[type="checkbox"] {
-									            font-size: 1rem;
-									        }
-
-									        button {
-									            padding: 12px 18px;
-									            font-size: 1.1rem;
-									            margin: 10px 0;
-									            cursor: pointer;
-									            width: 100%;
-									            border: none;
-									            border-radius: 8px;
-									        }
-
-									        /* WhatsApp 绿色按钮样式 */
-									        .whatsapp-button {
-									            background-color: #25D366; /* WhatsApp绿色 */
-									            color: white; /* 白色文字 */
-									        }
-
-									        /* 切换模式按钮样式 */
-									        .toggle-mode-btn {
-									            background-color: #007bff;
-									            color: white;
-									            padding: 10px 20px;
-									            margin-bottom: 20px;
-									            cursor: pointer;
-									            border: none;
-									            border-radius: 5px;
-									            font-size: 1rem;
-									        }
-
-									        .contact-info {
-									            font-size: 1rem;
-									            font-style: italic;
-									            color: #555; /* 稍微浅一点的颜色 */
-									            text-align: center;
-									            background-color: #f9f9f9; /* 柔和的背景色 */
-									            padding: 10px;
-									            border-radius: 8px;
-									            margin-bottom: 20px; /* 增加与下方内容的间距 */
-									            border: 1px solid #ddd; /* 添加浅色边框 */
-									        }
-
-									        @media (max-width: 768px) {
-									            h1 {
-									                font-size: 3rem;
-									            }
-
-									            body {
-									                padding: 10px;
-									            }
-
-									            button {
-									                padding: 10px 15px;
-									            }
-									        }
-
-									        .quantity-btn {
-									            width: 30px;
-									            height: 30px;
-									            border: none;
-									            border-radius: 50%; /* 圆形按钮 */
-									            cursor: pointer;
-									            font-size: 2rem;
-									            display: inline-flex;
-									            justify-content: center;
-									            align-items: center;
-									        }
-
-									        .quantity-btn:nth-child(3) {
-									            background-color: #4CAF50 ; /* 青色 */
-									            color: white;
-									        }
-
-									        .quantity-btn:nth-child(5) {
-									            background-color: #F44336; /* 红色 */
-									            color: white;
-									        }
-						                    .quantity-btn:hover {
-						    transform: scale(1.1); /* 放大按钮 */
-						    transition: transform 0.2s ease; /* 添加过渡效果 */
-						}
-						.quantity-btn:active {
-						    transform: scale(0.95); /* 按下时缩小按钮 */
-						    transition: transform 0.1s ease;
-						}
-						.quantity-btn {
-						    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-						}
-						.quantity-btn {
-						    transition: background-color 0.3s ease, color 0.3s ease;
-						}
-
-
-						                    input[type="number"] {
-						    width: 40px; /* 你可以根据需要调整为任何合适的大小 */
-						    padding: 5px; /* 调整内边距以使输入框看起来更舒适 */
-						    margin-left: 10px;
-			                margin-right: 10px;/* 留出与其他元素的间距 */
-						    text-align: middle; /* 保持数字靠右对齐 */
-						   }
-		</style>
-	</head>
-	<body>
-		<!-- 模式切换按钮 -->
-		<button class="toggle-mode-btn" onclick="toggleDarkMode()">切换至黑暗模式</button>
-
-		<h1>Stock Order</h1>
-		<div class="container">
-			<div class="loader">
-				<span style="--i:0;"></span>
-				<span style="--i:1;"></span>
-				<span style="--i:2;"></span>
-				<span style="--i:3;"></span>
-				<span style="--i:4;"></span>
-			</div>
-		</div>
-		<div>
-			<input type="checkbox" id="addOnCheckbox" />
-			<label for="addOnCheckbox">Add On</label>
-		</div>
-
-		<h3>SHOP</h3>
-		<div class="store-buttons">
+        #productList label {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
         
-    <a href="#" class="store-btn neon-button neon-button__1" data-value="*JKL*" onclick="selectStore(this)">JKL</a>
-    <a href="#" class="store-btn neon-button neon-button__2" data-value="*TOM*" onclick="selectStore(this)">TOM</a>
-	<a href="#" class="store-btn neon-button neon-button__3" data-value="*Ole-Ole*" onclick="selectStore(this)">Ole-Ole</a>
+
+        #suggestions {
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            background-color: white;
+            position: absolute;
+            width: 170px;
+            z-index: 10;
+        }
+
+        #suggestions div {
+            padding: 8px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        #suggestions div:hover {
+            background-color: #f0f0f0;
+        }
+
+        input[type="number"] {
+            width: 80px;
+            margin-left: 10px;
+            text-align: right;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 110px;
+        }
+
+        #result {
+            width: 100%;
+            height: 250px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            overflow: auto;
+            font-size: 1.1rem;
+            color: black;
+            background-color: #fff;
+            border-radius: 8px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        
+
+       button {
+    padding: 5px 10px;
+    font-size: 1rem;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+span {
+    font-size: 1.2rem;
+}
 
 
+        .toggle-mode-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
 
-		</div>
+        .saved-button {
+            background-color: #007bff;
+        }
 
-		<h3>Catogory</h3>
+        #searchBar {
+            width: 150px;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1.1rem;
+        }
 
-		<div class="category-container">
-			<a href="#" class="category-btn neon-button neon-button__4" data-value="BanHeang" onclick="selectCategory(this)">BanHeang</a>
-			<a href="#" class="category-btn neon-button neon-button__4" data-value="HopHup" onclick="selectCategory(this)">HopHup</a>
-			<a href="#" class="category-btn neon-button neon-button__4" data-value="Chocolate" onclick="selectCategory(this)">Chocolate</a>
-			<a href="#" class="category-btn neon-button neon-button__4" data-value="Sotong" onclick="selectCategory(this)">Sotong</a>
-			<a href="#" class="category-btn neon-button neon-button__4" data-value="Coffee" onclick="selectCategory(this)">Coffee</a>
-			<a href="#" class="category-btn neon-button neon-button__4" data-value="Amplang" onclick="selectCategory(this)">Amplang</a>
-			<a href="#" class="category-btn neon-button neon-button__4" data-value="Other" onclick="selectCategory(this)">Other</a>
-		</div>
+        .payment-section {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #2c2c2c;
+        }
 
-		<input type="text" id="productSearch" placeholder="Search..." oninput="searchProduct()" autocomplete="off" />
-		<div id="suggestions"></div>
-		<h3>Select items (default quantity is 1）</h3>
-		<div id="productList"></div>
+        .payment-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
 
-		<button onclick="generateText()">Generate</button>
-		<button class="whatsapp-button" onclick="copyAndSendWhatsApp()">Copy And Paste to WhatsApp</button>
+        .payment-option {
+            padding: 15px 10px;
+            border-radius: 8px;
+            background-color: #3c3c3c;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
 
-		<div id="result"></div>
+        .payment-option span {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
 
-		<script>
-			        const SHEET_ID = '你的表格ID';
-			const SHEET_NAME = 'Sheet1'; // 如果你的表格页面名称不是 Sheet1，请修改这里
+        .payment-option span i {
+            font-size: 1.5rem;
+        }
 
-			function loadQuantitiesFromSheet() {
-			    const SHEET_ID = '1QUB8R0-gtwNhdiPYU2rwFf_UKrGyyqCQHzIQ7AxKFLI';
-			    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+        .payment-option:hover {
+            background-color: #4c4c4c;
+            transform: translateY(-2px);
+        }
 
-			    fetch(url)
-			        .then(response => response.text())
-			        .then(data => {
-			            try {
-			                const jsonData = JSON.parse(data.substr(47).slice(0, -2));
-			                const rows = jsonData.table.rows;
+        .payment-option.selected {
+            background-color: #007bff;
+            color: white;
+        }
 
-			                // 创建一个映射来存储商品名称和库存数量
-			                const stockMap = {};
-			                rows.forEach(row => {
-			                    if(row.c[0] && row.c[1]) {
-			                        const productName = row.c[0].v;
-			                        const stockQuantity = row.c[1].v;
-			                        stockMap[productName] = stockQuantity;
-			                    }
-			                });
+        /* 添加响应式设计 */
+        @media screen and (max-width: 600px) {
+            .payment-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
 
-			                // 更新所有商品标签显示库存数量
-			                const labels = document.querySelectorAll('#productList label');
-			                labels.forEach(label => {
-			                    const productName = label.textContent;
-			                    const stock = stockMap[productName];
-			                    if (stock !== undefined) {
-			                        // 在商品名称后添加库存数量
-			                        label.innerHTML = `${productName} <span style="color: blue; font-size: 0.9em;">(Stock: ${stock})</span>`;
-			                    }
-			                });
-			            } catch (error) {
-			                console.error('解析数据错误:', error);
-			            }
-			        })
-			        .catch(error => console.error('获取数据失败:', error));
-			}
-						        // 分类商品
-						 						        const categories = {
-			    BanHeang: [
-			        { id: 101, name: "BH Tambun Original" },
-			        { id: 102, name: "BH Tambun Pandan" },
-			        { id: 103, name: "BH Tambun White Lotus" },
-			        { id: 104, name: "BH Tau Sar Pheah" },
-			        { id: 105, name: "BH Heong Pheah" },
-			        { id: 106, name: "BH Beh Teh Saw" },
-			        { id: 107, name: "BH Phong Pheah" },
-			        { id: 108, name: "BH Pepper Biscuit" },
-			        { id: 109, name: "BH Hup Toh Soh" },
-			        { id: 110, name: "BH Omlette Crisp Chocolate" },
-			        { id: 111, name: "BH Omlette Crisp Pandan" },
-			        { id: 112, name: "BH Kai Chai Biscuit" },
-			        { id: 113, name: "BH Almond Slice" },
-			        { id: 114, name: "BH Almond Slice Salted Egg" },
-			        { id: 115, name: "BH Durian Crisp" },
-			        { id: 116, name: "BH Coconut Crisp" },
-			        { id: 117, name: "BH Salted Fish Crisp" },
-			        { id: 118, name: "BH Salted Egg Crisp" },
-			        { id: 119, name: "BH Cheese Crisp" },
-			        { id: 120, name: "BH Chic Kut Teh" },
-			        { id: 121, name: "BH Ginger Slice" },
-			        { id: 122, name: "BH Dried Mango" },
-			        { id: 123, name: "BH Kacang Tumbuk" },
-			        { id: 124, name: "BH Gula Kacang" },
-			        { id: 125, name: "BH Black Sesame Peanut" },
-			        { id: 126, name: "BH Shat Kek Ma" },
-			        { id: 127, name: "BH Shat Kek Ma (Brown Sugar)" },
-			        { id: 128, name: "BH Coconut Biscuits" },
-			        { id: 129, name: "BH FD Durian 50g" },
-			        { id: 130, name: "BH FD Mango 50g" },
-			        { id: 131, name: "BH FD Durian 30g" },
-                    { id: 160, name: "BH FD Mango 30g" },
-                    { id: 161, name: "BH FD Cempedak 25g" },
-                    { id: 162, name: "BH FD Jackfruit 30g" },
-			        { id: 132, name: "BH Butter Cookies" },
-			        { id: 133, name: "BH Chocolate Cookies" },
-			        { id: 134, name: "BH Raisin Cookies" },
-			        { id: 135, name: "BH Almond Cookies" },
-			        { id: 136, name: "BH Pineapple Tart" },
-			        { id: 137, name: "BH Red Bean Mochi" },
-			        { id: 138, name: "BH Peanut Mochi" },
-			        { id: 139, name: "BH Green Tea Mochi" },
-			        { id: 140, name: "BH Durian Mochi" },
-			        { id: 141, name: "BH Yam Mochi" },
-			        { id: 142, name: "BH Mochi Milk Yam Filling" },
-			        { id: 143, name: "BH Mochi Milk Mango Filling" },
-			        { id: 144, name: "BH Mochi Milk Green Tea" },
-			        { id: 145, name: "BH Sotong Cuttlefish" },
-			        { id: 146, name: "BH Gula Cuttlefish" },
-			        { id: 147, name: "BH Satay Fish" },
-			        { id: 148, name: "BH Fillet Cracker With Anchovy" },
-			        { id: 149, name: "BH Fillet Cracker With Seaweed" },
-			        { id: 150, name: "BH Sakura Shrimp" },
-			        { id: 151, name: "BH Frugurt Yogurt Blueberry" },
-			        { id: 152, name: "BH Frugurt Yogurt Peach" },
-			        { id: 153, name: "BH Frugurt Yogurt Mango" },
-			        { id: 154, name: "BH Durian Pudding" },
-			        { id: 155, name: "BH Coconut Pudding" },
-			        { id: 156, name: "BH Dodol Durian" },
-			        { id: 157, name: "BH Dodol Coconut" },
-			        { id: 158, name: "BH Dodol Pandan" },
-			        { id: 159, name: "BH Durian Beh Teh Saw" },
-                    { id: 163, name: "Fruity Marshmallow" },
-                    { id: 164, name: "Matcha Marshmallow" },
-                    { id: 165, name: "Durian Marshmallow" },
-			    ],
-			    HopHup: [
-			        { id: 201, name: "HT Durian Tart" },
-			        { id: 202, name: "HT Mango Tart" },
-			        { id: 203, name: "HT Durian Wafer Roll" },
-			        { id: 204, name: "HT Mango Wafer Roll" },
-			        { id: 205, name: "HT Omelette Durian" },
-			        { id: 206, name: "HT Coconut Ori Cookies" },
-			        { id: 207, name: "HT Coconut Pandan Cookies" },
-			        { id: 208, name: "HT Dodol Original" },
-			        { id: 209, name: "HT Dodol Kopi" },
-			        { id: 210, name: "HT Dodol Durian" },
-			        { id: 211, name: "HT Freeze Dried Mango" },
-			        { id: 212, name: "HT Freeze Dried Durian" },
-			        { id: 213, name: "Salted Egg Fish Skin" },
-			        { id: 214, name: "Salted Egg Fish Skin Spicy" },
-			        { id: 215, name: "Salted Egg Salmon Skin" },
-			        { id: 216, name: "Musang King Durian Candy" },
-			        { id: 217, name: "HT Durian Cookies" },
-			        { id: 218, name: "Fish Chips Classic" },
-			        { id: 219, name: "Salted Egg Fish Chips" },
-			        { id: 220, name: "Salted Egg Fish Chips Mala" }
-			    ],
-			    Chocolate: [
-			        { id: 301, name: "AD Chocolate Durian", unit: 'pc', defaultQuantity: 50 },
-			        { id: 302, name: "AD Chocolate Sabah Tea", unit: 'pc', defaultQuantity: 50 },
-			        { id: 303, name: "AD Chocolate Mango", unit: 'pc', defaultQuantity: 50 },
-			        { id: 304, name: "AD Chocolate Chili", unit: 'pc', defaultQuantity: 50 },
-			        { id: 305, name: "AD Chocolate Dark", unit: 'pc', defaultQuantity: 50 },
-			        { id: 306, name: "AD Chocolate Coffee", unit: 'pc', defaultQuantity: 50 },
-			        { id: 307, name: "AD Chocolate Banana", unit: 'pc', defaultQuantity: 50 },
-			        { id: 308, name: "AD Chocolate Tiramisu", unit: 'pc', defaultQuantity: 50 },
-			        { id: 309, name: "AD Chocolate Mint", unit: 'pc', defaultQuantity: 50 },
-			        { id: 310, name: "AD Chocolate Rambutan", unit: 'pc', defaultQuantity: 50 },
-			        { id: 311, name: "AD Chocolate Soursup", unit: 'pc', defaultQuantity: 50 },
-			        { id: 312, name: "AD Chocolate Coconut", unit: 'pc', defaultQuantity: 50 },
-			        { id: 313, name: "AD Chocolate Mangosteen", unit: 'pc', defaultQuantity: 50 }
-			    ],
-			    Sotong: [
-			        { id: 401, name: "Cuttlefish Red" },
-			        { id: 402, name: "Cuttlefish Lemon" },
-			        { id: 403, name: "Cuttlefish Honey" },
-			        { id: 404, name: "Cuttlefish Floss Original" },
-			        { id: 405, name: "Cuttlefish Massive" },
-			        { id: 406, name: "Cuttlefish Whole" },
-			        { id: 407, name: "Cuttlefish Roasted" },
-			        { id: 408, name: "Cuttlefish Chili" },
-			        { id: 409, name: "Cuttle Fish Slices" },
-			        { id: 410, name: "Cuttle Fish Sugar" },
-			        { id: 411, name: "Five Star Cuttlefish" }
-			    ],
-			    Coffee: [
-			        { id: 501, name: "BH W/Coffee(Mini)" },
-			        { id: 502, name: "BH W/Coffee(Mini)No Sugar" },
-			        { id: 503, name: "BH Durian W/Coffee(Mini)" },
-			        { id: 504, name: "BH Teh Tarik(Mini)" },
-			        { id: 505, name: "BH W/Coffee" },
-			        { id: 506, name: "BH W/Coffee No Sugar" },
-			        { id: 507, name: "BH Kopi O 2in1" },
-			        { id: 508, name: "BH Kopi O No Sugar" },
-			        { id: 509, name: "BH Teh Tarik" },
-			        { id: 510, name: "BH Durian White Coffee" },
-			        { id: 511, name: "Kopi Tenom Silver" },
-			        { id: 512, name: "Kopi Tenom Gold" },
-			        { id: 513, name: "Kopi Tenom Blue" },
-			        { id: 514, name: "Kopi Tenom Green" },
-			        { id: 515, name: "Kopi Tenom Red" }
-			    ],
-			    Amplang: [
-			        { id: 601, name: "Amplang Ikan" },
-			        { id: 602, name: "Amplang Udang" },
-			        { id: 603, name: "Amplang Sotong" }
-			    ],
-			    Other: [
-			        { id: 701, name: "Fruity Gummy Assorted" },
-			        { id: 702, name: "Fruity Gummy Mango" },
-			        { id: 703, name: "Durian Kuih" },
-			        { id: 704, name: "Anchovy Blue" },
-			        { id: 705, name: "Anchovy Green" },
-			        { id: 706, name: "Anchovy Red" },
-			        { id: 707, name: "Anchovy Yellow" },
-                    { id: 708, name: "Prawn Cracker 500g" },
-                    { id: 709, name: "Fish Maw" }
-			    ]
-			};
-						        let selectedItems = {};
+            .payment-option {
+                padding: 10px 5px;
+                min-height: 50px;
+            }
 
-			function loadProducts(products) {
-			    const productList = document.getElementById('productList');
-			    productList.innerHTML = '';
+            .payment-option span {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
 
-			    products.forEach(product => {
-			        const div = document.createElement('div');
-			        const isChecked = selectedItems[product.id] ? 'checked' : '';
+    <div class="header">
+        <h1>Sales Listing</h1>
+    </div>
 
-			        div.innerHTML = `
-			            <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
-			            <label for="item${product.id}">${product.name}</label>
-			            <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
-			            <input type="number"
-			                   id="quantity${product.id}"
-			                   min="1"
-			                   value="${selectedItems[product.id] || 1}"
-			                   readonly>
-			            <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
-			        `;
-			        productList.appendChild(div);
-			    });
+    <div class="search-container">
+        <input type="text" id="searchBar" placeholder="Search for items..." onfocus="this.value=''" onkeyup="searchItems()">
+        <div id="suggestions"></div>
+    </div>
 
-			    // 加载并显示库存数量
-			    loadQuantitiesFromSheet();
-			}
-						        function saveItem(id, name) {
-						            const checkbox = document.getElementById('item' + id);
-						            const quantity = document.getElementById('quantity' + id).value || 1;
+    <h3>Category</h3>
+    <div class="category-container" id="categoryContainer"></div>
 
-						            if (checkbox.checked) {
-						                selectedItems[id] = quantity;
-						            } else {
-						                delete selectedItems[id]; // 如果取消勾选，就删除该商品
-						            }
-						        }
+    <div id="productList"></div>
 
-						        function saveQuantity(id) {
-						            const quantity = document.getElementById('quantity' + id).value || 1;
-						            if (selectedItems[id]) {
-						                selectedItems[id] = quantity; // 更新数量
-						            }
-						        }
+    <div class="payment-section">
+        <h3>Payment Method</h3>
+        <div class="payment-options">
+            <label class="payment-option">
+                <input type="radio" name="store" value="*Cash*" onclick="toggleCashInput(); updateResult(); selectPayment(this)">
+                <span>
+                    💵<br>
+                    Cash
+                </span>
+            </label>
+            <label class="payment-option">
+                <input type="radio" name="store" value="*Card*" onclick="hideCashInput(); updateResult(); selectPayment(this)">
+                <span>
+                    💳<br>
+                    Card
+                </span>
+            </label>
+            <label class="payment-option">
+                <input type="radio" name="store" value="*E-Wallet*" onclick="hideCashInput(); updateResult(); selectPayment(this)">
+                <span>
+                    📱<br>
+                    E-wallet
+                </span>
+            </label>
+        </div>
+    </div>
 
-						        function changeQuantity(id, change) {
-						            const quantityInput = document.getElementById('quantity' + id);
-						            let currentQuantity = parseInt(quantityInput.value) || 1; // 默认值为1
+    <div class="action-buttons">
+        <button onclick="clearAll()">Next Customers</button>
+        <div id="cashInputContainer" style="display: none;">
+            <input type="number" id="cashAmount" placeholder="Enter cash amount" 
+                   style="background-color: white; color: black; padding: 5px;"
+                   oninput="calculateChange()">
+            <div id="changeAmount" style="color: #e0e0e0; margin-left: 10px; display: inline-block;"></div>
+        </div>
+    </div>
 
-						            // 更新数量并确保不小于1
-						            currentQuantity = Math.max(1, currentQuantity + change);
-						            quantityInput.value = currentQuantity;
+    <div id="result"></div>
 
-						            saveQuantity(id); // 保存更新的数量
-						        }
-						                function toggleItems() {
-						            let selectedStore = document.querySelector('.store-btn.active');
-						            let checkboxes = document.querySelectorAll('#productList input[type="checkbox"]');
-						            let quantities = document.querySelectorAll('#productList input[type="number"]');
+    <div class="button-container">
+        <button onclick="saveToStorage(1)">Save 1</button>
+        <button onclick="saveToStorage(2)">Save 2</button>
+        <button onclick="saveToStorage(3)">Save 3</button>
+        <button onclick="saveToStorage(4)">Save 4</button>
+    </div>
+    <div class="button-container">
+        <button onclick="viewStorage(1)">View 1</button>
+        <button onclick="viewStorage(2)">View 2</button>
+        <button onclick="viewStorage(3)">View 3</button>
+        <button onclick="viewStorage(4)">View 4</button>
+    </div>
+    <button onclick="clearAllStorage()">Clear All</button>
 
-						            if (selectedStore) {
-						                checkboxes.forEach(checkbox => checkbox.disabled = false);
-						                quantities.forEach(quantity => quantity.disabled = false);
-						            } else {
-						                checkboxes.forEach(checkbox => checkbox.disabled = true);
-						                quantities.forEach(quantity => quantity.disabled = true);
-						            }
-						        }
+<script>
+    // 分类商品
+    const categories = {
+        BanHeang: [
+            { id: 1, name: "Tambun Original", price: 17.90 },
+            { id: 2, name: "Tambun Pandan", price: 17.90 },
+            { id: 3, name: "Tambun White Lotus", price: 20.80 },
+            { id: 4, name: "Tau Sar Pheah", price: 16.80 },
+            { id: 5, name: "Heong Pheah", price: 16.80 },
+            { id: 6, name: "Beh Teh Saw", price: 16.80 },
+            { id: 7, name: "Phong Pheah", price: 16.80 },
+            { id: 8, name: "Pepper Biscuit", price: 0 },
+            { id: 9, name: "Hup Toh Soh", price: 16.80 },
+            { id: 10, name: "Omlette Crisp Chocolate", price: 19.80 },
+            { id: 11, name: "Omlette Crisp Pandan", price: 19.80 },
+            { id: 12, name: "Kai Chai Biscuit", price: 14.80 },
+            { id: 13, name: "Almond Slice", price: 0 },
+            { id: 14, name: "Almond Slice Salted Egg", price: 0 },
+            { id: 15, name: "Durian Crisp", price: 17.80 },
+            { id: 16, name: "Coconut Crisp", price: 17.80 },
+            { id: 17, name: "Salted Fish Crisp", price: 17.80 },
+            { id: 18, name: "Salted Egg Crisp", price: 17.80 },
+            { id: 19, name: "Cheese Crisp", price: 17.80 },
+            { id: 20, name: "Chic Kut Teh", price: 18 },
+            { id: 21, name: "Ginger Slice", price: 19.80 },
+            { id: 26, name: "BH Dried Mango", price: 24.80 },
+            { id: 27, name: "Kacang Tumbuk", price: 8.90 },
+            { id: 28, name: "Gula Kacang", price: 8.90 },
+            { id: 29, name: "Black Sesame Peanut", price: 13.80 },
+            { id: 30, name: "Shat Kek Ma", price: 21.80 },
+            { id: 31, name: "Shat Kek Ma (Brown Sugar)", price: 21.80 },
+            { id: 32, name: "Coconut Biscuits (Beg)", price: 17.80 },
+            { id: 33, name: "BH Freeze Dried Durian", price: 26.80 },
+            { id: 34, name: "BH Freeze Dried Mango", price: 26.80 },
+            { id: 36, name: "Butter Cookies", price: 16.80 },
+            { id: 37, name: "Chocolate Cookies", price: 16.80 },
+            { id: 38, name: "Raisin Cookies", price: 16.80 },
+            { id: 39, name: "Almond Cookies", price: 16.80 },
+            { id: 40, name: "Pineapple Tart", price: 0 },
+            { id: 41, name: "Red Bean Mochi", price: 18.70 },
+            { id: 42, name: "Peanut Mochi", price: 18.70 },
+            { id: 43, name: "Green Tea Mochi", price: 18.70 },
+            { id: 44, name: "Durian Mochi", price: 18.70 },
+            { id: 45, name: "Yam Mochi", price: 18.70 },
+            { id: 46, name: "Mochi Milk Yam Filling", price: 18.70 },
+            { id: 47, name: "Mochi Milk Mango Filling", price: 18.70 },
+            { id: 48, name: "Mochi Milk Green Tea", price: 18.70 },
+            { id: 52, name: "Fillet Cracker With Anchovy", price: 14.60 },
+            { id: 53, name: "Fillet Cracker With Seaweed", price: 14.60 },
+            { id: 54, name: "Sakura Shrimp", price: 14.60 },
+            { id: 60, name: "Frugurt Yogurt Blueberry", price: 24.80 },
+            { id: 61, name: "Frugurt Yogurt Peach", price: 24.80 },
+            { id: 62, name: "Frugurt Yogurt Mango", price: 24.80 },
+            { id: 63, name: "Durian Pudding", price: 24.80 },
+            { id: 64, name: "Coconut Pudding", price: 24.80 },
+            { id: 65, name: "BH Dodol Durian", price: 0 },
+            { id: 66, name: "BH Dodol Coconut", price: 0 },
+            { id: 67, name: "BH Dodol Pandan", price: 0 },
+            { id: 68, name: "Durian Beh Teh Saw", price: 28.90 },
+        ],
+        HopHup: [
+            { id: 70, name: "Musang King Tart", price: 19 },
+            { id: 71, name: "Mango Tart", price: 19 },
+            { id: 72, name: "Durian Wafer Roll", price: 23.80 },
+            { id: 73, name: "Omelette Durian", price: 25.80 },
+            { id: 76, name: "HT Coconut Ori Cookies", price: 14.80 },
+            { id: 77, name: "HT Coconut Pandan Cookies", price: 14.80 },
+            { id: 78, name: "HT Dodol Kopi", price: 21.80 },
+            { id: 79, name: "HT Dodol Durian", price: 21.80 },
+            { id: 80, name: "HT Freeze Dried Mango", price: 26.80 },
+            { id: 81, name: "HT Freeze Dried Durian", price: 26.80 },
+            { id: 82, name: "Salted Egg Fish Skin", price: 30 },
+            { id: 83, name: "Salted Egg Fish Skin Spicy", price: 30 },
+            { id: 84, name: "Salted Egg Salmon Skin", price: 30 },
+            { id: 94, name: "HT Musang King Durian Candy", price: 21.80 },
+            { id: 126, name: "HT Dried Fruit Mango ", price: 24.80 }
+        ],
+        Chocolate: [
+            { id: 108, name: "AD Chocolate Durian", unit: 'pc', price: 39 },
+            { id: 109, name: "AD Chocolate Sabah Tea", unit: 'pc', price: 39 },
+            { id: 110, name: "AD Chocolate Mango", unit: 'pc', price: 39 },
+            { id: 111, name: "AD Chocolate Chili", unit: 'pc', price: 39 },
+            { id: 112, name: "AD Chocolate Dark", unit: 'pc', price: 39 },
+            { id: 113, name: "AD Chocolate Coffee", unit: 'pc', price: 39 },
+            { id: 114, name: "AD Chocolate Banana", unit: 'pc', price: 39 },
+            { id: 115, name: "AD Chocolate Tiramisu", unit: 'pc', price: 39 },
+            { id: 116, name: "AD Chocolate Mint", unit: 'pc', price: 39 },
+            { id: 117, name: "AD Chocolate Rambutan", unit: 'pc', price: 39 },
+            { id: 118, name: "AD Chocolate Soursup", unit: 'pc', price: 39 }
+        ],
+        Sotong: [
+            { id: 85, name: "Cuttlefish Red", price: 21.50 },
+            { id: 86, name: "Cuttlefish Lemon", price: 21.50 },
+            { id: 87, name: "Cuttlefish Honey", price: 21.50 },
+            { id: 88, name: "Cuttlefish Floss Original", price: 21.50 },
+            { id: 89, name: "Cuttlefish Massive", price: 21.50 },
+            { id: 90, name: "Cuttlefish Whole", price: 21.50 },
+            { id: 91, name: "Cuttlefish Roasted", price: 21.50 },
+            { id: 92, name: "Cuttlefish Chili", price: 21.50 },
+            { id: 93, name: "Five Star Cuttlefish", price: 34.00 },
+            { id: 49, name: "BH Sotong Cuttlefish", price: 14.60 },
+            { id: 50, name: "BH Gula Cuttlefish", price: 14.60 },
+            { id: 51, name: "BH Satay Fish", price: 14.60 }
+         ],
+        Coffee: [
+            { id: 22, name: "BH W/Coffee(Mini)", price: 25.80 },
+            { id: 23, name: "BH W/Coffee(Mini)No Sugar", price: 25.80 },
+            { id: 25, name: "BH Durian W/Coffee(Mini)", price: 25.80 },
+            { id: 24, name: "BH Teh Tarik(Mini)", price: 25.80 },
+            { id: 55, name: "BH W/Coffee", price: 29.50 },
+            { id: 119, name: "BH W/Coffee No Sugar", price: 29.50 },
+            { id: 58, name: "BH Teh Tarik", price: 29.50 },
+            { id: 59, name: "BH Durian White Coffee", price: 29.50 },
+            { id: 99, name: "Kopi Tenom Silver", price: 11.70 },
+            { id: 100, name: "Kopi Tenom Gold", price: 12.70 },
+            { id: 101, name: "Kopi Tenom Blue", price: 14.80 },
+            { id: 102, name: "Kopi Tenom Green", price: 14.30 },
+            { id: 125, name: "Kopi Tenom Red ", price: 15.60 }
+        ],
+        Amplang: [
+            { id: 96, name: "Amplang Ikan", price: 12 },
+            { id: 97, name: "Amplang Udang", price: 12 },
+            { id: 98, name: "Amplang Sotong", price: 12 },
+            { id: 143, name: "kuih Cincin", price: 12 },
+            { id: 144, name: "Kuih Cincin (Mini)", price: 18 }
+                        
+        ],
+        SabahTea: [
+            { id: 127, name: "Sabah Tea (S)", price: 7.50 },
+            { id: 128, name: "Sabah Tea (B)", price: 14 },
+            { id: 129, name: "Sabah Tea Box", price: 40 },
+            { id: 130, name: "Sabah Tea Gift Box", price: 96 },
+            { id: 131, name: "Sabah Tea Agarwood", price: 15.80 },
+            { id: 132, name: "Sabah Tea Cinnamon", price: 15.80 },
+            { id: 133, name: "Sabah Tea Ginger", price: 15.80 },
+            { id: 134, name: "Sabah Tea Misai Kuching", price: 15.80 },
+            { id: 135, name: "Sabah Tea Tongat Ali", price: 15.80 },
+            { id: 136, name: "Sabah Tea Geranium", price: 15.80 },
+            { id: 137, name: "Sabah Tea Lemon Grass", price: 15.80 },
+            { id: 138, name: "Sabah Tea Pandan", price: 15.80 },
+            { id: 139, name: "Sabah Tea Geranium", price: 15.80 },
+            { id: 140, name: "Sabah Tea Organic", price: 20 },
+            { id: 141, name: "Sabah Tea Wooden box (B)", price: 65 },
+            { id: 142, name: "Sabah Tea Wooden box (S)", price: 47.70 },
+                        
+        ],
+        Other: [
+            { id: 106, name: "Fruity Gummy Assorted", price: 8.50 },
+            { id: 124, name: "Fruity Gummy Mango", price: 8.50 },
+            { id: 69, name: "Durian Kuih", price: 33 },
+            { id: 120, name: "Anchovy Blue", price: 28.80 },
+            { id: 121, name: "Anchovy Green", price: 28.80 },
+            { id: 122, name: "Anchovy Red", price: 19.80 },
+            { id: 123, name: "Anchovy Yellow", price: 19.80 },
+            { id: 145, name: "Bird Nest", price: 0, customPrice: true },
+            { id: 146, name: "Fish Maw", price: 0, customPrice: true },
+            { id: 147, name: "Sea Cucumber", price: 0, customPrice: true }
+        ]
+    };
 
-						        function showCategory() {
-						            let selectedCategory = document.querySelector('input[name="category"]:checked');
+    let selectedItems = {};
 
-						            if (selectedCategory) {
-						                let categoryValue = selectedCategory.value;
-						                let productsToShow = categories[categoryValue];
+    window.onload = function() {
+        // 初始化分类选择
+        const categoryContainer = document.getElementById('categoryContainer');
+        for (let category in categories) {
+            const label = document.createElement('label');
+            label.innerHTML = `<input type="radio" name="category" value="${category}" onclick="showCategory()">${category}`;
+            categoryContainer.appendChild(label);
+        }
+    };
 
-						                if (productsToShow) {
-						                    loadProducts(productsToShow); // 根据选择的目录加载商品
-						                } else {
-						                    console.error("没有找到该分类的商品");
-						                }
-						            } else {
-						                console.error("没有选中任何分类");
-						            }
+function loadProducts(products) {
+    const productList = document.getElementById('productList');
+    productList.innerHTML = '';
 
-						            toggleItems(); // 确保激活商品选择框
-						        }
+    products.forEach(product => {
+        const div = document.createElement('div');
+        if (product.customPrice) {
+            if (["Bird Nest", "Fish Maw", "Sea Cucumber"].includes(product.name)) {
+                // 为 Bird Nest、Fish Maw 和 Sea Cucumber 添加 Add 按钮
+                div.innerHTML = `
+                    <label>${product.name}</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="number" 
+                               id="price${product.id}" 
+                               placeholder="Enter price" 
+                               style="width: 100px; padding: 5px; background-color: white; color: black;"
+                               step="0.10">
+                        <button onclick="addCustomItem(${product.id}, '${product.name}')">Add</button>
+                    </div>
+                `;
+            } else {
+                div.innerHTML = `
+                    <input type="checkbox" id="item${product.id}" onchange="saveCustomItem(${product.id}, '${product.name}')">
+                    <label for="item${product.id}">${product.name}</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="number" 
+                               id="price${product.id}" 
+                               placeholder="Enter price" 
+                               style="width: 100px; padding: 5px; background-color: white; color: black;"
+                               onchange="updateCustomPrice(${product.id})"
+                               step="0.10">
+                        <button onclick="decreaseQuantity(${product.id})">-</button>
+                        <span id="quantityDisplay${product.id}" style="padding: 0 10px;">1</span>
+                        <button onclick="increaseQuantity(${product.id})">+</button>
+                    </div>
+                `;
+            }
+        } else {
+            div.innerHTML = `
+                <input type="checkbox" id="item${product.id}" onchange="saveItem(${product.id}, '${product.name}', ${product.price})">
+                <label for="item${product.id}">${product.name} - RM${product.price.toFixed(2)}</label>
+                <div style="display: flex; align-items: center;">
+                    <button onclick="decreaseQuantity(${product.id})">-</button>
+                    <span id="quantityDisplay${product.id}" style="padding: 0 10px;">1</span>
+                    <button onclick="increaseQuantity(${product.id})">+</button>
+                </div>
+            `;
+        }
+        productList.appendChild(div);
+    });
+}
+function increaseQuantity(id) {
+    const quantityDisplay = document.getElementById(`quantityDisplay${id}`);
+    let currentQuantity = parseInt(quantityDisplay.textContent);
+    currentQuantity++;
+    quantityDisplay.textContent = currentQuantity;
+    saveQuantity(id, currentQuantity);  // 更新选中的商品数量
+    updateResult();
+}
 
-						function generateText() {
-   let result = '';
-   // 修改选择器以同时支持 button 和 a 标签
-   let selectedStore = document.querySelector('.store-btn.active, .store-btn.selected');
-   let hasAddOn = document.getElementById('addOnCheckbox').checked;
+function decreaseQuantity(id) {
+    const quantityDisplay = document.getElementById(`quantityDisplay${id}`);
+    let currentQuantity = parseInt(quantityDisplay.textContent);
+    if (currentQuantity > 1) {  // 确保数量不小于 1
+        currentQuantity--;
+        quantityDisplay.textContent = currentQuantity;
+        saveQuantity(id, currentQuantity);  // 更新选中的商品数量
+        updateResult();
+    }
+}
+
+function searchItems() {
+    const searchTerm = document.getElementById('searchBar').value.toLowerCase();
+    const allProducts = Object.values(categories).flat();
+    const filteredProducts = allProducts.filter(product => product.name.toLowerCase().includes(searchTerm));
+    
+    // 清空建议列表
+    const suggestionsDiv = document.getElementById('suggestions');
+    suggestionsDiv.innerHTML = '';
+    
+    // 如果搜索栏为空，不显示建议
+    if (searchTerm === '') {
+        return;
+    }
+
+    // 显示建议列表
+    filteredProducts.forEach(product => {
+        const suggestionItem = document.createElement('div');
+        suggestionItem.textContent = product.name;
+        suggestionItem.onclick = function() {
+            document.getElementById('searchBar').value = product.name;
+            suggestionsDiv.innerHTML = '';  // 清空建议列表
+            loadProducts([product]);  // 显示选中的产品信息
+        };
+        suggestionsDiv.appendChild(suggestionItem);
+    });
+}
+
+function saveItem(id, name, price) {
+    const checkbox = document.getElementById('item' + id);
+    const quantity = document.getElementById('quantityDisplay' + id).textContent || 1;
+
+    if (checkbox.checked) {
+        selectedItems[id] = { quantity: quantity, price: price };
+    } else {
+        delete selectedItems[id];
+    }
+    updateResult();
+}
+
+function saveQuantity(id, quantity) {
+    if (selectedItems[id]) {
+        selectedItems[id].quantity = quantity;
+    }
+}
+
+function toggleItems() {
+    let checkboxes = document.querySelectorAll('#productList input[type="checkbox"]');
+    let quantities = document.querySelectorAll('#productList input[type="number"]');
+
+    checkboxes.forEach(checkbox => checkbox.disabled = false);
+    quantities.forEach(quantity => quantity.disabled = false);
+}
+
+function showCategory() {
+    let selectedCategory = document.querySelector('input[name="category"]:checked');
+    
+    if (selectedCategory) {
+        let categoryValue = selectedCategory.value;
+        let productsToShow = categories[categoryValue];
+        
+        if (productsToShow) {
+            loadProducts(productsToShow);
+        } else {
+            console.error("没有找到该分类的商品");
+        }
+    } else {
+        console.error("没有选中任何分类");
+    }
+
+    toggleItems();
+}
+
+function calculateTotal() {
+    let total = 0;
+    for (const item of Object.values(selectedItems)) {
+        total += item.quantity * item.price;
+    }
+    return total.toFixed(2);
+}
+
+function updateResult() {
+    let result = '';
+    let selectedStore = document.querySelector('input[name="store"]:checked');
     if (selectedStore) {
-       result += 'Kedai: ' + selectedStore.getAttribute('data-value');
-       if (hasAddOn) {
-           result += ' 💥Add On💥';
-       }
-       result += '\n\n';
-   } else {
-       result += 'Kedai: 未选择\n';
-   }
+        result += 'Payment: ' + selectedStore.value + '\n\n';
+    } else {
+        result += 'Payment: No Select\n';
+    }
 
-			    // 按分类整理已选商品
-			    const categorizedItems = {};
+    // 显示所有商品记录
+    for (const [uniqueId, { name, quantity, price }] of Object.entries(selectedItems)) {
+        result += `${name} - ${quantity} pc, RM${(quantity * price).toFixed(2)}\n`;
+    }
 
-			    // 初始化所有分类
-			    Object.keys(categories).forEach(category => {
-			        categorizedItems[category] = [];
-			    });
+    result += `\nTotal: RM${calculateTotal()}\n`;
 
-			    // 将选中的商品按分类整理
-			    for (const [id, quantity] of Object.entries(selectedItems)) {
-			        // 查找商品所属的分类
-			        for (const [category, products] of Object.entries(categories)) {
-			            const product = products.find(p => p.id == id);
-			            if (product) {
-			                const unit = product.unit === 'pc' ? 'pc' : 'ctn';
-			                categorizedItems[category].push({
-			                    name: product.name,
-			                    quantity: quantity,
-			                    unit: unit
-			                });
-			                break;
-			            }
-			        }
-			    }
+    // 添加现金和找零信息
+    if (selectedStore && selectedStore.value === '*Cash*') {
+        const cashAmount = parseFloat(document.getElementById('cashAmount').value) || 0;
+        result += `Cash: RM${cashAmount.toFixed(2)}\n`;
+        
+        const total = parseFloat(calculateTotal());
+        const change = cashAmount - total;
+        
+        if (!isNaN(change) && change >= 0) {
+            result += `Change: RM${change.toFixed(2)}`;
+        } else if (!isNaN(change) && change < 0) {
+            result += `Insufficient amount`;
+        }
+    }
 
-			    // 按分类输出商品
-			    for (const [category, items] of Object.entries(categorizedItems)) {
-			        if (items.length > 0) {
-			            result += `\n=== ${category} ===\n`;
-			            items.forEach(item => {
-			                result += `${item.name} - ${item.quantity} ${item.unit}\n`;
-			            });
-			        }
-			    }
+    // 更新 `result` 内容
+    document.getElementById('result').innerText = result;
 
-			    result += '\nAirport Stock Order: smartprofits.github.io/order/';
-			    document.getElementById('result').innerText = result;
+    // 动态添加日期和时间
+    const now = new Date();
+    const dateTimeString = `Date: ${now.toLocaleDateString()} Time: ${now.toLocaleTimeString()}`;
 
-			    // 清空商品列表
-			    document.getElementById('productList').innerHTML = '';
+    // 检查是否已有日期时间元素
+    let dateTimeElement = document.getElementById('dateTime');
+    if (!dateTimeElement) {
+        // 如果没有，创建一个新的元素并插入到 result 下方
+        dateTimeElement = document.createElement('div');
+        dateTimeElement.id = 'dateTime';
+        dateTimeElement.style.marginTop = '10px';
+        dateTimeElement.style.fontSize = '1.1rem';
+        dateTimeElement.style.color = 'black'; // 确保日期时间内容可见
+        document.getElementById('result').insertAdjacentElement('afterend', dateTimeElement);
+    }
 
-			    return result;
-			}
+    // 更新日期和时间
+    dateTimeElement.textContent = dateTimeString;
+}
 
+function saveToStorage(position) {
+    const text = document.getElementById('result').innerText;
+    localStorage.setItem('salesItemPosition' + position, text);
+    alert('Data Saved ' + position);
+    const saveButton = document.querySelector(`button[onclick="saveToStorage(${position})"]`);
+    saveButton.classList.add('saved-button');
+}
 
+function viewStorage(position) {
+    const storedText = localStorage.getItem('salesItemPosition' + position);
+    if (storedText) {
+        alert('Save ' + position + ' Data:\n' + storedText);
+    } else {
+        alert('Save ' + position + ' No Data');
+    }
+}
 
-						        function copyAndSendWhatsApp() {
-						            let text = generateText();
-						            navigator.clipboard.writeText(text).then(() => {
-						                alert('文字已复制，现在跳转到WhatsApp');
-						                let whatsappURL = `https://wa.me/?text=${encodeURIComponent(text)}`;
-						                window.location.href = whatsappURL;
-						            }).catch(err => {
-						                console.error('无法复制', err);
-						            });
-						        }
+function clearAll() {
+    selectedItems = {};
+    document.getElementById('productList').innerHTML = '';
+    document.getElementById('result').innerText = '';
+    document.querySelectorAll('input[name="store"]').forEach(input => input.checked = false);
+    document.querySelectorAll('input[name="category"]').forEach(input => input.checked = false);
+    toggleItems();
+}
 
-						        // 检查是否已经选择了模式，并设置默认模式
+function toggleDarkMode() {
+    const isDarkModeEnabled = document.body.classList.toggle('dark-mode');
+    const toggleButton = document.querySelector('.toggle-mode-btn');
 
+    if (isDarkModeEnabled) {
+        toggleButton.textContent = '切换至正常模式';
+        localStorage.setItem('dark-mode', 'enabled');
+    } else {
+        toggleButton.textContent = '切换至黑暗模式';
+        localStorage.setItem('dark-mode', 'disabled');
+    }
+}
 
-						        function toggleDarkMode() {
-						            const isDarkModeEnabled = document.body.classList.toggle('dark-mode');
-						            const toggleButton = document.querySelector('.toggle-mode-btn');
+function clearAllStorage() {
+    selectedItems = {};
+    document.getElementById('productList').innerHTML = '';
+    document.getElementById('result').innerText = '';
+    document.querySelectorAll('input[name="store"]').forEach(input => input.checked = false);
+    document.querySelectorAll('input[name="category"]').forEach(input => input.checked = false);
+    toggleItems();
+    // 清除本地存储内容并复原按钮颜色
+    for (let i = 1; i <= 5; i++) {
+        localStorage.removeItem('salesItemPosition' + i);
+        const saveButton = document.querySelector(`button[onclick="saveToStorage(${i})"]`);
+        saveButton.classList.remove('saved-button');
+    }
+    alert('所有内容已清空');
+}
 
-						            if (isDarkModeEnabled) {
-						                toggleButton.textContent = 'Light Mode🌞';
-						                localStorage.setItem('dark-mode', 'enabled');
-						            } else {
-						                toggleButton.textContent = 'Dark Mode🌙';
-						                localStorage.setItem('dark-mode', 'disabled');
-						            }
-						        }
-						function searchProduct() {
-						    const searchText = document.getElementById('productSearch').value.toLowerCase();
-						    const suggestionsContainer = document.getElementById('suggestions');
-						    suggestionsContainer.innerHTML = ''; // 清空之前的建议
+function toggleCashInput() {
+    document.getElementById('cashInputContainer').style.display = 'block';
+    calculateChange();
+}
 
-						    if (searchText.length === 0) return; // 如果没有输入，不显示建议
+function hideCashInput() {
+    document.getElementById('cashInputContainer').style.display = 'none';
+    document.getElementById('changeAmount').textContent = '';
+}
 
-						    // 获取所有分类中的商品
-						    const allProducts = Object.values(categories).flat();
+function calculateChange() {
+    const cashAmount = parseFloat(document.getElementById('cashAmount').value) || 0;
+    const total = parseFloat(calculateTotal());
+    const change = cashAmount - total;
+    
+    if (!isNaN(change) && change >= 0) {
+        document.getElementById('changeAmount').textContent = `Change: RM${change.toFixed(2)}`;
+    } else if (!isNaN(change) && change < 0) {
+        document.getElementById('changeAmount').textContent = `Insufficient amount`;
+    } else {
+        document.getElementById('changeAmount').textContent = '';
+    }
+    
+    updateResult();
+}
 
-						    // 根据输入的内容筛选出匹配的商品
-						    const matchingProducts = allProducts.filter(product => product.name.toLowerCase().includes(searchText));
+function selectPayment(radio) {
+    // 移除所有支付选项的选中样式
+    document.querySelectorAll('.payment-option').forEach(option => {
+        option.classList.remove('selected');
+    });
+    
+    // 为选中的支付选项添加样式
+    if (radio.checked) {
+        radio.closest('.payment-option').classList.add('selected');
+    }
+}
 
-						    // 显示匹配的商品作为建议
-						    matchingProducts.forEach(product => {
-						        const div = document.createElement('div');
-						        div.textContent = product.name;
-						        div.onclick = () => selectProduct(product); // 点击建议后选择该商品
-						        suggestionsContainer.appendChild(div);
-						    });
-						}
+function saveCustomItem(id, name) {
+    const checkbox = document.getElementById('item' + id);
+    const priceInput = document.getElementById('price' + id);
+    const quantity = document.getElementById('quantityDisplay' + id).textContent || 1;
+    const price = parseFloat(priceInput.value) || 0;
 
-						function selectProduct(product) {
-			    const productSearch = document.getElementById('productSearch');
-			    productSearch.value = '';
-			    const productList = document.getElementById('productList');
-			    productList.innerHTML = '';
+    if (checkbox.checked) {
+        if (price <= 0) {
+            alert('Please enter a valid price');
+            checkbox.checked = false;
+            return;
+        }
+        selectedItems[id] = { quantity: quantity, price: price };
+    } else {
+        delete selectedItems[id];
+    }
+    updateResult();
+}
 
-			    // 创建新的商品选择框
-			    const div = document.createElement('div');
-			    div.innerHTML = `
-			        <input type="checkbox" id="item${product.id}" checked onchange="saveItem(${product.id}, '${product.name}')">
-			        <label for="item${product.id}">${product.name}</label>
-			        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
-			        <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
-			        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
-			    `;
-			    productList.appendChild(div);
+function updateCustomPrice(id) {
+    const checkbox = document.getElementById('item' + id);
+    if (checkbox.checked) {
+        saveCustomItem(id, '');
+    }
+}
 
-			    // 保存新选择的商品
-			    saveItem(product.id, product.name);
+// 添加专门处理 Add 按钮点击事件的函数
+function addCustomItem(id, name) {
+    const priceInput = document.getElementById('price' + id);
+    const price = parseFloat(priceInput.value) || 0;
 
-			    // 立即为这个特定商品加载库存信息
-			    loadStockForProduct(product.name);
+    if (price <= 0) {
+        alert('Please enter a valid price');
+        return;
+    }
 
-			    document.getElementById('suggestions').innerHTML = '';
-			}
+    // 生成唯一的 ID，避免重复
+    const uniqueId = `${id}-${Date.now()}`;
 
-			// 新增函数：只为特定商品加载库存信息
-			function loadStockForProduct(productName) {
-			    const SHEET_ID = '1QUB8R0-gtwNhdiPYU2rwFf_UKrGyyqCQHzIQ7AxKFLI';
-			    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+    // 添加到 selectedItems，确保每次都是新记录
+    selectedItems[uniqueId] = { name: name, quantity: 1, price: price };
 
-			    fetch(url)
-			        .then(response => response.text())
-			        .then(data => {
-			            try {
-			                const jsonData = JSON.parse(data.substr(47).slice(0, -2));
-			                const rows = jsonData.table.rows;
+    updateResult();
+    alert(`${name} added successfully!`);
+}
 
-			                // 查找特定商品的库存
-			                const stockInfo = rows.find(row =>
-			                    row.c[0] && row.c[0].v === productName
-			                );
+</script>
+<p class="contact-info">If you have any questions or need to add new products, please contact me (Mark).</p>
 
-			                if (stockInfo && stockInfo.c[1]) {
-			                    const stock = stockInfo.c[1].v;
-			                    // 更新特定商品的标签
-			                    const label = document.querySelector(`label[for="item${product.id}"]`);
-			                    if (label) {
-			                        label.innerHTML = `${productName} <span style="color: #666; font-size: 0.9em;">(Stock:${stock})</span>`;
-			                    }
-			                }
-			            } catch (error) {
-			                console.error('解析数据错误:', error);
-			            }
-			        })
-			        .catch(error => console.error('获取数据失败:', error));
-			}
-
-
-
-						// 在页面加载时设置默认语言
-			window.onload = function() {
-			    const savedMode = localStorage.getItem('dark-mode');
-			    if (savedMode === 'enabled') {
-			        document.body.classList.add('dark-mode');
-			        document.querySelector('.toggle-mode-btn').textContent = '切换至正常模式';
-			    }
-			    toggleItems(); // 初始化商品选择框
-
-			    // 添加定时刷新
-			    setInterval(loadQuantitiesFromSheet, 30000);
-			}
-
-
-						        // 其他代码省略...
-function selectStore(button) {
-   // 阻止默认行为
-   event.preventDefault();
-   
-   // 移除其他按钮的活动状态
-   document.querySelectorAll('.store-btn').forEach(btn => {
-       btn.classList.remove('active');
-       btn.classList.remove('selected');
-   });
-   
-   // 添加当前按钮的活动状态
-   button.classList.add('active');
-   button.classList.add('selected');
-   
-   // 触发原有的切换功能
-   toggleItems();
-
-			}
-
-			function selectCategory(button) {
-			    // 移除其他按钮的活动状态
-			    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-			    // 添加当前按钮的活动状态
-			    button.classList.add('active');
-			    // 获取分类值并显示对应商品
-			    const categoryValue = button.getAttribute('data-value');
-			    showCategoryByValue(categoryValue);
-			}
-            const links = document.querySelectorAll("a");
-
-links.forEach((link) => {
-  link.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.target.classList.add("active");
-    setTimeout(() => {
-      event.target.classList.remove("active");
-    }, 500);
-  });
-});
-
-			function showCategoryByValue(categoryValue) {
-			    if (categoryValue && categories[categoryValue]) {
-			        loadProducts(categories[categoryValue]);
-			    }
-			    toggleItems();
-			}
-            
-		</script>
-
-		<p class="contact-info">If you have any questions or need to add new products, please contact me (Mark).</p>
-	</body>
+</body>
 </html>
