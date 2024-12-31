@@ -203,7 +203,7 @@
         }
 
         /* 联系信息样式 */
-       .contact-info {
+        .contact-info {
             text-align: center;
             margin-top: 20px;
             color: var(--dark-red);
@@ -281,6 +281,52 @@
             width: 300px;
         }
 
+        /* 生成图片容器样式（全屏覆盖） */
+        #generateImage {
+            display: none; /* 初始隐藏 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* 半透明黑色背景 */
+            justify-content: center;
+            align-items: center;
+            z-index: 4; /* 高于其他元素 */
+            animation: fadeIn 0.5s forwards; /* 淡入动画 */
+        }
+
+        /* 生成图片样式 */
+        #generateImage img {
+            width: 80%; /* 根据需要调整图片大小 */
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        /* 淡入动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 淡出动画 */
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* 关闭按钮样式 */
+        #generateImage .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            z-index: 5;
+        }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .stock-order-container img {
@@ -311,6 +357,11 @@
 
             .song-selector audio {
                 width: 100%;
+            }
+
+            /* 调整全屏图片大小 */
+            #generateImage img {
+                width: 90%;
             }
         }
     </style>
@@ -390,6 +441,7 @@
     <button class="whatsapp-button" onclick="copyAndSendWhatsApp()">Copy And Paste to WhatsApp</button>
 
     <div id="result"></div>
+    <div id="generateImage"></div> <!-- 新增的图片容器 -->
 
     <script>
         const SHEET_ID = '1QUB8R0-gtwNhdiPYU2rwFf_UKrGyyqCQHzIQ7AxKFLI';
@@ -745,6 +797,25 @@
 
             // 发射烟花
             launchFirework();
+
+            // 显示生成的图片（全屏覆盖）
+            const generateImageContainer = document.getElementById('generateImage');
+            generateImageContainer.innerHTML = `
+                <span class="close-btn" onclick="closeGenerateImage()">&times;</span>
+                <img src="https://github.com/SmartProfits/orderpro/blob/main/caishendao.gif?raw=true" alt="生成图片" />
+            `;
+            generateImageContainer.style.display = 'flex';
+            generateImageContainer.style.animation = 'fadeIn 0.5s forwards'; // 应用淡入动画
+
+            // 5秒后自动隐藏图片
+            setTimeout(() => {
+                generateImageContainer.style.animation = 'fadeOut 0.5s forwards';
+                // 等待动画完成后隐藏
+                setTimeout(() => {
+                    generateImageContainer.innerHTML = '';
+                    generateImageContainer.style.display = 'none';
+                }, 500);
+            }, 5000);
 
             return result;
         }
@@ -1117,7 +1188,7 @@
             }
         });
 
-        // requestAnimationFrame shim
+        // 请求动画帧兼容性处理
         window.requestAnimFrame = (function() {
             return window.requestAnimationFrame ||
                    window.webkitRequestAnimationFrame ||
@@ -1126,21 +1197,31 @@
                        window.setTimeout(callback, 1000 / 60);
                    };
         })();
+
+        // 关闭全屏图片的函数
+        function closeGenerateImage() {
+            const generateImageContainer = document.getElementById('generateImage');
+            generateImageContainer.style.animation = 'fadeOut 0.5s forwards';
+            setTimeout(() => {
+                generateImageContainer.innerHTML = '';
+                generateImageContainer.style.display = 'none';
+            }, 500);
+        }
     </script>
 
-        <p class="contact-info">If you have any questions or need to add new products, please contact me (Mark).</p>
-<p class="contact-info">
-    恭祝大家
-吉祥如意<br>
-    财源广进<br>
-    万事如意<br>
-    恭喜发财<br>
-    步步高升<br>
-    平安喜乐<br>
-    富贵荣华<br>
-    事事顺心<br>
-    福星高照<br>
-    一帆风顺
-</p>
+    <p class="contact-info">If you have any questions or need to add new products, please contact me (Mark).</p>
+    <p class="contact-info">
+        恭祝大家<br>
+        吉祥如意<br>
+        财源广进<br>
+        万事如意<br>
+        恭喜发财<br>
+        步步高升<br>
+        平安喜乐<br>
+        富贵荣华<br>
+        事事顺心<br>
+        福星高照<br>
+        一帆风顺
+    </p>
 </body>
 </html>
