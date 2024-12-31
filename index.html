@@ -65,12 +65,6 @@
             transform: scale(0.95); /* 按下时缩小 */
         }
 
-        /* 其他现有样式保持不变 */
-        #productList label span {
-            color: #666;  /* 默认模式下的颜色 */
-            font-size: 0.9em;
-        }
-
         /* 店铺和分类容器 */
         .shop-container, .category-container {
             display: grid;
@@ -80,6 +74,19 @@
         }
 
         /* 标题样式 */
+        .stock-order-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px; /* 调整间距 */
+            margin-bottom: 20px; /* 空间下方 */
+        }
+
+        .stock-order-container img {
+            width: 50px; /* 调整图片大小 */
+            height: auto;
+        }
+
         h1 {
             font-size: 4rem;
             font-weight: bold;
@@ -196,17 +203,10 @@
         }
 
         /* 联系信息样式 */
-        .contact-info {
-            font-size: 1rem;
-            font-style: italic;
-            color: #555; /* 稍微浅一点的颜色 */
+       .contact-info {
             text-align: center;
-            background-color: #f9f9f9; /* 柔和的背景色 */
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 20px; /* 增加与下方内容的间距 */
-            border: 1px solid #ddd; /* 添加浅色边框 */
-            z-index: 2; /* 确保信息在canvas之上 */
+            margin-top: 20px;
+            color: var(--dark-red);
         }
 
         /* 模态框样式 */
@@ -260,8 +260,33 @@
             }
         }
 
+        /* 新年歌曲选择样式 */
+        .song-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            z-index: 2; /* 确保在canvas之上 */
+        }
+
+        .song-selector select {
+            padding: 8px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .song-selector audio {
+            width: 300px;
+        }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
+            .stock-order-container img {
+                width: 100px; /* 更小的图片在小屏幕上 */
+            }
+
             h1 {
                 font-size: 3rem;
             }
@@ -283,12 +308,30 @@
             .modal-content div {
                 font-size: 1.5rem; /* 调整字符大小 */
             }
+
+            .song-selector audio {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body class="new-year-theme">
     <!-- 画布用于烟花动画 -->
     <canvas id="canvas">Canvas is not supported in your browser.</canvas>
+
+    <!-- 新年歌曲选择 -->
+    <div class="song-selector">
+        <label for="newYearSong">新年歌：</label>
+        <select id="newYearSong" onchange="changeSong()">
+            <option value="">请选择歌曲</option>
+            <option value="https://github.com/SmartProfits/orderpro/raw/refs/heads/main/%E5%A4%A7%E5%9C%98%E5%9C%93.mp3">大团圆</option>
+            <option value="https://github.com/SmartProfits/orderpro/raw/refs/heads/main/%E5%A4%A7%E6%97%A5%E5%AD%90.mp3">大日子</option>
+            <option value="https://github.com/SmartProfits/orderpro/raw/refs/heads/main/%E5%A4%A9%E5%A4%A9%E5%A5%BD%E5%A4%A9.mp3">天天好天</option>
+        </select>
+        <audio id="audioPlayer" controls>
+            您的浏览器不支持音频播放。
+        </audio>
+    </div>
 
     <!-- 弹出模态框 -->
     <div id="welcomeModal" class="modal">
@@ -304,14 +347,19 @@
         </div>
     </div>
 
-    <h1>Stock Order</h1>
+    <!-- Stock Order 标题和装饰图片 -->
+    <div class="stock-order-container">
+        <img src="https://github.com/SmartProfits/orderpro/blob/main/Chinese%20Celebrations.gif?raw=true" alt="Chinese Celebrations">
+        <h1>新年如意</h1>
+        <img src="https://github.com/SmartProfits/orderpro/blob/main/Chinese%20Celebrations.gif?raw=true" alt="Chinese Celebrations">
+    </div>
     
     <div>
         <input type="checkbox" id="addOnCheckbox" />
         <label for="addOnCheckbox">Add On</label>
     </div>
 
-    <h3>SHOP</h3>
+    <h3>福星高照</h3>
     <div class="shop-container">
         <label><input type="radio" name="store" value="*JKL*" onclick="toggleItems()" /> JKL</label>
         <label><input type="radio" name="store" value="*TOM*" onclick="toggleItems()" /> TOM</label>
@@ -319,7 +367,7 @@
         <label><input type="radio" name="store" value="*New Shop*" onclick="toggleItems()" /> New Shop</label>
     </div>
 
-    <h3>Category</h3>
+    <h3>招财进宝</h3>
 
     <div class="category-container">
         <label><input type="radio" name="category" value="BanHeang" onclick="showCategory()" /> BanHeang</label>
@@ -333,7 +381,7 @@
 
     <input type="text" id="productSearch" placeholder="Search..." oninput="searchProduct()" autocomplete="off" />
     <div id="suggestions"></div>
-    <h3>Select items (default quantity is 1)</h3>
+
     <div id="productList">
         <!-- 示例商品 -->
     </div>
@@ -821,6 +869,21 @@
                 .catch(error => console.error('获取数据失败:', error));
         }
 
+        // 新年歌曲选择功能
+        function changeSong() {
+            const select = document.getElementById('newYearSong');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const selectedSong = select.value;
+
+            if (selectedSong) {
+                audioPlayer.src = selectedSong;
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+                audioPlayer.src = '';
+            }
+        }
+
         // 烟花相关变量和函数
         let fireworks = [];
         let particles = [];
@@ -834,7 +897,7 @@
 
         // 获取画布和上下文
         const canvasElement = document.getElementById('canvas');
-        const ctx = canvasElement.getContext('2d');
+        const ctxCanvas = canvasElement.getContext('2d');
         let cw = window.innerWidth;
         let ch = window.innerHeight;
 
@@ -904,15 +967,15 @@
 
         // 绘制烟花
         Firework.prototype.draw = function() {
-            ctx.beginPath();
-            ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
-            ctx.lineTo(this.x, this.y);
-            ctx.strokeStyle = 'hsl(' + hue + ', 100%, ' + this.brightness + '%)';
-            ctx.stroke();
+            ctxCanvas.beginPath();
+            ctxCanvas.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
+            ctxCanvas.lineTo(this.x, this.y);
+            ctxCanvas.strokeStyle = 'hsl(' + hue + ', 100%, ' + this.brightness + '%)';
+            ctxCanvas.stroke();
 
-            ctx.beginPath();
-            ctx.arc(this.tx, this.ty, this.targetRadius, 0, Math.PI * 2);
-            ctx.stroke();
+            ctxCanvas.beginPath();
+            ctxCanvas.arc(this.tx, this.ty, this.targetRadius, 0, Math.PI * 2);
+            ctxCanvas.stroke();
         }
 
         // 创建粒子
@@ -950,11 +1013,11 @@
 
         // 绘制粒子
         Particle.prototype.draw = function() {
-            ctx.beginPath();
-            ctx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
-            ctx.lineTo(this.x, this.y);
-            ctx.strokeStyle = 'hsla(' + this.hue + ', 100%, ' + this.brightness + '%, ' + this.alpha + ')';
-            ctx.stroke();
+            ctxCanvas.beginPath();
+            ctxCanvas.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
+            ctxCanvas.lineTo(this.x, this.y);
+            ctxCanvas.strokeStyle = 'hsla(' + this.hue + ', 100%, ' + this.brightness + '%, ' + this.alpha + ')';
+            ctxCanvas.stroke();
         }
 
         // 创建粒子群
@@ -971,10 +1034,10 @@
 
             hue = random(0, 360);
 
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            ctx.fillRect(0, 0, cw, ch);
-            ctx.globalCompositeOperation = 'lighter';
+            ctxCanvas.globalCompositeOperation = 'destination-out';
+            ctxCanvas.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctxCanvas.fillRect(0, 0, cw, ch);
+            ctxCanvas.globalCompositeOperation = 'lighter';
 
             var i = fireworks.length;
             while(i--) {
@@ -1013,8 +1076,8 @@
         }
 
         // 发射烟花函数
-        function launchFirework() {
-            fireworks.push(new Firework(cw / 2, ch, random(0, cw), random(0, ch / 2)));
+        function launchFirework(x = random(0, cw), y = random(0, ch / 2)) {
+            fireworks.push(new Firework(cw / 2, ch, x, y));
         }
 
         // 全局点击事件监听器，点击任何地方发射烟花
@@ -1022,7 +1085,7 @@
             const rect = canvasElement.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
-            fireworks.push(new Firework(cw / 2, ch, x, y));
+            launchFirework(x, y);
         });
 
         // 初始化页面加载
@@ -1054,7 +1117,7 @@
             }
         });
 
-        // 请求动画帧的shim
+        // requestAnimationFrame shim
         window.requestAnimFrame = (function() {
             return window.requestAnimationFrame ||
                    window.webkitRequestAnimationFrame ||
@@ -1065,6 +1128,19 @@
         })();
     </script>
 
-    <p class="contact-info">If you have any questions or need to add new products, please contact me (Mark).</p>
+        <p class="contact-info">If you have any questions or need to add new products, please contact me (Mark).</p>
+<p class="contact-info">
+    恭祝大家
+吉祥如意<br>
+    财源广进<br>
+    万事如意<br>
+    恭喜发财<br>
+    步步高升<br>
+    平安喜乐<br>
+    富贵荣华<br>
+    事事顺心<br>
+    福星高照<br>
+    一帆风顺
+</p>
 </body>
 </html>
