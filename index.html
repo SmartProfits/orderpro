@@ -274,43 +274,54 @@
             margin: 0 5px;
         }
 
+        /* 修改标题样式 */
         h1 {
             font-size: 4rem;
             font-weight: bold;
             text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            margin: 20px auto;
+            max-width: 80%;
+            position: relative;
+            overflow: hidden;
+            animation: glowingTitle 3s ease-in-out infinite;
         }
 
-        div {
-            margin-bottom: 15px;
+        /* 添加标题动画效果 */
+        @keyframes glowingTitle {
+            0% {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
+                             0 0 10px rgba(255, 255, 255, 0.8),
+                             0 0 15px rgba(255, 255, 255, 0.8);
+                transform: translateY(0);
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
+                             0 0 35px rgba(255, 255, 255, 0.8),
+                             0 0 40px rgba(255, 255, 255, 0.8);
+                transform: translateY(-5px);
+            }
+            100% {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
+                             0 0 10px rgba(255, 255, 255, 0.8),
+                             0 0 15px rgba(255, 255, 255, 0.8);
+                transform: translateY(0);
+            }
         }
 
-        label {
-            font-size: 1.1rem;
+        /* 适配深色模式 */
+        body.dark-mode h1 {
+            color: #fff;
+            background: rgba(0, 0, 0, 0.2);
         }
 
-        input[type="number"],
-        input[type="checkbox"] {
-            font-size: 1rem;
-        }
-
-        /* WhatsApp 绿色按钮样式 */
-        .whatsapp-button {
-            background-color: #25D366; /* WhatsApp绿色 */
-            color: white; /* 白色文字 */
-        }
-
-        /* 切换模式按钮样式 */
-        .toggle-mode-btn {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            margin-bottom: 20px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
-
+        /* 响应式调整 */
         @media (max-width: 768px) {
             .shop-container,
             .category-container {
@@ -323,6 +334,8 @@
             
             h1 {
                 font-size: 2.5rem;
+                padding: 15px;
+                max-width: 90%;
             }
             
             body {
@@ -489,15 +502,6 @@
     <button class="toggle-mode-btn" onclick="toggleDarkMode()">切换至黑暗模式</button>
 
     <h1>Stock Order</h1>
-    <div class="container">
-        <div class="loader">
-            <span style="--i:0;"></span>
-            <span style="--i:1;"></span>
-            <span style="--i:2;"></span>
-            <span style="--i:3;"></span>
-            <span style="--i:4;"></span>
-        </div>
-    </div>
     <div>
         <input type="checkbox" id="addOnCheckbox" />
         <label for="addOnCheckbox">Add On</label>
