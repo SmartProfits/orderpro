@@ -850,6 +850,26 @@
                 <span style="display: flex; align-items: center; justify-content: center;">📝</span>
             </div>
             
+            <div id="editFavoriteBtn" onclick="toggleEditFavorite()" style="
+                width: 40px;
+                height: 40px;
+                border-radius: 20px;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                line-height: 1;
+                padding: 0;
+                text-align: center;
+                ">
+                <span style="display: flex; align-items: center; justify-content: center;">❤️</span>
+            </div>
+            
             <div id="settings-button" style="
                 width: 40px;
                 height: 40px;
@@ -903,18 +923,7 @@
         </div>
     </div>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
-        <h3 style="margin: 0;">Category</h3>
-        <button id="editFavoriteBtn" 
-                onclick="toggleEditFavorite()" 
-                style="background: none; 
-                       border: none; 
-                       font-size: 1.5em; 
-                       cursor: pointer; 
-                       padding: 5px;">
-            ❤️
-        </button>
-    </div>
+    <h3 style="margin: 20px 0;">Category</h3>
 
     <div class="category-container">
         <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
@@ -1232,12 +1241,15 @@
             const productList = document.getElementById('productList');
             productList.innerHTML = '';
 
+            // 获取当前选中的分类
+            const currentCategory = document.querySelector('input[name="category"]:checked')?.value;
+
             // 如果是 InStock 分类，我们需要特殊处理
-            if (products === categories.InStock || products.length === 0) {  // 添加 length 检查
+            if (currentCategory === 'InStock' && (products === categories.InStock || products.length === 0)) {
                 // 收集所有有库存的商品
                 const inStockProducts = [];
                 Object.entries(categories).forEach(([category, categoryProducts]) => {
-                    if (category !== 'InStock' && Array.isArray(categoryProducts)) {
+                    if (category !== 'InStock' && category !== 'Favorite' && Array.isArray(categoryProducts)) {
                         categoryProducts.forEach(product => {
                             if (stockMap[product.name] && stockMap[product.name] > 0) {
                                 inStockProducts.push(product);
@@ -1247,11 +1259,18 @@
                 });
                 products = inStockProducts;
             }
+            // 如果是 Favorite 分类，直接使用 products，即使是空数组
+            else if (currentCategory === 'Favorite') {
+                products = products || [];
+            }
+            // 其他分类保持原样
+            else if (!products || products.length === 0) {
+                return;
+            }
 
             products.forEach(product => {
                 const div = document.createElement('div');
                 const isChecked = selectedItems[product.id] ? 'checked' : '';
-                // 使用商品的默认数量或者已保存的数量，如果都没有则使用1
                 const defaultQuantity = product.defaultQuantity || 1;
                 const currentQuantity = selectedItems[product.id] || defaultQuantity;
 
@@ -1836,12 +1855,15 @@
             categories.Favorite = favorites;
         }
 
-        // 加载收藏商品
+        // 修改 loadFavorites 函数来返回收藏的商品数组
         function loadFavorites() {
             const savedFavorites = localStorage.getItem('favorites');
             if (savedFavorites) {
-                categories.Favorite = JSON.parse(savedFavorites);
+                const favorites = JSON.parse(savedFavorites);
+                categories.Favorite = favorites;
+                return favorites;
             }
+            return [];
         }
 
         // 切换编辑收藏模式
@@ -1853,13 +1875,13 @@
             modal.classList.add('glass-effect');  // 添加玻璃效果类
             modal.style.cssText = `
                 position: fixed;
-                top: 20px;
+                top: 180px;
                 right: 20px;
                 transform: none;
                 left: auto;
-                padding: 15px;
-                z-index: 1001;
-                max-width: 300px;
+                width: 300px;
+                padding: 20px;
+                z-index: 1000;
                 max-height: 400px;
                 overflow-y: auto;
             `;
@@ -1883,23 +1905,23 @@
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-bottom: 15px;
-                padding-bottom: 10px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                margin-bottom: 20px;
             `;
             
             // 添加标题
             const title = document.createElement('h3');
             title.textContent = 'Edit Favorites';
-            title.style.margin = '0';
+            title.style.cssText = `
+                margin: 0;
+                color: inherit;
+                font-size: 1.17em;
+            `;
             
             // 添加关闭按钮
             const closeButton = document.createElement('span');
             closeButton.textContent = '×';
             closeButton.style.cssText = `
                 cursor: pointer;
-                font-size: 24px;
-                padding: 5px;
             `;
             closeButton.onclick = () => {
                 document.body.removeChild(modal);
@@ -1927,8 +1949,9 @@
             });
             
             // 加载当前收藏
-            loadFavorites();
-            const favorites = new Set(categories.Favorite);
+            const favorites = loadFavorites();
+            // 创建一个 Map 用于快速查找收藏的商品
+            const favoritesMap = new Map(favorites.map(product => [product.id, product]));
             
             // 创建商品选择框
             allProducts.forEach(product => {
@@ -1945,7 +1968,8 @@
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.id = `fav-${product.id}`;
-                checkbox.checked = favorites.has(product);
+                // 使用 Map 来检查商品是否在收藏列表中
+                checkbox.checked = favoritesMap.has(product.id);
                 checkbox.style.cssText = `
                     margin-right: 10px;
                     cursor: pointer;
