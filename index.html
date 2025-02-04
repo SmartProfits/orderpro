@@ -1737,7 +1737,7 @@
             
             content += `Total Items: ${totalItems}\n`;
             
-            // 按分类显示商品
+            // 按分类显示商品，不再显示红色
             Object.entries(categories).forEach(([category, products]) => {
                 if (Array.isArray(products)) {
                     const categoryItems = products.filter(product => lastOrder.items[product.id]);
@@ -1745,12 +1745,8 @@
                         content += `\n=== ${category} ===\n`;
                         categoryItems.forEach(product => {
                             const unit = product.unit || 'ctn';
-                            // 检查库存状态
-                            const stock = stockMap[product.name] || 0;
-                            const itemName = stock === 0 ? 
-                                `<span style="color: #ff4444;">${product.name}</span>` : 
-                                product.name;
-                            content += `${itemName} - ${lastOrder.items[product.id]} ${unit}\n`;
+                            // 直接显示商品名称，不添加颜色标记
+                            content += `${product.name} - ${lastOrder.items[product.id]} ${unit}\n`;
                         });
                     }
                 }
