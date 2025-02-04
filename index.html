@@ -1201,9 +1201,7 @@
                 { id: 708, name: "Prawn Cracker 500g", unit: 'pkt' },
                 { id: 709, name: "Fish Maw", unit: 'pkt' }
             ],
-            InStock: {
-                items: []
-            }
+            InStock: []  // 将 InStock 也定义为数组
         };
 
         let selectedItems = {};
@@ -1213,7 +1211,7 @@
             productList.innerHTML = '';
 
             // 如果是 InStock 分类，我们需要特殊处理
-            if (products === categories.InStock) {
+            if (products === categories.InStock || products.length === 0) {  // 添加 length 检查
                 // 收集所有有库存的商品
                 const inStockProducts = [];
                 Object.entries(categories).forEach(([category, categoryProducts]) => {
@@ -1706,7 +1704,7 @@
             localStorage.setItem('lastOrder', JSON.stringify(orderData));
         }
 
-        // 加载最后一次订单
+        // 修改 loadLastOrder 函数
         function loadLastOrder() {
             const lastOrderJson = localStorage.getItem('lastOrder');
             if (!lastOrderJson) {
@@ -1715,23 +1713,53 @@
             }
             
             const lastOrder = JSON.parse(lastOrderJson);
-            let content = `<p>Store: ${lastOrder.store || 'Not selected'}</p>`;
-            content += `<p>Time: ${new Date(lastOrder.timestamp).toLocaleString()}</p>`;
-            content += `<p>Add On: ${lastOrder.addOn ? 'Yes' : 'No'}</p>`;
-            content += '<h4>Items:</h4>';
+            let content = `Kedai: ${lastOrder.store || 'Not selected'}`;
+            if (lastOrder.addOn) {
+                content += ' 💥Add On💥';
+            }
+            content += '\n\n';
             
-            // 遍历所有分类和商品
+            // 计算总数量
+            let totalItems = 0;
             Object.entries(categories).forEach(([category, products]) => {
-                const categoryItems = products.filter(product => lastOrder.items[product.id]);
-                if (categoryItems.length > 0) {
-                    content += `<p><strong>${category}:</strong></p>`;
-                    categoryItems.forEach(product => {
-                        content += `<p>${product.name} - ${lastOrder.items[product.id]} ${product.unit || 'ctn'}</p>`;
+                if (Array.isArray(products)) {
+                    products.forEach(product => {
+                        if (lastOrder.items[product.id]) {
+                            if (category === 'Chocolate') {
+                                totalItems += 1;
+                            } else {
+                                totalItems += parseInt(lastOrder.items[product.id]);
+                            }
+                        }
                     });
                 }
             });
             
-            document.getElementById('last-order-content').innerHTML = content;
+            content += `Total Items: ${totalItems}\n`;
+            
+            // 按分类显示商品
+            Object.entries(categories).forEach(([category, products]) => {
+                if (Array.isArray(products)) {
+                    const categoryItems = products.filter(product => lastOrder.items[product.id]);
+                    if (categoryItems.length > 0) {
+                        content += `\n=== ${category} ===\n`;
+                        categoryItems.forEach(product => {
+                            const unit = product.unit || 'ctn';
+                            // 检查库存状态
+                            const stock = stockMap[product.name] || 0;
+                            const itemName = stock === 0 ? 
+                                `<span style="color: #ff4444;">${product.name}</span>` : 
+                                product.name;
+                            content += `${itemName} - ${lastOrder.items[product.id]} ${unit}\n`;
+                        });
+                    }
+                }
+            });
+            
+            content += '\nAirport Stock Order: smartprofits.github.io/order/';
+            
+            // 将换行符转换为 HTML 的换行
+            document.getElementById('last-order-content').innerHTML = content.replace(/\n/g, '<br>');
         }
 
         // 应用上一次的订单
