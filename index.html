@@ -903,7 +903,19 @@
         </div>
     </div>
 
-    <h3>Category</h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
+        <h3 style="margin: 0;">Category</h3>
+        <button id="editFavoriteBtn" 
+                onclick="toggleEditFavorite()" 
+                style="background: none; 
+                       border: none; 
+                       font-size: 1.5em; 
+                       cursor: pointer; 
+                       padding: 5px;">
+            ❤️
+        </button>
+    </div>
+
     <div class="category-container">
         <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
             <input type="radio" name="category" value="BanHeang" id="banheang">
@@ -960,6 +972,15 @@
             <label for="instock">
                 <span class="category-icon">📦</span>
                 <span>In Stock</span>
+            </label>
+        </div>
+        
+        <!-- Add new Favorite category card -->
+        <div class="category-card" onclick="selectCategory(this, 'Favorite')">
+            <input type="radio" name="category" value="Favorite" id="favorite">
+            <label for="favorite">
+                <span class="category-icon">❤️</span>
+                <span>Favorite</span>
             </label>
         </div>
     </div>
@@ -1201,7 +1222,8 @@
                 { id: 708, name: "Prawn Cracker 500g", unit: 'pkt' },
                 { id: 709, name: "Fish Maw", unit: 'pkt' }
             ],
-            InStock: []  // 将 InStock 也定义为数组
+            InStock: [],
+            Favorite: []  // 添加新的 Favorite 分类
         };
 
         let selectedItems = {};
@@ -1804,6 +1826,215 @@
             // 关闭订单历史面板
             toggleOrderHistory();
         }
+
+        // 在 script 标签内添加以下代码
+
+        // 用于存储收藏商品的函数
+        function saveFavorites(favorites) {
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            // 更新 categories 对象中的 Favorite 数组
+            categories.Favorite = favorites;
+        }
+
+        // 加载收藏商品
+        function loadFavorites() {
+            const savedFavorites = localStorage.getItem('favorites');
+            if (savedFavorites) {
+                categories.Favorite = JSON.parse(savedFavorites);
+            }
+        }
+
+        // 切换编辑收藏模式
+        function toggleEditFavorite() {
+            const currentCategory = document.querySelector('input[name="category"]:checked')?.value;
+            
+            // 创建模态框
+            const modal = document.createElement('div');
+            modal.classList.add('glass-effect');  // 添加玻璃效果类
+            modal.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                transform: none;
+                left: auto;
+                padding: 15px;
+                z-index: 1001;
+                max-width: 300px;
+                max-height: 400px;
+                overflow-y: auto;
+            `;
+            
+            // 创建背景遮罩
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                backdrop-filter: blur(5px);
+                z-index: 1000;
+            `;
+            
+            // 添加标题和关闭按钮的容器
+            const headerDiv = document.createElement('div');
+            headerDiv.style.cssText = `
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            `;
+            
+            // 添加标题
+            const title = document.createElement('h3');
+            title.textContent = 'Edit Favorites';
+            title.style.margin = '0';
+            
+            // 添加关闭按钮
+            const closeButton = document.createElement('span');
+            closeButton.textContent = '×';
+            closeButton.style.cssText = `
+                cursor: pointer;
+                font-size: 24px;
+                padding: 5px;
+            `;
+            closeButton.onclick = () => {
+                document.body.removeChild(modal);
+                document.body.removeChild(overlay);
+            };
+            
+            headerDiv.appendChild(title);
+            headerDiv.appendChild(closeButton);
+            
+            // 创建商品列表容器
+            const productList = document.createElement('div');
+            productList.style.cssText = `
+                margin-top: 15px;
+                max-height: 300px;
+                overflow-y: auto;
+                padding-right: 5px;
+            `;
+            
+            // 获取所有商品并排除 Favorite 和 InStock 分类
+            const allProducts = new Set();
+            Object.entries(categories).forEach(([category, products]) => {
+                if (category !== 'Favorite' && category !== 'InStock' && Array.isArray(products)) {
+                    products.forEach(product => allProducts.add(product));
+                }
+            });
+            
+            // 加载当前收藏
+            loadFavorites();
+            const favorites = new Set(categories.Favorite);
+            
+            // 创建商品选择框
+            allProducts.forEach(product => {
+                const div = document.createElement('div');
+                div.style.cssText = `
+                    margin-bottom: 10px;
+                    padding: 8px;
+                    border-radius: 5px;
+                    transition: background-color 0.3s;
+                    display: flex;
+                    align-items: center;
+                `;
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `fav-${product.id}`;
+                checkbox.checked = favorites.has(product);
+                checkbox.style.cssText = `
+                    margin-right: 10px;
+                    cursor: pointer;
+                `;
+                
+                const label = document.createElement('label');
+                label.htmlFor = `fav-${product.id}`;
+                label.textContent = product.name;
+                label.style.cssText = `
+                    flex: 1;
+                    margin-left: 5px;
+                    cursor: pointer;
+                `;
+                
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                productList.appendChild(div);
+                
+                // 添加悬停效果
+                div.onmouseover = () => {
+                    div.style.backgroundColor = document.body.classList.contains('dark-mode') ? 
+                        'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+                };
+                div.onmouseout = () => {
+                    div.style.backgroundColor = 'transparent';
+                };
+            });
+            
+            // 创建保存按钮
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save Favorites';
+            saveButton.style.cssText = `
+                width: 100%;
+                margin-top: 15px;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+                color: inherit;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            `;
+            
+            // 添加悬停效果
+            saveButton.onmouseover = () => {
+                saveButton.style.background = 'rgba(255, 255, 255, 0.2)';
+            };
+            saveButton.onmouseout = () => {
+                saveButton.style.background = 'rgba(255, 255, 255, 0.1)';
+            };
+            
+            saveButton.onclick = () => {
+                const newFavorites = Array.from(allProducts)
+                    .filter(product => document.getElementById(`fav-${product.id}`).checked);
+                saveFavorites(newFavorites);
+                document.body.removeChild(modal);
+                document.body.removeChild(overlay);
+                
+                // 如果当前在 Favorite 分类，刷新显示
+                if (currentCategory === 'Favorite') {
+                    showCategory();
+                }
+            };
+            
+            // 组装模态框
+            modal.appendChild(headerDiv);
+            modal.appendChild(productList);
+            modal.appendChild(saveButton);
+            
+            // 添加到页面
+            document.body.appendChild(overlay);
+            document.body.appendChild(modal);
+            
+            // 点击遮罩层关闭模态框
+            overlay.onclick = (e) => {
+                if (e.target === overlay) {
+                    document.body.removeChild(modal);
+                    document.body.removeChild(overlay);
+                }
+            };
+        }
+
+        // 在页面加载时加载收藏
+        window.addEventListener('load', function() {
+            // ... existing load event code ...
+            loadFavorites();
+        });
     </script>
 
     <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Rowan now will help me to update stock amount.</p>
