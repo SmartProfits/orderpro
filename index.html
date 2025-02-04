@@ -688,26 +688,34 @@
             background: rgba(33, 150, 243, 0.15);  /* 稍深的淡蓝色背景 */
         }
 
-        /* 添加性能优化相关的 CSS */
-        .ripple {
-            transform: translate(-50%, -50%);
-            will-change: transform;
+        /* 设置面板的样式 */
+        #settings-panel select,
+        #settings-panel button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: inherit;
+            border-radius: 5px;
         }
 
-        #productList div {
-            will-change: transform;
-            transform: translateZ(0);
+        #settings-panel button:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
-        .shop-card, .category-card {
-            will-change: transform;
-            transform: translateZ(0);
+        /* Light Mode 下的设置面板样式 */
+        body:not(.dark-mode) #settings-panel {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
         }
 
-        @media (max-width: 768px) {
-            * {
-                -webkit-tap-highlight-color: transparent;
-            }
+        body:not(.dark-mode) #settings-panel select,
+        body:not(.dark-mode) #settings-panel button {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        body:not(.dark-mode) #settings-panel button:hover {
+            background: #f5f5f5;
         }
     </style>
 </head>
@@ -744,7 +752,7 @@
         </div>
     </div>
 
-    <!-- 添加悬浮图标 -->
+    <!-- 修改预览图标的样式 -->
     <div id="preview-icon" style="
         position: fixed;
         top: 20px;
@@ -757,21 +765,113 @@
         border: 1px solid rgba(255, 255, 255, 0.2);
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         cursor: pointer;
-        display: none;
         z-index: 1000;
-        display: flex;
+        display: none;
         align-items: center;
         justify-content: center;
-        font-size: 24px;"
+        font-size: 24px;
+        line-height: 1;
+        padding: 0;
+        text-align: center;
+        "
         onclick="togglePreview()">
-        📋
+        <span style="display: flex; align-items: center; justify-content: center;">📋</span>
     </div>
 
-    <!-- 模式切换按钮 -->
-    <button class="toggle-mode-btn" onclick="toggleDarkMode()">Light Mode🌞</button>
+    <!-- 保留设置面板，但调整位置 -->
+    <div id="settings-panel" class="glass-effect" style="
+        position: absolute;
+        top: 180px;
+        right: 20px;
+        width: 250px;
+        padding: 20px;
+        z-index: 1000;
+        display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0;">Settings</h3>
+            <span style="cursor: pointer;" onclick="toggleSettings()">×</span>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 10px;">Theme</label>
+            <div style="display: flex; gap: 10px;">
+                <button id="dark-mode-btn" 
+                        onclick="changeTheme('dark')" 
+                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
+                    Dark Mode 🌙
+                </button>
+                <button id="light-mode-btn" 
+                        onclick="changeTheme('light')" 
+                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
+                    Light Mode 🌞
+                </button>
+            </div>
+        </div>
+        
+        <div>
+            <label style="display: block; margin-bottom: 10px;">Font Size</label>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 0.8em;">小</span>
+                <input type="range" 
+                       id="font-size-selector" 
+                       min="0" 
+                       max="2" 
+                       step="1" 
+                       value="1"
+                       style="flex-grow: 1;"
+                       onchange="changeFontSize(this.value)">
+                <span style="font-size: 1.2em;">大</span>
+            </div>
+        </div>
+    </div>
 
     <h1>Stock Order</h1>
-    <h3>选择店铺</h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
+        <h3 style="margin: 0;">Select Shop</h3>
+        <!-- 这里保留设置按钮 -->
+        <div style="display: flex; gap: 10px;">
+            <div id="settings-button" style="
+                width: 40px;
+                height: 40px;
+                border-radius: 20px;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                line-height: 1;
+                padding: 0;
+                text-align: center;
+                ">
+                <span style="display: flex; align-items: center; justify-content: center;">⚙️</span>
+            </div>
+            
+            <div id="order-history-button" style="
+                width: 40px;
+                height: 40px;
+                border-radius: 20px;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 20px;
+                line-height: 1;
+                padding: 0;
+                text-align: center;
+                ">
+                <span style="display: flex; align-items: center; justify-content: center;">📝</span>
+            </div>
+        </div>
+    </div>
+
     <div class="shop-container">
         <div class="shop-card" onclick="selectShop(this, '*JKL*')">
             <input type="radio" name="store" value="*JKL*" id="jkl">
@@ -803,7 +903,7 @@
         </div>
     </div>
 
-    <h3>选择分类</h3>
+    <h3>Category</h3>
     <div class="category-container">
         <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
             <input type="radio" name="category" value="BanHeang" id="banheang">
@@ -861,6 +961,25 @@
     <h3>Select items (default quantity is 1）</h3>
     <div id="productList"></div>
 
+    <!-- 添加订单历史面板 -->
+    <div id="order-history-panel" class="glass-effect" style="
+        position: absolute;
+        top: 180px;
+        right: 20px;
+        width: 300px;
+        padding: 20px;
+        z-index: 1000;
+        display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0;">Last Order</h3>
+            <span style="cursor: pointer;" onclick="toggleOrderHistory()">×</span>
+        </div>
+        <div id="last-order-content" style="max-height: 400px; overflow-y: auto;">
+            <!-- 这里将显示最后一次订单的内容 -->
+        </div>
+        <button onclick="applyLastOrder()" style="width: 100%; margin-top: 15px;">Apply This Order</button>
+    </div>
+
     <script>
         const SHEET_ID = '你的表格ID';
         const SHEET_NAME = 'Sheet1'; // 如果你的表格页面名称不是 Sheet1，请修改这里
@@ -879,30 +998,28 @@
                         const jsonData = JSON.parse(data.substr(47).slice(0, -2));
                         const rows = jsonData.table.rows;
 
-                        // 批量更新 stockMap
-                        const newStockMap = {};
+                        // 更新全局 stockMap
+                        stockMap = {};
                         rows.forEach(row => {
                             if(row.c[0] && row.c[1]) {
-                                newStockMap[row.c[0].v] = row.c[1].v;
+                                const productName = row.c[0].v;
+                                const stockQuantity = row.c[1].v;
+                                stockMap[productName] = stockQuantity;
                             }
                         });
 
-                        // 一次性更新 stockMap
-                        stockMap = newStockMap;
-
-                        // 使用 requestAnimationFrame 优化 DOM 更新
-                        requestAnimationFrame(() => {
-                            const labels = document.querySelectorAll('#productList label');
-                            labels.forEach(label => {
-                                const productName = label.textContent.split(' (')[0];
-                                const stock = stockMap[productName];
-                                if (stock !== undefined) {
-                                    const stockClass = stock === 0 ? 'zero-stock' : '';
-                                    label.innerHTML = `${productName} <span class="${stockClass}">(Stock: ${stock})</span>`;
-                                }
-                            });
+                        // 更新标签显示
+                        const labels = document.querySelectorAll('#productList label');
+                        labels.forEach(label => {
+                            const productName = label.textContent;
+                            const stock = stockMap[productName];
+                            if (stock !== undefined) {
+                                const stockClass = stock === 0 ? 'zero-stock' : '';
+                                label.innerHTML = `${productName} <span class="${stockClass}">(Stock: ${stock})</span>`;
+                            }
                         });
 
+                        // 更新预览窗口
                         updatePreview();
                     } catch (error) {
                         console.error('解析数据错误:', error);
@@ -1067,52 +1184,14 @@
 
         let selectedItems = {};
 
-        // 添加防抖函数
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
-        // 优化搜索功能，使用防抖
-        const debouncedSearch = debounce(function() {
-            const searchText = document.getElementById('productSearch').value.toLowerCase();
-            const suggestionsContainer = document.getElementById('suggestions');
-            suggestionsContainer.innerHTML = '';
-
-            if (searchText.length === 0) return;
-
-            // 使用 DocumentFragment 优化 DOM 操作
-            const fragment = document.createDocumentFragment();
-            const allProducts = Object.values(categories).flat();
-            const matchingProducts = allProducts.filter(product => 
-                product.name.toLowerCase().includes(searchText)
-            ).slice(0, 10); // 限制显示结果数量
-
-            matchingProducts.forEach(product => {
-                const div = document.createElement('div');
-                div.textContent = product.name;
-                div.onclick = () => selectProduct(product);
-                fragment.appendChild(div);
-            });
-
-            suggestionsContainer.appendChild(fragment);
-        }, 300); // 300ms 的防抖延迟
-
-        // 优化商品列表渲染
         function loadProducts(products) {
             const productList = document.getElementById('productList');
-            const fragment = document.createDocumentFragment();
+            productList.innerHTML = '';
 
             products.forEach(product => {
                 const div = document.createElement('div');
                 const isChecked = selectedItems[product.id] ? 'checked' : '';
+                // 使用商品的默认数量或者已保存的数量，如果都没有则使用1
                 const defaultQuantity = product.defaultQuantity || 1;
                 const currentQuantity = selectedItems[product.id] || defaultQuantity;
 
@@ -1127,30 +1206,11 @@
                            readonly>
                     <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
                 `;
-                fragment.appendChild(div);
+                productList.appendChild(div);
             });
 
-            productList.innerHTML = '';
-            productList.appendChild(fragment);
-            
-            // 使用 requestAnimationFrame 优化库存更新
-            requestAnimationFrame(() => {
-                loadQuantitiesFromSheet();
-            });
-        }
-
-        // 优化预览窗口更新
-        const updatePreviewThrottled = debounce(function() {
-            const previewContent = document.getElementById('preview-content');
-            const text = generateText(false);
-            requestAnimationFrame(() => {
-                previewContent.innerHTML = text.replace(/\n/g, '<br>');
-            });
-        }, 100);
-
-        // 替换原有的 updatePreview 函数
-        function updatePreview() {
-            updatePreviewThrottled();
+            // 加载并显示库存数量
+            loadQuantitiesFromSheet();
         }
 
         function saveItem(id, name) {
@@ -1162,20 +1222,26 @@
             if (checkbox.checked) {
                 selectedItems[id] = quantity;
                 // 检查是否是第一个被选中的物品
-                if (Object.keys(selectedItems).length === 1 && allowAutoShow) {
-                    // 显示预览窗口
-                    previewWindow.style.display = 'block';
-                    previewIcon.style.display = 'none';
+                if (Object.keys(selectedItems).length === 1) {
+                    // 如果是第一个选中的物品，且允许自动显示，则显示预览窗口
+                    if (allowAutoShow) {
+                        previewWindow.style.display = 'block';
+                        previewIcon.style.display = 'none';
+                    } else {
+                        // 如果不允许自动显示预览窗口，则显示预览图标
+                        previewIcon.style.display = 'flex';
+                    }
                 }
             } else {
                 delete selectedItems[id];
-                // 如果没有选中的物品，隐藏预览窗口
+                // 如果没有选中的物品，同时隐藏预览窗口和预览图标
                 if (Object.keys(selectedItems).length === 0) {
                     previewWindow.style.display = 'none';
-                    previewIcon.style.display = 'flex';
+                    previewIcon.style.display = 'none';
                 }
             }
             updatePreview();
+            saveOrderToHistory();
         }
 
         function saveQuantity(id) {
@@ -1310,18 +1376,26 @@
             });
         }
 
-        // 检查是否已经选择了模式，并设置默认模式
-        function toggleDarkMode() {
-            const isDarkModeEnabled = document.body.classList.toggle('dark-mode');
-            const toggleButton = document.querySelector('.toggle-mode-btn');
+        function searchProduct() {
+            const searchText = document.getElementById('productSearch').value.toLowerCase();
+            const suggestionsContainer = document.getElementById('suggestions');
+            suggestionsContainer.innerHTML = ''; // 清空之前的建议
 
-            if (isDarkModeEnabled) {
-                toggleButton.textContent = 'Light Mode🌞';
-                localStorage.setItem('dark-mode', 'enabled');
-            } else {
-                toggleButton.textContent = 'Dark Mode🌙';
-                localStorage.setItem('dark-mode', 'disabled');
-            }
+            if (searchText.length === 0) return; // 如果没有输入，不显示建议
+
+            // 获取所有分类中的商品
+            const allProducts = Object.values(categories).flat();
+
+            // 根据输入的内容筛选出匹配的商品
+            const matchingProducts = allProducts.filter(product => product.name.toLowerCase().includes(searchText));
+
+            // 显示匹配的商品作为建议
+            matchingProducts.forEach(product => {
+                const div = document.createElement('div');
+                div.textContent = product.name;
+                div.onclick = () => selectProduct(product); // 点击建议后选择该商品
+                suggestionsContainer.appendChild(div);
+            });
         }
 
         function selectProduct(product) {
@@ -1442,21 +1516,32 @@
             const ripple = document.createElement('div');
             ripple.classList.add('ripple');
             
+            // 获取点击位置
             const rect = element.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
             
-            ripple.style.transform = `translate(${x - 50}px, ${y - 50}px)`;
+            ripple.style.left = `${x - 50}px`;
+            ripple.style.top = `${y - 50}px`;
             
             element.appendChild(ripple);
             
+            // 动画结束后移除涟漪元素
             ripple.addEventListener('animationend', () => {
                 ripple.remove();
-            }, { once: true });
+            });
         }
 
         // 添加一个标志来控制预览窗口的自动显示
         let allowAutoShow = true;
+
+        // 修改 updatePreview 函数
+        function updatePreview() {
+            const previewContent = document.getElementById('preview-content');
+            // 使用 generateText(false) 来获取带HTML标签的版本
+            const text = generateText(false);
+            previewContent.innerHTML = text.replace(/\n/g, '<br>');
+        }
 
         // 修改 togglePreview 函数
         function togglePreview() {
@@ -1482,8 +1567,163 @@
             });
         });
 
-        // 修改搜索输入事件监听
-        document.getElementById('productSearch').oninput = debouncedSearch;
+        // 添加设置相关的函数
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // 初始化设置按钮点击事件
+        document.getElementById('settings-button').addEventListener('click', toggleSettings);
+
+        // 修改字体大小调整函数
+        function changeFontSize(value) {
+            const sizes = {
+                '0': '85%',  // 小
+                '1': '100%', // 中
+                '2': '115%'  // 大
+            };
+            document.body.style.fontSize = sizes[value];
+            localStorage.setItem('fontSize', value);
+        }
+
+        // 修改页面加载时的字体大小初始化
+        window.addEventListener('load', function() {
+            // 加载保存的字体大小，默认为中等(1)
+            const savedFontSize = localStorage.getItem('fontSize') || '1';
+            document.getElementById('font-size-selector').value = savedFontSize;
+            changeFontSize(savedFontSize);
+            
+            // 加载保存的主题设置
+            const isDarkMode = localStorage.getItem('dark-mode') === 'enabled';
+            changeTheme(isDarkMode ? 'dark' : 'light');
+        });
+
+        // 修改主题切换函数
+        function changeTheme(theme) {
+            const darkBtn = document.getElementById('dark-mode-btn');
+            const lightBtn = document.getElementById('light-mode-btn');
+            
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('dark-mode', 'enabled');
+                darkBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                lightBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('dark-mode', 'disabled');
+                darkBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                lightBtn.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+            }
+        }
+
+        // 添加点击外部关闭设置面板的功能
+        document.addEventListener('click', function(event) {
+            const settingsPanel = document.getElementById('settings-panel');
+            const settingsButton = document.getElementById('settings-button');
+            const orderHistoryPanel = document.getElementById('order-history-panel');
+            const orderHistoryButton = document.getElementById('order-history-button');
+            
+            if (!settingsPanel.contains(event.target) && 
+                !settingsButton.contains(event.target) && 
+                !orderHistoryPanel.contains(event.target) && 
+                !orderHistoryButton.contains(event.target)) {
+                settingsPanel.style.display = 'none';
+                orderHistoryPanel.style.display = 'none';
+            }
+        });
+
+        // 添加订单历史相关的函数
+        function toggleOrderHistory() {
+            const panel = document.getElementById('order-history-panel');
+            const settingsPanel = document.getElementById('settings-panel');
+            
+            // 如果设置面板是打开的，先关闭它
+            if (settingsPanel.style.display === 'block') {
+                settingsPanel.style.display = 'none';
+            }
+            
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            
+            if (panel.style.display === 'block') {
+                loadLastOrder();
+            }
+        }
+
+        // 保存订单到localStorage
+        function saveOrderToHistory() {
+            const orderData = {
+                store: document.querySelector('input[name="store"]:checked')?.value,
+                items: selectedItems,
+                addOn: document.getElementById('addOnCheckbox').checked,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('lastOrder', JSON.stringify(orderData));
+        }
+
+        // 加载最后一次订单
+        function loadLastOrder() {
+            const lastOrderJson = localStorage.getItem('lastOrder');
+            if (!lastOrderJson) {
+                document.getElementById('last-order-content').innerHTML = '<p>No previous order found.</p>';
+                return;
+            }
+            
+            const lastOrder = JSON.parse(lastOrderJson);
+            let content = `<p>Store: ${lastOrder.store || 'Not selected'}</p>`;
+            content += `<p>Time: ${new Date(lastOrder.timestamp).toLocaleString()}</p>`;
+            content += `<p>Add On: ${lastOrder.addOn ? 'Yes' : 'No'}</p>`;
+            content += '<h4>Items:</h4>';
+            
+            // 遍历所有分类和商品
+            Object.entries(categories).forEach(([category, products]) => {
+                const categoryItems = products.filter(product => lastOrder.items[product.id]);
+                if (categoryItems.length > 0) {
+                    content += `<p><strong>${category}:</strong></p>`;
+                    categoryItems.forEach(product => {
+                        content += `<p>${product.name} - ${lastOrder.items[product.id]} ${product.unit || 'ctn'}</p>`;
+                    });
+                }
+            });
+            
+            document.getElementById('last-order-content').innerHTML = content;
+        }
+
+        // 应用上一次的订单
+        function applyLastOrder() {
+            const lastOrderJson = localStorage.getItem('lastOrder');
+            if (!lastOrderJson) return;
+            
+            const lastOrder = JSON.parse(lastOrderJson);
+            
+            // 清除当前选择
+            selectedItems = {};
+            document.querySelectorAll('#productList input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // 选择商店
+            if (lastOrder.store) {
+                const storeRadio = document.querySelector(`input[value="${lastOrder.store}"]`);
+                if (storeRadio) {
+                    storeRadio.checked = true;
+                    storeRadio.closest('.shop-card').classList.add('selected');
+                }
+            }
+            
+            // 设置Add On
+            document.getElementById('addOnCheckbox').checked = lastOrder.addOn;
+            
+            // 应用商品选择
+            selectedItems = {...lastOrder.items};
+            updatePreview();
+            
+            // 关闭订单历史面板
+            toggleOrderHistory();
+            
+            // 刷新商品列表显示
+            showCategory();
+        }
     </script>
 
     <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Rowan now will help me to update stock amount.</p>
