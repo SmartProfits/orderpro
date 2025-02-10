@@ -982,6 +982,9 @@
             // 监听所有位置的库存变化
             const locations = ['office', 'kepayan'];
             
+            // 清空之前的库存数据
+            stockMap = {};
+            
             locations.forEach(location => {
                 db.ref(`inventory/${location}`).on('value', (snapshot) => {
                     const data = snapshot.val();
@@ -1199,10 +1202,13 @@
                 // 使用商品的默认数量或者已保存的数量，如果都没有则使用1
                 const defaultQuantity = product.defaultQuantity || 1;
                 const currentQuantity = selectedItems[product.id] || defaultQuantity;
+                const stock = stockMap[product.name] || 0;
+                const stockClass = stock === 0 ? 'zero-stock' : '';
+                const stockText = stock === 0 ? '(缺货)' : `(Stock: ${stock})`;
 
                 div.innerHTML = `
                     <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
-                    <label for="item${product.id}">${product.name}</label>
+                    <label for="item${product.id}">${product.name} <span class="${stockClass}">${stockText}</span></label>
                     <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
                     <input type="number"
                            id="quantity${product.id}"
@@ -1474,12 +1480,12 @@
             document.querySelector('.toggle-mode-btn').textContent = 'Light Mode🌞';
             localStorage.setItem('dark-mode', 'enabled');
             
-            toggleItems(); // 初始化商品选择框
-            
             // 先进行匿名认证
             firebase.auth().signInAnonymously()
                 .then(() => {
                     console.log('Anonymous auth successful');
+                    // 初始化数据监听
+                    loadQuantitiesFromFirebase();
                 })
                 .catch((error) => {
                     console.error('Anonymous auth failed:', error);
@@ -1488,6 +1494,8 @@
                         productList.innerHTML = '<div class="error-message">无法连接到数据库，请稍后再试</div>';
                     }
                 });
+            
+            toggleItems(); // 初始化商品选择框
         }
 
         // 添加选择效果的JavaScript
@@ -1634,20 +1642,6 @@
                 !settingsButton.contains(event.target) && 
                 settingsPanel.style.display === 'block') {
                 settingsPanel.style.display = 'none';
-            }
-        });
-
-        // 修改认证状态监听
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                console.log('User is signed in:', user.uid);
-                loadQuantitiesFromFirebase();
-            } else {
-                console.log('User is signed out');
-                const productList = document.getElementById('productList');
-                if (productList) {
-                    productList.innerHTML = '<div class="error-message">请稍等，正在连接数据库...</div>';
-                }
             }
         });
     </script>
