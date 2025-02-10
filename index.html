@@ -720,6 +720,7 @@
     </style>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
 <body>
@@ -1475,8 +1476,18 @@
             
             toggleItems(); // 初始化商品选择框
             
-            // 使用 Firebase 实时监听替代定时刷新
-            loadQuantitiesFromFirebase();
+            // 先进行匿名认证
+            firebase.auth().signInAnonymously()
+                .then(() => {
+                    console.log('Anonymous auth successful');
+                })
+                .catch((error) => {
+                    console.error('Anonymous auth failed:', error);
+                    const productList = document.getElementById('productList');
+                    if (productList) {
+                        productList.innerHTML = '<div class="error-message">无法连接到数据库，请稍后再试</div>';
+                    }
+                });
         }
 
         // 添加选择效果的JavaScript
@@ -1626,27 +1637,17 @@
             }
         });
 
-        // 在 Firebase 初始化后添加
-        firebase.auth().signInAnonymously()
-            .then(() => {
-                console.log('Anonymous auth successful');
-                // 开始加载数据
-                loadQuantitiesFromFirebase();
-            })
-            .catch((error) => {
-                console.error('Anonymous auth failed:', error);
-                // 显示错误信息
-                const productList = document.getElementById('productList');
-                if (productList) {
-                    productList.innerHTML = '<div class="error-message">无法连接到数据库，请稍后再试</div>';
-                }
-            });
-
-        // 监听认证状态变化
+        // 修改认证状态监听
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                // 用户已登录，可以开始加载数据
+                console.log('User is signed in:', user.uid);
                 loadQuantitiesFromFirebase();
+            } else {
+                console.log('User is signed out');
+                const productList = document.getElementById('productList');
+                if (productList) {
+                    productList.innerHTML = '<div class="error-message">请稍等，正在连接数据库...</div>';
+                }
             }
         });
     </script>
