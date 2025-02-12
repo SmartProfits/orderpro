@@ -115,10 +115,10 @@
         /* 添加玻璃态效果的通用类 */
         .glass-effect {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);  /* 降低模糊程度 */
-            -webkit-backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 16px rgba(31, 38, 135, 0.37);  /* 简化阴影 */
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             border-radius: 10px;
         }
 
@@ -400,18 +400,18 @@
             max-width: 80%;
             position: relative;
             overflow: hidden;
-            animation: glowingTitle 3s ease-in-out infinite;
+            animation: simpleGlow 3s ease-in-out infinite;
+            will-change: transform;
         }
 
-        /* 简化动画效果，减少性能消耗 */
-        @keyframes glowingTitle {
+        @keyframes simpleGlow {
             0%, 100% {
-                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
                 transform: translateY(0);
+                opacity: 1;
             }
             50% {
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
                 transform: translateY(-3px);
+                opacity: 0.8;
             }
         }
 
@@ -594,6 +594,8 @@
             width: 100px;
             height: 100px;
             animation: ripple 0.6s linear;
+            transform: translate3d(0, 0, 0); /* 启用GPU加速 */
+            will-change: transform;
         }
 
         /* 修改预览窗口标题栏样式 */
@@ -936,53 +938,143 @@
         // 添加一个全局变量来存储库存信息
         let stockMap = {};
 
-        // 优化库存更新逻辑，增加节流
-        let lastUpdate = 0;
-        const UPDATE_INTERVAL = 60000; // 1分钟更新一次
-        
-        function loadQuantitiesFromSheet() {
-            const now = Date.now();
-            if (now - lastUpdate < UPDATE_INTERVAL) return;
-            
-            lastUpdate = now;
-            const SHEET_ID = '1QUB8R0-gtwNhdiPYU2rwFf_UKrGyyqCQHzIQ7AxKFLI';
-            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+        // 1. 添加节流函数来限制频繁操作
+        function throttle(func, limit) {
+            let inThrottle;
+            return function(...args) {
+                if (!inThrottle) {
+                    func.apply(this, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            }
+        }
 
-            fetch(url)
-                .then(response => response.text())
-                .then(data => {
-                    try {
-                        const jsonData = JSON.parse(data.substr(47).slice(0, -2));
-                        const rows = jsonData.table.rows;
+        // 2. 优化搜索功能，添加防抖
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            }
+        }
 
-                        // 批量更新 DOM
-                        const updates = {};
-                        rows.forEach(row => {
-                            if(row.c[0] && row.c[1]) {
-                                updates[row.c[0].v] = row.c[1].v;
-                            }
-                        });
+        // 3. 修改搜索产品函数，使用防抖
+        const debouncedSearch = debounce(function() {
+            const searchText = document.getElementById('productSearch').value.toLowerCase();
+            const suggestionsContainer = document.getElementById('suggestions');
+            suggestionsContainer.innerHTML = '';
 
-                        // 一次性更新 DOM
-                        requestAnimationFrame(() => {
-                            const labels = document.querySelectorAll('#productList label');
-                            labels.forEach(label => {
-                                const productName = label.textContent.split(' (')[0];
-                                const stock = updates[productName];
-                                if (stock !== undefined) {
-                                    const stockClass = stock === 0 ? 'zero-stock' : '';
-                                    label.innerHTML = `${productName} <span class="${stockClass}">(Stock: ${stock})</span>`;
-                                }
-                            });
-                        });
+            if (searchText.length === 0) return;
 
-                        stockMap = updates;
-                        updatePreview();
-                    } catch (error) {
-                        console.error('解析数据错误:', error);
+            const matchingProducts = [];
+            for (const category in categories) {
+                for (const product of categories[category]) {
+                    if (product.name.toLowerCase().includes(searchText)) {
+                        matchingProducts.push(product);
+                        if (matchingProducts.length >= 5) break; // 限制显示数量
                     }
-                })
-                .catch(error => console.error('获取数据失败:', error));
+                }
+                if (matchingProducts.length >= 5) break;
+            }
+
+            const fragment = document.createDocumentFragment();
+            matchingProducts.forEach(product => {
+                const div = document.createElement('div');
+                div.textContent = product.name;
+                div.onclick = () => selectProduct(product);
+                fragment.appendChild(div);
+            });
+            suggestionsContainer.appendChild(fragment);
+        }, 300);
+
+        // 4. 优化库存加载，使用节流
+        const throttledLoadQuantities = throttle(loadQuantitiesFromSheet, 5000);
+
+        // 5. 修改库存加载函数，添加缓存
+        let lastStockUpdate = 0;
+        const STOCK_CACHE_TIME = 30000; // 30秒缓存
+
+        async function loadQuantitiesFromSheet() {
+            const now = Date.now();
+            if (now - lastStockUpdate < STOCK_CACHE_TIME) {
+                return; // 使用缓存的数据
+            }
+
+            try {
+                const SHEET_ID = '1QUB8R0-gtwNhdiPYU2rwFf_UKrGyyqCQHzIQ7AxKFLI';
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+                
+                const response = await fetch(url);
+                const data = await response.text();
+                const jsonData = JSON.parse(data.substr(47).slice(0, -2));
+                
+                // 批量更新 DOM
+                const fragment = document.createDocumentFragment();
+                const labels = document.querySelectorAll('#productList label');
+                
+                jsonData.table.rows.forEach(row => {
+                    if (row.c[0] && row.c[1]) {
+                        const productName = row.c[0].v;
+                        const stockQuantity = row.c[1].v;
+                        stockMap[productName] = stockQuantity;
+                    }
+                });
+
+                lastStockUpdate = now;
+                updatePreview();
+            } catch (error) {
+                console.error('获取数据失败:', error);
+            }
+        }
+
+        // 6. 优化动画效果
+        const optimizedRippleEffect = throttle(addRippleEffect, 100);
+
+        // 7. 优化预览更新
+        const debouncedUpdatePreview = debounce(updatePreview, 300);
+
+        // 8. 修改页面加载初始化
+        window.onload = function() {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('dark-mode', 'enabled');
+            toggleItems();
+            
+            // 降低库存刷新频率
+            setInterval(throttledLoadQuantities, 60000); // 改为每60秒更新一次
+            
+            // 添加页面可见性检测
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible') {
+                    throttledLoadQuantities();
+                }
+            });
+        }
+
+        // 9. 优化商品列表渲染
+        function loadProducts(products) {
+            const productList = document.getElementById('productList');
+            const fragment = document.createDocumentFragment();
+
+            products.forEach(product => {
+                const div = document.createElement('div');
+                const isChecked = selectedItems[product.id] ? 'checked' : '';
+                const defaultQuantity = product.defaultQuantity || 1;
+                const currentQuantity = selectedItems[product.id] || defaultQuantity;
+
+                div.innerHTML = `
+                    <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
+                    <label for="item${product.id}">${product.name}</label>
+                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+                    <input type="number" id="quantity${product.id}" min="1" value="${currentQuantity}" readonly>
+                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+                `;
+                fragment.appendChild(div);
+            });
+
+            productList.innerHTML = '';
+            productList.appendChild(fragment);
+            throttledLoadQuantities();
         }
 
         // 分类商品
@@ -1145,12 +1237,11 @@
 
         function loadProducts(products) {
             const productList = document.getElementById('productList');
-            productList.innerHTML = '';
+            const fragment = document.createDocumentFragment();
 
             products.forEach(product => {
                 const div = document.createElement('div');
                 const isChecked = selectedItems[product.id] ? 'checked' : '';
-                // 使用商品的默认数量或者已保存的数量，如果都没有则使用1
                 const defaultQuantity = product.defaultQuantity || 1;
                 const currentQuantity = selectedItems[product.id] || defaultQuantity;
 
@@ -1158,18 +1249,15 @@
                     <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
                     <label for="item${product.id}">${product.name}</label>
                     <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
-                    <input type="number"
-                           id="quantity${product.id}"
-                           min="1"
-                           value="${currentQuantity}"
-                           readonly>
+                    <input type="number" id="quantity${product.id}" min="1" value="${currentQuantity}" readonly>
                     <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
                 `;
-                productList.appendChild(div);
+                fragment.appendChild(div);
             });
 
-            // 加载并显示库存数量
-            loadQuantitiesFromSheet();
+            productList.innerHTML = '';
+            productList.appendChild(fragment);
+            throttledLoadQuantities();
         }
 
         function saveItem(id, name) {
@@ -1334,31 +1422,26 @@
             });
         }
 
-        // 优化搜索功能，添加防抖
-        let searchTimeout;
         function searchProduct() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const searchText = document.getElementById('productSearch').value.toLowerCase();
-                const suggestionsContainer = document.getElementById('suggestions');
-                suggestionsContainer.innerHTML = '';
+            const searchText = document.getElementById('productSearch').value.toLowerCase();
+            const suggestionsContainer = document.getElementById('suggestions');
+            suggestionsContainer.innerHTML = ''; // 清空之前的建议
 
-                if (searchText.length === 0) return;
+            if (searchText.length === 0) return; // 如果没有输入，不显示建议
 
-                const allProducts = Object.values(categories).flat();
-                const matchingProducts = allProducts
-                    .filter(product => product.name.toLowerCase().includes(searchText))
-                    .slice(0, 5); // 限制显示结果数量
+            // 获取所有分类中的商品
+            const allProducts = Object.values(categories).flat();
 
-                const fragment = document.createDocumentFragment();
-                matchingProducts.forEach(product => {
-                    const div = document.createElement('div');
-                    div.textContent = product.name;
-                    div.onclick = () => selectProduct(product);
-                    fragment.appendChild(div);
-                });
-                suggestionsContainer.appendChild(fragment);
-            }, 300);
+            // 根据输入的内容筛选出匹配的商品
+            const matchingProducts = allProducts.filter(product => product.name.toLowerCase().includes(searchText));
+
+            // 显示匹配的商品作为建议
+            matchingProducts.forEach(product => {
+                const div = document.createElement('div');
+                div.textContent = product.name;
+                div.onclick = () => selectProduct(product); // 点击建议后选择该商品
+                suggestionsContainer.appendChild(div);
+            });
         }
 
         function selectProduct(product) {
@@ -1418,19 +1501,6 @@
                     }
                 })
                 .catch(error => console.error('获取数据失败:', error));
-        }
-
-        // 优化页面加载
-        window.onload = function() {
-            document.body.classList.add('dark-mode');
-            localStorage.setItem('dark-mode', 'enabled');
-            toggleItems();
-            
-            // 延迟加载非关键功能
-            setTimeout(() => {
-                loadQuantitiesFromSheet();
-                setInterval(loadQuantitiesFromSheet, UPDATE_INTERVAL);
-            }, 1000);
         }
 
         // 添加选择效果的JavaScript
