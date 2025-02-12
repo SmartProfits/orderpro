@@ -94,7 +94,7 @@
             font-family: Arial, sans-serif;
             padding: 15px;
             margin: 0;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #6e8efb, #ff8e8e);
             color: #333;
             transition: background-color 0.3s, color 0.3s;
             min-height: 100vh;
@@ -108,15 +108,15 @@
 
         /* 修改黑暗模式背景 */
         body.dark-mode {
-            background: #1a1a1a;
+            background: linear-gradient(135deg, #1a1f35, #2d1b1b);
             color: #e0e0e0;
         }
 
         /* 添加玻璃态效果的通用类 */
         .glass-effect {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             border-radius: 10px;
@@ -405,11 +405,23 @@
 
         /* 添加标题动画效果 */
         @keyframes glowingTitle {
-            0%, 100% {
+            0% {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
+                             0 0 10px rgba(255, 255, 255, 0.8),
+                             0 0 15px rgba(255, 255, 255, 0.8);
                 transform: translateY(0);
             }
             50% {
-                transform: translateY(-3px);
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
+                             0 0 35px rgba(255, 255, 255, 0.8),
+                             0 0 40px rgba(255, 255, 255, 0.8);
+                transform: translateY(-5px);
+            }
+            100% {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
+                             0 0 10px rgba(255, 255, 255, 0.8),
+                             0 0 15px rgba(255, 255, 255, 0.8);
+                transform: translateY(0);
             }
         }
 
@@ -574,8 +586,12 @@
 
         /* 动画效果 */
         @keyframes ripple {
-            to {
-                transform: scale(2);
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(4);
                 opacity: 0;
             }
         }
@@ -765,6 +781,24 @@
             color: #333;
             background: rgba(0, 0, 0, 0.1);
         }
+
+        /* 低性能模式的样式 */
+        .low-perf-mode .glass-effect {
+            /* 替换磨砂玻璃效果为纯色背景 */
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .low-perf-mode.dark-mode .glass-effect {
+            background: rgba(30, 30, 30, 0.8);
+        }
+
+        /* 禁用动画效果 */
+        .low-perf-mode * {
+            animation: none !important;
+            transition: none !important;
+        }
     </style>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -856,6 +890,23 @@
                         onclick="changeTheme('light')" 
                         style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
                     Light Mode 🌞
+                </button>
+            </div>
+        </div>
+        
+        <!-- 添加低性能模式选项 -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 10px;">Performance Mode</label>
+            <div style="display: flex; gap: 10px;">
+                <button id="high-perf-btn" 
+                        onclick="togglePerformanceMode(false)" 
+                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
+                    High 🚀
+                </button>
+                <button id="low-perf-btn" 
+                        onclick="togglePerformanceMode(true)" 
+                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
+                    Low 🐌
                 </button>
             </div>
         </div>
@@ -1014,6 +1065,10 @@
         </div>
     </div>
 
+    <div class="setting-menu">
+        <!-- 删除这两个设置项 -->
+    </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDAK5KVv9oln2qS5EfNzox1snM19wa83-o",
@@ -1079,14 +1134,20 @@
 
         // 修改 updateStockDisplay 函数
         function updateStockDisplay() {
-            const fragment = document.createDocumentFragment();
             Object.entries(categories).forEach(([category, products]) => {
                 products.forEach(product => {
                     const label = document.querySelector(`label[for="item${product.id}"]`);
                     if (label) {
                         const stock = stockMap[product.name] || 0;
                         const stockClass = stock === 0 ? 'zero-stock' : '';
-                        label.innerHTML = `${product.name} <span class="${stockClass}">${stock === 0 ? '(缺货)' : `(Stock: ${stock})`}</span>`;
+                        const stockText = stock === 0 ? '(缺货)' : `(Stock: ${stock})`;
+                        
+                        // 添加查看图片按钮（如果有图片URL）
+                        const viewImageButton = product.imageUrl ? 
+                            `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">View</button>` : '';
+                        
+                        // 修改这里，将 viewImageButton 放在 stockText 后面
+                        label.innerHTML = `${product.name} <span class="${stockClass}">${stockText} ${viewImageButton}</span>`;
                     }
                 });
             });
@@ -1254,31 +1315,36 @@
 
         function loadProducts(products) {
             const productList = document.getElementById('productList');
-            // 使用文档片段减少重排
-            const fragment = document.createDocumentFragment();
-            
+            productList.innerHTML = '';
+
             products.forEach(product => {
                 const div = document.createElement('div');
                 const isChecked = selectedItems[product.id] ? 'checked' : '';
                 const defaultQuantity = product.defaultQuantity || 1;
                 const currentQuantity = selectedItems[product.id] || defaultQuantity;
                 
+                // 添加查看图片按钮
+                const viewImageButton = product.imageUrl ? 
+                    `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">View</button>` : '';
+
                 div.innerHTML = `
-                    <input type="checkbox" id="item${product.id}" ${isChecked}>
-                    <label for="item${product.id}">${product.name}</label>
-                    <div class="quantity-controls">
-                        <button class="quantity-btn">-</button>
-                        <input type="number" id="quantity${product.id}" value="${currentQuantity}" readonly>
-                        <button class="quantity-btn">+</button>
-                    </div>
+                    <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
+                    <label for="item${product.id}">
+                        ${product.name}
+                        ${viewImageButton}
+                    </label>
+                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+                    <input type="number"
+                           id="quantity${product.id}"
+                           min="1"
+                           value="${currentQuantity}"
+                           readonly>
+                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
                 `;
-                
-                // 使用事件委托而不是直接绑定事件
-                fragment.appendChild(div);
+                productList.appendChild(div);
             });
-            
-            productList.innerHTML = '';
-            productList.appendChild(fragment);
+
+            loadQuantitiesFromFirebase();
         }
 
         // 添加显示图片的函数
@@ -1286,17 +1352,12 @@
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImage');
             
-            // 添加加载指示器
-            modalImg.style.opacity = '0';
-            modal.style.display = "flex";
-            
-            // 图片加载完成后再显示
-            modalImg.onload = function() {
-                modalImg.style.opacity = '1';
-            };
-            
             modalImg.src = imageUrl;
             modalImg.alt = productName;
+            modal.style.display = "flex";
+            
+            // 添加震动反馈
+            vibrate();
         }
 
         // 添加关闭模态框的函数
@@ -1614,6 +1675,11 @@
         }
 
         function addRippleEffect(element, event) {
+            // 在低性能模式下不添加涟漪效果
+            if (document.body.classList.contains('low-perf-mode')) {
+                return;
+            }
+            
             const ripple = document.createElement('div');
             ripple.classList.add('ripple');
             
@@ -1702,6 +1768,10 @@
             // 初始化震动设置
             const isVibrationEnabled = localStorage.getItem('vibration-enabled') !== 'disabled';
             toggleVibration(isVibrationEnabled);
+            
+            // 加载性能模式设置
+            const isLowPerfMode = localStorage.getItem('lowPerfMode') === 'true';
+            togglePerformanceMode(isLowPerfMode);
         });
 
         // 修改主题切换函数
@@ -1748,39 +1818,37 @@
             }
         });
 
-        // 使用事件委托处理商品列表的点击事件
-        document.getElementById('productList').addEventListener('click', function(e) {
-            const target = e.target;
-            
-            if (target.type === 'checkbox') {
-                const id = target.id.replace('item', '');
-                saveItem(id, target.nextElementSibling.textContent);
-            } else if (target.classList.contains('quantity-btn')) {
-                const id = target.parentElement.querySelector('input[type="number"]').id.replace('quantity', '');
-                const change = target.textContent === '+' ? 1 : -1;
-                changeQuantity(id, change);
+        // 添加低性能模式的处理逻辑
+        const lowPerfModeToggle = document.getElementById('lowPerfModeToggle');
+        lowPerfModeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('low-perf-mode');
+            } else {
+                document.body.classList.remove('low-perf-mode');
             }
+            // 保存设置到 localStorage
+            localStorage.setItem('lowPerfMode', this.checked);
         });
 
-        // 优化搜索功能，添加防抖
-        function debounce(func, wait) {
-            let timeout;
-            return function(...args) {
-                clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(this, args), wait);
-            };
+        // 页面加载时检查之前的设置
+        if (localStorage.getItem('lowPerfMode') === 'true') {
+            lowPerfModeToggle.checked = true;
+            document.body.classList.add('low-perf-mode');
         }
 
-        const debouncedSearch = debounce(function() {
-            searchProduct();
-        }, 300);
-
-        document.getElementById('productSearch').addEventListener('input', debouncedSearch);
-
-        // 优化预览更新
-        const debouncedUpdatePreview = debounce(function() {
-            updatePreview();
-        }, 100);
+        // 添加性能模式切换函数
+        function togglePerformanceMode(isLowPerf) {
+            if (isLowPerf) {
+                document.body.classList.add('low-perf-mode');
+                document.getElementById('low-perf-btn').style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                document.getElementById('high-perf-btn').style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            } else {
+                document.body.classList.remove('low-perf-mode');
+                document.getElementById('low-perf-btn').style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                document.getElementById('high-perf-btn').style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+            }
+            localStorage.setItem('lowPerfMode', isLowPerf);
+        }
     </script>
 
     <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Rowan now will help me to update stock amount.</p>
