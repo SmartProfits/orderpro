@@ -1828,7 +1828,12 @@
             const isLowPerfMode = localStorage.getItem('lowPerfMode') === 'true';
             togglePerformanceMode(isLowPerfMode);
         });
+const adjustedData = amplangData.map(item => ({
+    ...item,
+    quantity: item.quantity > 60 ? item.quantity - 60 : 0 // 确保数量不会变成负数
+}));
 
+console.log(adjustedData);
         // 修改主题切换函数
         function changeTheme(theme) {
             const darkBtn = document.getElementById('dark-mode-btn');
