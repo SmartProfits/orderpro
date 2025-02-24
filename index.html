@@ -1179,24 +1179,26 @@
 
         // 修改 updateStockDisplay 函数
         function updateStockDisplay() {
-            Object.entries(categories).forEach(([category, products]) => {
-                products.forEach(product => {
-                    const label = document.querySelector(`label[for="item${product.id}"]`);
-                    if (label) {
-                        const stock = stockMap[product.name] || 0;
-                        const stockClass = stock === 0 ? 'zero-stock' : '';
-                        const stockText = stock === 0 ? '(缺货)' : `(Stock: ${stock})`;
-                        
-                        // 添加查看图片按钮（如果有图片URL）
-                        const viewImageButton = product.imageUrl ? 
-                            `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">View</button>` : '';
-                        
-                        // 修改这里，将 viewImageButton 放在 stockText 后面
-                        label.innerHTML = `${product.name} <span class="${stockClass}">${stockText} ${viewImageButton}</span>`;
-                    }
-                });
-            });
-        }
+    Object.entries(categories).forEach(([category, products]) => {
+        products.forEach(product => {
+            const label = document.querySelector(`label[for="item${product.id}"]`);
+            if (label) {
+                let stock = stockMap[product.name] || 0;
+
+                // 仅对指定的 Amplang 商品进行库存调整
+                if (["Amplang Ikan", "Amplang Udang", "Amplang Sotong"].includes(product.name)) {
+                    stock = stock - 60 > 0 ? stock - 60 : 0; // 减去 60，确保不会变成负数
+                }
+
+                const stockClass = stock === 0 ? 'zero-stock' : '';
+                const stockText = stock === 0 ? '(缺货)' : `(Stock: ${stock})`;
+
+                // 生成标签文本
+                label.innerHTML = `${product.name} <span class="${stockClass}">${stockText}</span>`;
+            }
+        });
+    });
+}
 
         // 分类商品
         const categories = {
@@ -1827,11 +1829,6 @@
             // 加载性能模式设置
             const isLowPerfMode = localStorage.getItem('lowPerfMode') === 'true';
             togglePerformanceMode(isLowPerfMode);
-        });
-const adjustedData = amplangData.map(item => ({
-    ...item,
-    quantity: item.quantity > 60 ? item.quantity - 60 : 0 // 确保数量不会变成负数
-}));
 
 console.log(adjustedData);
         // 修改主题切换函数
