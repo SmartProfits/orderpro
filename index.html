@@ -925,12 +925,12 @@
                 <button id="high-perf-btn" 
                         onclick="togglePerformanceMode(false)" 
                         style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
-                    High 🚀
+                    High 💫
                 </button>
                 <button id="low-perf-btn" 
                         onclick="togglePerformanceMode(true)" 
                         style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
-                    Low 🐌
+                    Smooth ✨
                 </button>
             </div>
         </div>
@@ -1022,6 +1022,20 @@
                 <span class="shop-name">Ole-Ole Luar</span>
             </label>
         </div>
+        <div class="shop-card" onclick="selectShop(this, '*Wrapping(AA)*')">
+            <input type="radio" name="store" value="*Wrapping(AA)*" id="aa">
+            <label for="aa">
+                <span class="shop-icon">🧳</span>
+                <span class="shop-name">Wrapping(AA)</span>
+            </label>
+        </div>
+        <div class="shop-card" onclick="selectShop(this, '*Wrapping(MAS)*')">
+            <input type="radio" name="store" value="*Wrapping()*" id="mas">
+            <label for="mas">
+                <span class="shop-icon">🧳</span>
+                <span class="shop-name">Wrapping(MAS)</span>
+            </label>
+        </div>
     </div>
 
     <h3>Category</h3>
@@ -1073,6 +1087,13 @@
             <label for="other">
                 <span class="category-icon">🎁</span>
                 <span>Other</span>
+            </label>
+        </div>
+        <div class="category-card" onclick="selectCategory(this, 'Wrapping')">
+            <input type="radio" name="category" value="Wrapping" id="wrapping">
+            <label for="Wrapping">
+                <span class="category-icon">🧸</span>
+                <span>Wrapping</span>
             </label>
         </div>
     </div>
@@ -1255,6 +1276,7 @@
             HopHup: [
                 { id: 201, name: "HH Durian Tart" },
                 { id: 202, name: "HH Mango Tart" },
+		{ id: 221, name: "HH Dried Fruit Mango" },
                 { id: 203, name: "HH Durian Wafer Roll" },
                 { id: 204, name: "HH Mango Wafer Roll" },
                 { id: 205, name: "HH Omelette Crisp Durian" },
@@ -1325,13 +1347,22 @@
                 { id: 603, name: "Amplang Sotong", unit: 'pkt', defaultQuantity: 1 }
             ],
             Other: [
-                { id: 701, name: "Fruity Gummy Assorted" },
+                 { id: 701, name: "Fruity Gummy Assorted" },
                 { id: 702, name: "Fruity Gummy Mango" },
+		{ id: 710, name: "Sour Gummy Blackcurrant" },
+		{ id: 711, name: "Sour Gummy Apple" },
                 { id: 703, name: "Durian Kuih" },
                 { id: 704, name: "Anchovy Blue" },
                 { id: 705, name: "Anchovy Green" },
-                { id: 706, name: "Crispy Anchory Spicy (Red)" },
-                { id: 707, name: "Crispy Anchory Honey (Yellow)" }
+                { id: 706, name: "Anchovy Red" },
+                { id: 707, name: "Anchovy Yellow" },
+                { id: 708, name: "Prawn Cracker 500g", unit: 'pkt' },
+                { id: 709, name: "Fish Maw", unit: 'pkt' }
+            ],
+            Wrapping: [
+                 { id: 801, name: "Wrapping Machine", unit: 'roll' },
+                { id: 802, name: "Wrapping Mini" ,unit: 'roll'},
+                { id: 809, name: "Neck Pillow", unit: 'roll' }
             ]
         };
 
@@ -1875,7 +1906,7 @@
         }
     </script>
 
-    <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Rowan now will help me to update stock amount.</p>
+    <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Stock quantity now will auto update from stock system!.</p>
  
 </body>
 </html>
