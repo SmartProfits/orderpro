@@ -1,5 +1,5 @@
 // 缓存版本号 - 每次更新HTML时需要更改此版本号
-const CACHE_VERSION = 'v1.0.1';
+const CACHE_VERSION = 'v1.0.2';
 const CACHE_NAME = `smart-profits-cache-${CACHE_VERSION}`;
 
 // 获取基础路径
