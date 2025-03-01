@@ -4,7 +4,7 @@ const CACHE_NAME = 'airport-stock-request-v1';
 // 需要缓存的资源列表
 const urlsToCache = [
   '/',
-  '/order.html',
+  '/index.html',
   '/manifest.json',
   // 添加其他需要缓存的资源
 ];
