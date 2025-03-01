@@ -1,13 +1,18 @@
 // 缓存版本号 - 每次更新HTML时需要更改此版本号
-const CACHE_VERSION = 'v1.0.0';
+const CACHE_VERSION = 'v1.0.1';
 const CACHE_NAME = `smart-profits-cache-${CACHE_VERSION}`;
+
+// 获取基础路径
+const BASE_PATH = location.hostname === 'localhost' || location.hostname === '127.0.0.1' 
+  ? '' 
+  : '/orderpro';
 
 // 需要缓存的资源列表
 const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json',
-  './s2.png'
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/manifest.json`,
+  `${BASE_PATH}/s2.png`
 ];
 
 // 安装service worker

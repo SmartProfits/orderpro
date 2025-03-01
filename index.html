@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
+    <!-- 添加base标签 -->
+    <base href="https://smartprofits.github.io/orderpro/">
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Airport Stock Request</title>
     <!-- PWA相关元标签 -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="SmartProfits">
-    <link rel="apple-touch-icon" href="s2.png">
+    <link rel="apple-touch-icon" href="./s2.png">
     <!-- PWA相关元标签结束 -->
     <style>
         #productList label span {
@@ -1928,8 +1931,12 @@
         // 注册Service Worker
         function registerServiceWorker() {
             if ('serviceWorker' in navigator) {
+                // 获取正确的基础路径
+                const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+                const basePath = isLocalhost ? '.' : '/orderpro';
+                
                 // 添加时间戳参数，确保每次获取最新的service worker文件
-                navigator.serviceWorker.register('./service-worker.js?v=' + new Date().getTime())
+                navigator.serviceWorker.register(`${basePath}/service-worker.js?v=${new Date().getTime()}`)
                     .then(reg => {
                         console.log('Service Worker 注册成功:', reg.scope);
                         
