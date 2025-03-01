@@ -1,17 +1,18 @@
-// 缓存名称，更改此值将创建新的缓存
-const CACHE_NAME = 'airport-stock-request-v1';
+// 缓存版本号 - 每次更新HTML时需要更改此版本号
+const CACHE_VERSION = 'v1.0.0';
+const CACHE_NAME = `smart-profits-cache-${CACHE_VERSION}`;
 
 // 需要缓存的资源列表
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  // 添加其他需要缓存的资源
+  './',
+  './index.html',
+  './manifest.json',
+  './s2.png'
 ];
 
 // 安装service worker
 self.addEventListener('install', event => {
-  console.log('Service Worker installing.');
+  console.log('Service Worker 正在安装...');
   
   // 强制新的service worker立即激活，不等待旧的service worker终止
   self.skipWaiting();
@@ -19,7 +20,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Cache opened');
+        console.log('缓存已打开');
         return cache.addAll(urlsToCache);
       })
   );
@@ -27,66 +28,30 @@ self.addEventListener('install', event => {
 
 // 激活service worker
 self.addEventListener('activate', event => {
-  console.log('Service Worker activating.');
+  console.log('Service Worker 已激活');
   
-  // 清理旧缓存
+  // 清理旧版本缓存
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.filter(cacheName => {
-          return cacheName !== CACHE_NAME;
-        }).map(cacheName => {
-          console.log('Deleting old cache:', cacheName);
-          return caches.delete(cacheName);
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Service Worker: 删除旧缓存 ', cacheName);
+            return caches.delete(cacheName);
+          }
         })
       );
-    }).then(() => {
-      console.log('Service Worker activated, claiming clients');
-      return self.clients.claim();
     })
   );
+  
+  // 立即控制所有页面
+  return self.clients.claim();
 });
 
-// 处理fetch请求
+// 处理网络请求
 self.addEventListener('fetch', event => {
-  // 对manifest.json的请求不使用缓存，始终从网络获取最新版本
-  if (event.request.url.includes('manifest.json')) {
-    event.respondWith(
-      fetch(event.request)
-        .catch(error => {
-          console.error('Failed to fetch manifest:', error);
-          return caches.match(event.request);
-        })
-    );
-    return;
-  }
-  
-  // 对HTML文件使用网络优先策略，确保获取最新版本
-  if (event.request.url.includes('.html')) {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          // 克隆响应，因为响应流只能使用一次
-          const responseToCache = response.clone();
-          
-          // 更新缓存
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
-            
-          return response;
-        })
-        .catch(error => {
-          console.log('Fetch failed; returning cached page instead.', error);
-          return caches.match(event.request);
-        })
-    );
-    return;
-  }
-  
-  // 对其他资源使用缓存优先策略
   event.respondWith(
+    // 尝试从缓存中获取资源
     caches.match(event.request)
       .then(response => {
         // 如果找到缓存的响应，则返回缓存
@@ -94,7 +59,7 @@ self.addEventListener('fetch', event => {
           return response;
         }
         
-        // 否则从网络获取
+        // 否则发起网络请求
         return fetch(event.request)
           .then(response => {
             // 检查是否收到有效响应
@@ -102,22 +67,31 @@ self.addEventListener('fetch', event => {
               return response;
             }
             
-            // 克隆响应
+            // 克隆响应，因为响应是流，只能使用一次
             const responseToCache = response.clone();
             
-            // 将响应添加到缓存
+            // 将新响应添加到缓存
             caches.open(CACHE_NAME)
               .then(cache => {
                 cache.put(event.request, responseToCache);
               });
-              
+            
             return response;
           });
+      })
+      .catch(() => {
+        // 如果网络和缓存都失败，可以返回一个离线页面
+        // 这里简单返回一个离线消息
+        if (event.request.mode === 'navigate') {
+          return new Response('您当前处于离线状态，请检查网络连接。', {
+            headers: { 'Content-Type': 'text/html; charset=utf-8' }
+          });
+        }
       })
   );
 });
 
-// 监听消息，用于手动触发更新
+// 监听消息，用于接收更新通知
 self.addEventListener('message', event => {
   if (event.data && event.data.action === 'skipWaiting') {
     self.skipWaiting();

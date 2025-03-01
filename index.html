@@ -2,10 +2,18 @@
 <html lang="zh">
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<link rel="manifest" href="manifest.json?v=10">
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Airport Stock Request</title>
+    <!-- PWA相关元标签 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="SmartProfits">
+    <link rel="apple-touch-icon" href="s2.png">
+    <!-- PWA相关元标签结束 -->
     <style>
         #productList label span {
             color: #00CED1 !important;  /* 默认显示青色 */
@@ -109,7 +117,7 @@
 
         /* 修改黑暗模式背景 */
         body.dark-mode {
-            background: linear-gradient(135deg, #1a1f35, #2d1b1b);
+            background: linear-gradient(135deg, #1a1f35, #000000);
             color: #e0e0e0;
         }
 
@@ -829,106 +837,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <script>
-        // PWA更新检测变量
-        let newWorker;
-        let refreshing;
-
-        // 当页面加载完成时注册service worker
-        window.addEventListener('load', () => {
-            registerServiceWorker();
-        });
-
-        // 注册service worker
-        function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                // 添加时间戳参数强制重新获取service worker
-                navigator.serviceWorker.register('/service-worker.js?v=' + new Date().getTime())
-                    .then(reg => {
-                        console.log('Service worker registered successfully', reg);
-                        
-                        // 检查是否有新的service worker等待安装
-                        reg.addEventListener('updatefound', () => {
-                            newWorker = reg.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                // 当新的service worker安装完成时
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    showUpdateNotification();
-                                }
-                            });
-                        });
-                    })
-                    .catch(err => {
-                        console.error('Service worker registration failed:', err);
-                    });
-
-                // 防止刷新循环
-                navigator.serviceWorker.addEventListener('controllerchange', () => {
-                    if (refreshing) return;
-                    refreshing = true;
-                    window.location.reload();
-                });
-            }
-        }
-
-        // 显示更新通知
-        function showUpdateNotification() {
-            // 创建一个通知元素
-            const notification = document.createElement('div');
-            notification.className = 'update-notification';
-            notification.innerHTML = `
-                <p>有新版本可用！</p>
-                <button id="update-button">立即更新</button>
-            `;
-            
-            // 添加样式
-            notification.style.position = 'fixed';
-            notification.style.bottom = '20px';
-            notification.style.left = '50%';
-            notification.style.transform = 'translateX(-50%)';
-            notification.style.backgroundColor = '#4CAF50';
-            notification.style.color = 'white';
-            notification.style.padding = '10px 20px';
-            notification.style.borderRadius = '5px';
-            notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-            notification.style.zIndex = '1000';
-            notification.style.textAlign = 'center';
-            
-            // 添加到页面
-            document.body.appendChild(notification);
-            
-            // 添加更新按钮事件
-            document.getElementById('update-button').addEventListener('click', () => {
-                if (newWorker) {
-                    // 通知service worker跳过等待
-                    newWorker.postMessage({ action: 'skipWaiting' });
-                    // 移除通知
-                    notification.remove();
-                }
-            });
-        }
-
-        // 定期检查manifest更新
-        setInterval(() => {
-            if ('serviceWorker' in navigator) {
-                // 添加时间戳参数强制重新获取manifest
-                fetch('/manifest.json?v=' + new Date().getTime())
-                    .then(response => response.json())
-                    .then(manifest => {
-                        console.log("Manifest checked:", manifest);
-                        // 如果有缓存的版本号，比较是否有更新
-                        const cachedVersion = localStorage.getItem('appVersion');
-                        if (cachedVersion && cachedVersion !== manifest.version) {
-                            console.log("New version detected:", manifest.version);
-                            showUpdateNotification();
-                        }
-                        // 保存当前版本号
-                        localStorage.setItem('appVersion', manifest.version);
-                    })
-                    .catch(err => console.log("Failed to fetch manifest:", err));
-            }
-        }, 3600000); // 每小时检查一次
-    </script>
 </head>
 <body>
     <!-- 在 body 开始处添加浮动预览窗口 -->
@@ -1069,7 +977,7 @@
         </div>
     </div>
 
-    <h1>Stock Order1</h1>
+    <h1>Stock Order</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h3 style="margin: 0;">Select Shop</h3>
         <!-- 这里保留设置按钮 -->
@@ -1915,8 +1823,10 @@
             localStorage.setItem('fontSize', value);
         }
 
-        // 修改页面加载时的字体大小初始化
-        window.addEventListener('load', function() {
+        // 页面加载完成后注册Service Worker
+        window.addEventListener('load', () => {
+            registerServiceWorker();
+            
             // 加载保存的字体大小，默认为中等(1)
             const savedFontSize = localStorage.getItem('fontSize') || '1';
             document.getElementById('font-size-selector').value = savedFontSize;
@@ -2009,6 +1919,70 @@
                 document.getElementById('high-perf-btn').style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
             }
             localStorage.setItem('lowPerfMode', isLowPerf);
+        }
+
+        // PWA更新提示UI
+        let newWorker;
+        let refreshing;
+
+        // 注册Service Worker
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                // 添加时间戳参数，确保每次获取最新的service worker文件
+                navigator.serviceWorker.register('./service-worker.js?v=' + new Date().getTime())
+                    .then(reg => {
+                        console.log('Service Worker 注册成功:', reg.scope);
+                        
+                        reg.addEventListener('updatefound', () => {
+                            newWorker = reg.installing;
+                            
+                            newWorker.addEventListener('statechange', () => {
+                                // 当新的Service Worker安装完成且有控制页面的Service Worker时，显示更新提示
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showUpdateBar();
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.log('Service Worker 注册失败:', error);
+                    });
+                        
+                // 当Service Worker控制权变更时刷新页面
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        window.location.reload();
+                        refreshing = true;
+                    }
+                });
+            }
+        }
+        
+        // 显示更新提示栏
+        function showUpdateBar() {
+            const updateBar = document.createElement('div');
+            updateBar.className = 'update-bar';
+            updateBar.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; 
+                            padding: 10px 15px; background: rgba(0, 0, 0, 0.8); color: white; 
+                            position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
+                            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);">
+                    <span>发现新版本! 点击更新应用</span>
+                    <button onclick="updateServiceWorker()" 
+                            style="background: #4CAF50; color: white; border: none; 
+                                   padding: 8px 15px; border-radius: 4px; cursor: pointer;">
+                        更新
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(updateBar);
+        }
+        
+        // 更新Service Worker
+        function updateServiceWorker() {
+            if (newWorker) {
+                newWorker.postMessage({ action: 'skipWaiting' });
+            }
         }
     </script>
 

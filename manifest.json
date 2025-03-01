@@ -1,8 +1,8 @@
 {
-  "name": "SmartProftis",
+  "name": "Airport Stock Request",
   "short_name": "Stock Request",
   "description": "Airport Stock Request Application",
-  "start_url": "index.html",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#6e8efb",
@@ -11,6 +11,12 @@
       "src": "s2.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "s2.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ],
   "version": "1.0.0"
 } 
