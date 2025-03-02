@@ -43,35 +43,64 @@ self.addEventListener('activate', event => {
   );
 });
 
-// 拦截网络请求，实现缓存优先策略
+// 拦截网络请求，实现不同的缓存策略
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // 如果在缓存中找到响应，则返回缓存
-        if (response) {
-          return response;
-        }
-        // 否则，从网络获取
-        return fetch(event.request)
-          .then(networkResponse => {
-            // 如果获取成功，将响应复制到缓存中
-            if (networkResponse && networkResponse.status === 200) {
-              const responseToCache = networkResponse.clone();
-              caches.open(CACHE_NAME)
-                .then(cache => {
-                  cache.put(event.request, responseToCache);
-                });
-            }
-            return networkResponse;
-          })
-          .catch(error => {
-            console.error('Fetch 失败:', error);
-            // 这里可以返回一个离线页面或默认响应
-            // return caches.match('/offline.html');
-          });
-      })
-  );
+  const url = new URL(event.request.url);
+  
+  // 对HTML文件使用网络优先策略
+  if (event.request.mode === 'navigate' || 
+      (event.request.method === 'GET' && 
+       event.request.headers.get('accept').includes('text/html'))) {
+    console.log('对HTML请求使用网络优先策略:', url.pathname);
+    event.respondWith(
+      fetch(event.request)
+        .then(networkResponse => {
+          // 如果从网络获取成功，更新缓存
+          if (networkResponse && networkResponse.status === 200) {
+            const clonedResponse = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              console.log('更新HTML缓存:', url.pathname);
+              cache.put(event.request, clonedResponse);
+            });
+          }
+          return networkResponse;
+        })
+        .catch(error => {
+          console.log('网络请求失败，使用缓存:', url.pathname, error);
+          // 如果网络请求失败，尝试从缓存获取
+          return caches.match(event.request);
+        })
+    );
+  } else {
+    // 对其他资源使用缓存优先策略
+    event.respondWith(
+      caches.match(event.request)
+        .then(response => {
+          // 如果在缓存中找到响应，则返回缓存
+          if (response) {
+            return response;
+          }
+          // 否则，从网络获取
+          return fetch(event.request)
+            .then(networkResponse => {
+              // 如果获取成功，将响应复制到缓存中
+              if (networkResponse && networkResponse.status === 200) {
+                const responseToCache = networkResponse.clone();
+                caches.open(CACHE_NAME)
+                  .then(cache => {
+                    cache.put(event.request, responseToCache);
+                  });
+              }
+              return networkResponse;
+            })
+            .catch(error => {
+              console.error('Fetch 失败:', error);
+              // 这里可以返回一个离线页面或默认响应
+              // return caches.match('./offline.html');
+            });
+        })
+    );
+  }
 });
 
 // 监听消息，处理更新通知

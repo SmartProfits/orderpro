@@ -977,7 +977,7 @@
         </div>
     </div>
 
-    <h1>Stock Order13288</h1>
+    <h1>Stock Order288</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h3 style="margin: 0;">Select Shop</h3>
         <!-- 这里保留设置按钮 -->
@@ -1928,9 +1928,38 @@
         <button id="update-button" style="background-color: white; color: #4a90e2; border: none; padding: 5px 15px; border-radius: 3px; cursor: pointer;">立即更新</button>
     </div>
 
+    <!-- 手动刷新按钮 -->
+    <div id="refresh-button" style="position: fixed; top: 10px; right: 10px; background-color: rgba(74, 144, 226, 0.8); color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; z-index: 9998;">
+        <span style="font-size: 20px;">🔄</span>
+    </div>
+
     <script>
         // PWA Service Worker 注册
         if ('serviceWorker' in navigator) {
+            let refreshing = false;
+
+            // 手动强制刷新按钮
+            document.getElementById('refresh-button').addEventListener('click', function() {
+                // 卸载当前Service Worker
+                navigator.serviceWorker.getRegistration().then(registration => {
+                    if (registration) {
+                        registration.unregister().then(() => {
+                            // 清除缓存
+                            caches.keys().then(cacheNames => {
+                                return Promise.all(
+                                    cacheNames.map(cacheName => caches.delete(cacheName))
+                                );
+                            }).then(() => {
+                                // 重新加载页面
+                                window.location.reload(true);
+                            });
+                        });
+                    } else {
+                        window.location.reload(true);
+                    }
+                });
+            });
+
             window.addEventListener('load', function() {
                 // 使用相对路径注册Service Worker
                 navigator.serviceWorker.register('./sw.js')
@@ -1941,35 +1970,44 @@
                         // 检查更新
                         registration.addEventListener('updatefound', () => {
                             const newWorker = registration.installing;
+                            console.log('发现新的Service Worker版本');
+                            
                             newWorker.addEventListener('statechange', () => {
+                                console.log('Service Worker状态变化:', newWorker.state);
                                 // 当新的Service Worker安装完成并等待激活
                                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                                     // 显示更新通知
+                                    console.log('新版本已准备就绪，显示更新通知');
                                     showUpdateNotification();
                                 }
                             });
                         });
                         
-                        // 定期检查更新 (每60秒)
+                        // 更频繁地检查更新 (每30秒)
                         setInterval(() => {
-                            registration.update();
-                            console.log('正在检查Service Worker更新...');
-                        }, 60000);
+                            console.log('检查Service Worker更新...');
+                            registration.update().catch(err => {
+                                console.error('更新检查失败:', err);
+                            });
+                        }, 30000);
                     })
                     .catch(function(error) {
                         // 注册失败
                         console.log('ServiceWorker 注册失败: ', error);
                     });
                 
-                // 页面加载时主动检查一次更新
+                // 页面加载时立即检查一次更新
                 navigator.serviceWorker.ready.then(registration => {
-                    registration.update();
+                    console.log('Service Worker准备就绪，立即检查更新');
+                    registration.update().catch(err => {
+                        console.error('初始更新检查失败:', err);
+                    });
                 });
                 
                 // 监听控制权变化
-                let refreshing = false;
                 navigator.serviceWorker.addEventListener('controllerchange', function() {
                     if (!refreshing) {
+                        console.log('Service Worker控制权发生变化，刷新页面');
                         window.location.reload();
                         refreshing = true;
                     }
