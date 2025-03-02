@@ -1,4 +1,4 @@
-const CACHE_NAME = 'airport-stock-v8';
+const CACHE_NAME = 'airport-stock-v3';
 const ASSETS = [
   './',
   './index.html',
