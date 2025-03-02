@@ -2,7 +2,7 @@
   "name": "Airport Stock Request",
   "short_name": "AirportStock",
   "description": "Stock request application for airport stores",
-  "start_url": "/",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4a90e2",
