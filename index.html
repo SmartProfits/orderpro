@@ -8,7 +8,7 @@
     <title>Airport Stock Request</title>
     
     <!-- PWA相关标记 -->
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#4a90e2">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./icons/s2.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -977,7 +977,7 @@
         </div>
     </div>
 
-    <h1>Stock Order</h1>
+    <h1>Stock Order13288</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h3 style="margin: 0;">Select Shop</h3>
         <!-- 这里保留设置按钮 -->
@@ -1923,22 +1923,16 @@
     <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Stock quantity now will auto update from stock system!.</p>
  
     <!-- PWA更新提示 -->
-    <div id="update-notification" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 400px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 40px rgba(31, 38, 135, 0.5); z-index: 9999; text-align: center;">
-        <p style="margin: 0 0 20px 0; font-size: 1.4em; font-weight: bold;">🔄 新版本可用!</p>
-        <p style="margin: 0 0 25px 0; font-size: 1.1em; opacity: 0.9;">请点击下方按钮更新到最新版本</p>
-        <button id="update-button" style="width: 100%; background: rgba(255, 255, 255, 0.25); color: white; border: 1px solid rgba(255, 255, 255, 0.4); padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1em; transition: all 0.3s;">立即更新</button>
+    <div id="update-notification" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37); z-index: 9999;">
+        <p style="margin: 0 0 15px 0; text-align: center; font-weight: bold;">🔄 新版本可用!</p>
+        <button id="update-button" style="width: 100%; background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: all 0.3s;">立即更新</button>
     </div>
 
     <script>
         // PWA Service Worker 注册
         if ('serviceWorker' in navigator) {
-            // 存储全局状态
-            const PWA_STATE = {
-                refreshing: false,
-                updateReady: false,
-                newWorker: null,
-                updateNotificationShown: false
-            };
+            let refreshing = false;
+            let updateNotificationShown = false;
 
             window.addEventListener('load', function() {
                 // 使用相对路径注册Service Worker
@@ -1949,20 +1943,15 @@
                         
                         // 检查更新
                         registration.addEventListener('updatefound', () => {
-                            // 获取正在安装的 Service Worker
-                            PWA_STATE.newWorker = registration.installing;
-                            console.log('发现新的Service Worker版本，状态:', PWA_STATE.newWorker.state);
+                            const newWorker = registration.installing;
+                            console.log('发现新的Service Worker版本');
                             
-                            // 监听新 Service Worker 的状态变化
-                            PWA_STATE.newWorker.addEventListener('statechange', () => {
-                                console.log('Service Worker状态变化:', PWA_STATE.newWorker.state);
-                                
-                                // 当新的 Service Worker 安装完成并等待激活
-                                if (PWA_STATE.newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    console.log('新版本已准备就绪，等待用户确认');
-                                    // 标记更新已准备就绪
-                                    PWA_STATE.updateReady = true;
+                            newWorker.addEventListener('statechange', () => {
+                                console.log('Service Worker状态变化:', newWorker.state);
+                                // 当新的Service Worker安装完成并等待激活
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                                     // 显示更新通知
+                                    console.log('新版本已准备就绪，显示更新通知');
                                     showUpdateNotification();
                                 }
                             });
@@ -1970,12 +1959,10 @@
                         
                         // 更频繁地检查更新 (每30秒)
                         setInterval(() => {
-                            if (!PWA_STATE.updateReady && !PWA_STATE.updateNotificationShown) {
-                                console.log('定期检查Service Worker更新...');
-                                registration.update().catch(err => {
-                                    console.error('更新检查失败:', err);
-                                });
-                            }
+                            console.log('检查Service Worker更新...');
+                            registration.update().catch(err => {
+                                console.error('更新检查失败:', err);
+                            });
                         }, 30000);
                     })
                     .catch(function(error) {
@@ -1991,15 +1978,12 @@
                     });
                 });
                 
-                // 不再自动处理控制权变化，改为等待用户确认后手动处理
+                // 监听控制权变化
                 navigator.serviceWorker.addEventListener('controllerchange', function() {
-                    if (PWA_STATE.refreshing) return;
-                    console.log('Service Worker控制权发生变化');
-                    // 只有在用户点击了更新按钮后才刷新页面
-                    if (PWA_STATE.userAcceptedUpdate) {
-                        console.log('用户已确认更新，刷新页面');
-                        PWA_STATE.refreshing = true;
+                    if (!refreshing) {
+                        console.log('Service Worker控制权发生变化，刷新页面');
                         window.location.reload();
+                        refreshing = true;
                     }
                 });
             });
@@ -2007,43 +1991,36 @@
             // 显示更新通知
             function showUpdateNotification() {
                 // 防止重复显示通知
-                if (PWA_STATE.updateNotificationShown) {
-                    console.log('更新通知已经显示，不再重复显示');
-                    return;
-                }
+                if (updateNotificationShown) return;
                 
-                console.log('显示更新通知');
                 const notification = document.getElementById('update-notification');
                 notification.style.display = 'block';
-                PWA_STATE.updateNotificationShown = true;
+                updateNotificationShown = true;
                 
                 // 更新按钮添加悬停效果
                 const updateButton = document.getElementById('update-button');
                 updateButton.addEventListener('mouseover', function() {
-                    this.style.background = 'rgba(255, 255, 255, 0.4)';
+                    this.style.background = 'rgba(255, 255, 255, 0.3)';
                 });
                 updateButton.addEventListener('mouseout', function() {
-                    this.style.background = 'rgba(255, 255, 255, 0.25)';
+                    this.style.background = 'rgba(255, 255, 255, 0.2)';
                 });
                 
-                // 清除旧的事件监听器
-                updateButton.onclick = null;
+                // 移除之前可能存在的事件监听器
+                updateButton.removeEventListener('click', updateClickHandler);
                 
-                // 添加新的事件监听器
-                updateButton.addEventListener('click', function() {
-                    console.log('用户点击了更新按钮');
-                    // 标记用户已接受更新
-                    PWA_STATE.userAcceptedUpdate = true;
-                    
-                    if (PWA_STATE.newWorker && navigator.serviceWorker.controller) {
-                        // 通知 Service Worker 跳过等待
-                        console.log('发送skipWaiting消息到Service Worker');
-                        navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
-                        
-                        // 隐藏通知
-                        notification.style.display = 'none';
-                    }
-                });
+                // 更新按钮点击事件
+                updateButton.addEventListener('click', updateClickHandler);
+            }
+            
+            function updateClickHandler() {
+                if (navigator.serviceWorker.controller) {
+                    // 通知Service Worker跳过等待
+                    navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+                    // 只有在用户点击按钮后才隐藏通知
+                    document.getElementById('update-notification').style.display = 'none';
+                    updateNotificationShown = false;
+                }
             }
         }
     </script>
