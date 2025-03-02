@@ -10,7 +10,7 @@
     <!-- PWA相关标记 -->
     <meta name="theme-color" content="#4a90e2">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icons/icon-512x512.png">
+    <link rel="apple-touch-icon" href="icons/s2.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
@@ -977,7 +977,7 @@
         </div>
     </div>
 
-    <h1>Stock Order13</h1>
+    <h1>Stock Order188</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h3 style="margin: 0;">Select Shop</h3>
         <!-- 这里保留设置按钮 -->
@@ -1948,11 +1948,22 @@
                                 }
                             });
                         });
+                        
+                        // 定期检查更新 (每60秒)
+                        setInterval(() => {
+                            registration.update();
+                            console.log('正在检查Service Worker更新...');
+                        }, 60000);
                     })
                     .catch(function(error) {
                         // 注册失败
                         console.log('ServiceWorker 注册失败: ', error);
                     });
+                
+                // 页面加载时主动检查一次更新
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.update();
+                });
                 
                 // 监听控制权变化
                 let refreshing = false;

@@ -1,25 +1,31 @@
-const CACHE_NAME = 'airport-stock-v2';
+const CACHE_NAME = 'airport-stock-v3';
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
+  '/icons/s2.png'
   // 添加您的其他资源，如CSS，JS，图片等
 ];
 
 // 安装Service Worker并缓存核心资源
 self.addEventListener('install', event => {
+  console.log('安装新版本Service Worker: ' + CACHE_NAME);
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('缓存已打开');
         return cache.addAll(ASSETS);
       })
-      .then(() => self.skipWaiting())
+      .then(() => {
+        console.log('资源缓存完成，跳过等待阶段');
+        return self.skipWaiting();
+      })
   );
 });
 
 // 当Service Worker被激活时，清理旧缓存
 self.addEventListener('activate', event => {
+  console.log('激活新版本Service Worker: ' + CACHE_NAME);
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -30,7 +36,10 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    }).then(() => self.clients.claim())
+    }).then(() => {
+      console.log('现在使用新缓存，立即接管所有客户端');
+      return self.clients.claim();
+    })
   );
 });
 
@@ -55,6 +64,11 @@ self.addEventListener('fetch', event => {
                 });
             }
             return networkResponse;
+          })
+          .catch(error => {
+            console.error('Fetch 失败:', error);
+            // 这里可以返回一个离线页面或默认响应
+            // return caches.match('/offline.html');
           });
       })
   );
@@ -62,7 +76,9 @@ self.addEventListener('fetch', event => {
 
 // 监听消息，处理更新通知
 self.addEventListener('message', event => {
+  console.log('Service Worker 收到消息:', event.data);
   if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('收到跳过等待的请求，开始激活');
     self.skipWaiting();
   }
 }); 

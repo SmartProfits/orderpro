@@ -2,7 +2,7 @@
 
 本目录只需要包含以下尺寸的图标文件：
 
-- icon-512x512.png
+- s2.png (512x512像素)
 
 我们简化了图标系统，只使用一个高分辨率图标，现代浏览器会自动处理缩放以适应不同设备。
 
@@ -12,7 +12,7 @@
 
 1. 使用像Photoshop、GIMP或在线工具如[Canva](https://www.canva.com/)创建图标
 2. 保存为512x512像素的PNG格式
-3. 将图标保存为`icon-512x512.png`并放在此目录中
+3. 将图标保存为`s2.png`并放在此目录中
 
 如果您需要快速生成图标，也可以使用在线工具如[PWA App Icon Generator](https://tools.crawlink.com/tools/pwa-icon-generator/)，然后只使用512x512的图标。
 
