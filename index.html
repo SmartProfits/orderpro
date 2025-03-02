@@ -977,7 +977,7 @@
         </div>
     </div>
 
-    <h1>Stock Order</h1>
+    <h1>Stock Order13288</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h3 style="margin: 0;">Select Shop</h3>
         <!-- 这里保留设置按钮 -->
@@ -1928,37 +1928,10 @@
         <button id="update-button" style="background-color: white; color: #4a90e2; border: none; padding: 5px 15px; border-radius: 3px; cursor: pointer;">立即更新</button>
     </div>
 
-    <!-- 手动刷新按钮 -->
-    <div id="refresh-button" style="position: fixed; top: 10px; right: 10px; background-color: rgba(74, 144, 226, 0.8); color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; z-index: 9998;">
-        <span style="font-size: 20px;">🔄</span>
-    </div>
-
     <script>
         // PWA Service Worker 注册
         if ('serviceWorker' in navigator) {
             let refreshing = false;
-
-            // 手动强制刷新按钮
-            document.getElementById('refresh-button').addEventListener('click', function() {
-                // 卸载当前Service Worker
-                navigator.serviceWorker.getRegistration().then(registration => {
-                    if (registration) {
-                        registration.unregister().then(() => {
-                            // 清除缓存
-                            caches.keys().then(cacheNames => {
-                                return Promise.all(
-                                    cacheNames.map(cacheName => caches.delete(cacheName))
-                                );
-                            }).then(() => {
-                                // 重新加载页面
-                                window.location.reload(true);
-                            });
-                        });
-                    } else {
-                        window.location.reload(true);
-                    }
-                });
-            });
 
             window.addEventListener('load', function() {
                 // 使用相对路径注册Service Worker
