@@ -1,9 +1,9 @@
 const CACHE_NAME = 'airport-stock-v3';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icons/s2.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './icons/s2.png'
   // 添加您的其他资源，如CSS，JS，图片等
 ];
 
