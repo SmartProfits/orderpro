@@ -8,7 +8,7 @@
     <title>Airport Stock Request</title>
     
     <!-- PWA相关标记 -->
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#4a90e2">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./icons/s2.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -832,14 +832,173 @@
             animation: none !important;
             transition: none !important;
         }
+
+        /* 登录和注册界面样式 */
+        .auth-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1e2029;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .auth-box {
+            background: #2a2d3e;
+            border-radius: 10px;
+            padding: 30px;
+            width: 85%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-box h2 {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: #3a3f55;
+            border: 1px solid #4a5173;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+        }
+
+        .auth-form input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .auth-form button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #4a90e2, #63b3ed);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .auth-form .switch-form {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .user-info .role {
+            margin-left: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .user-info .logout {
+            margin-left: auto;
+            cursor: pointer;
+            padding: 4px 10px;
+            background: rgba(255, 0, 0, 0.3);
+            border-radius: 5px;
+        }
     </style>
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
 <body>
-    <!-- 在 body 开始处添加浮动预览窗口 -->
+    <!-- 登录和注册界面 -->
+    <div id="authContainer" class="auth-container">
+        <div class="auth-box">
+            <h2 id="authTitle">用户登录</h2>
+            
+            <!-- 登录表单 -->
+            <div id="loginForm" class="auth-form">
+                <input type="text" id="loginId" placeholder="请输入ID" required>
+                <input type="password" id="loginPassword" placeholder="请输入密码" required>
+                <button id="loginButton">登录</button>
+                <div class="switch-form" onclick="switchToRegister()">没有账号？点击注册</div>
+            </div>
+            
+            <!-- 注册表单 -->
+            <div id="registerForm" class="auth-form" style="display: none;">
+                <input type="text" id="registerId" placeholder="请设置ID" required>
+                <input type="password" id="registerPassword" placeholder="请设置密码" required>
+                <input type="text" id="registerName" placeholder="请输入姓名" required>
+                <button id="registerButton">注册</button>
+                <div class="switch-form" onclick="switchToLogin()">已有账号？点击登录</div>
+            </div>
+            
+            <!-- 等待审核界面 -->
+            <div id="pendingForm" class="auth-form" style="display: none; text-align: center;">
+                <div style="font-size: 60px; margin-bottom: 20px;">⏳</div>
+                <h3 style="margin-bottom: 15px;">您的账号正在等待审核</h3>
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 25px;">请耐心等待管理员审核您的账号，审核通过后即可登录使用</p>
+                <button onclick="backToLogin()">返回登录</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户信息显示 -->
+    <div id="userInfo" class="user-info" style="display: none;">
+        <span id="userName">未登录</span>
+        <span id="userRole" class="role">游客</span>
+        <span class="logout" onclick="logout()">退出登录</span>
+        <!-- 管理员按钮 - 仅对Admin和SAdmin显示 -->
+        <span class="admin-button admin-only" onclick="openAdminPanel()" style="
+            margin-left: 10px;
+            cursor: pointer;
+            padding: 4px 10px;
+            background: rgba(0, 100, 255, 0.3);
+            border-radius: 5px;">管理</span>
+    </div>
+    
+    <!-- 管理员面板 -->
+    <div id="adminPanel" class="auth-container" style="display: none;">
+        <div class="auth-box" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>用户管理</h2>
+                <span style="cursor: pointer; font-size: 24px;" onclick="document.getElementById('adminPanel').style.display = 'none'">×</span>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3>待审核用户</h3>
+                <div id="pendingUsersList" style="margin-top: 15px;">
+                    加载中...
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3>所有用户</h3>
+                <div id="allUsersList" style="margin-top: 15px;">
+                    加载中...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 原有的页面内容 -->
     <div id="preview-window" style="
         position: fixed;
         top: 20px;
@@ -977,7 +1136,7 @@
         </div>
     </div>
 
-    <h1>Stock Order</h1>
+    <h1>Stock Order13288</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h3 style="margin: 0;">Select Shop</h3>
         <!-- 这里保留设置按钮 -->
@@ -1124,7 +1283,20 @@
     </div>
 
     <script>
-        const firebaseConfig = {
+        // 认证用Firebase配置
+        const authFirebaseConfig = {
+            apiKey: "AIzaSyAs2ZN6dIqV6mxCGyNc87NhYDMHbjtXlHg",
+            authDomain: "order-8649a.firebaseapp.com",
+            databaseURL: "https://order-8649a-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "order-8649a",
+            storageBucket: "order-8649a.firebasestorage.app",
+            messagingSenderId: "786186314747",
+            appId: "1:786186314747:web:d50dc099fcfa0aa1ece15e",
+            measurementId: "G-XH6PV5ZQ8H"
+        };
+        
+        // 库存查询用Firebase配置
+        const stockFirebaseConfig = {
             apiKey: "AIzaSyDAK5KVv9oln2qS5EfNzox1snM19wa83-o",
             authDomain: "smart-profits-stock.firebaseapp.com",
             databaseURL: "https://smart-profits-stock-default-rtdb.asia-southeast1.firebasedatabase.app",
@@ -1135,18 +1307,259 @@
             measurementId: "G-R0K4Q7JTGE"
         };
 
-        // 初始化 Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // 添加一个全局变量来存储库存信息
+        // 初始化认证用Firebase
+        const authApp = firebase.initializeApp(authFirebaseConfig);
+        const db = authApp.database();
+        const auth = authApp.auth();
+        
+        // 初始化库存查询用Firebase (使用secondary app)
+        const stockApp = firebase.initializeApp(stockFirebaseConfig, "stock");
+        const stockDb = stockApp.database();
+        
+        // 保留现有的库存变量
         let stockMap = {};
+        let currentUser = null;
+        let userRole = "User"; // 默认为普通用户角色
 
+        // 身份验证状态监听
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // 用户已登录
+                currentUser = user;
+                
+                // 从数据库获取用户信息和角色
+                db.ref(`users/${user.uid}`).once('value').then((snapshot) => {
+                    const userData = snapshot.val();
+                    if (userData) {
+                        // 检查用户状态，如果是pending则显示等待审核界面
+                        if (userData.status === 'pending') {
+                            document.getElementById('loginForm').style.display = 'none';
+                            document.getElementById('registerForm').style.display = 'none';
+                            document.getElementById('pendingForm').style.display = 'block';
+                            document.getElementById('authTitle').textContent = '账号审核中';
+                            document.getElementById('authContainer').style.display = 'flex';
+                            document.getElementById('userInfo').style.display = 'none';
+                            return;
+                        }
+                        
+                        // 正常状态的用户
+                        document.getElementById('userName').textContent = userData.name || '用户';
+                        userRole = userData.role || 'User';
+                        document.getElementById('userRole').textContent = userRole;
+                        
+                        // 显示用户信息栏
+                        document.getElementById('userInfo').style.display = 'flex';
+                        
+                        // 隐藏登录界面
+                        document.getElementById('authContainer').style.display = 'none';
+                        
+                        // 根据角色控制功能访问权限
+                        applyRoleBasedPermissions(userRole);
+                        
+                        // 加载库存数据
+                        loadQuantitiesFromFirebase();
+                    } else {
+                        // 新注册用户，还没有数据
+                        db.ref(`users/${user.uid}`).set({
+                            id: 'guest_' + Math.floor(Math.random() * 1000),
+                            name: '访客',
+                            role: 'User',
+                            status: 'active', // 访客用户直接设为激活状态
+                            createdAt: firebase.database.ServerValue.TIMESTAMP
+                        }).then(() => {
+                            document.getElementById('userName').textContent = '访客';
+                            document.getElementById('userRole').textContent = 'User';
+                            document.getElementById('userInfo').style.display = 'flex';
+                            document.getElementById('authContainer').style.display = 'none';
+                            // 加载库存数据
+                            loadQuantitiesFromFirebase();
+                        });
+                    }
+                });
+            } else {
+                // 用户未登录
+                document.getElementById('authContainer').style.display = 'flex';
+                document.getElementById('userInfo').style.display = 'none';
+                currentUser = null;
+            }
+        });
+
+        // 应用基于角色的权限控制
+        function applyRoleBasedPermissions(role) {
+            // 根据不同角色显示/隐藏功能
+            switch(role) {
+                case 'SAdmin':
+                    // 超级管理员拥有所有权限
+                    document.querySelectorAll('.admin-only, .sadmin-only').forEach(el => {
+                        el.style.display = 'block';
+                    });
+                    break;
+                case 'Admin':
+                    // 管理员拥有管理员权限
+                    document.querySelectorAll('.admin-only').forEach(el => {
+                        el.style.display = 'block';
+                    });
+                    // 隐藏超级管理员权限
+                    document.querySelectorAll('.sadmin-only').forEach(el => {
+                        el.style.display = 'none';
+                    });
+                    break;
+                case 'User':
+                default:
+                    // 普通用户权限
+                    document.querySelectorAll('.admin-only, .sadmin-only').forEach(el => {
+                        el.style.display = 'none';
+                    });
+                    break;
+            }
+        }
+
+        // 切换到注册界面
+        function switchToRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('authTitle').textContent = '用户注册';
+        }
+
+        // 切换到登录界面
+        function switchToLogin() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('authTitle').textContent = '用户登录';
+        }
+
+        // 用户注册
+        document.getElementById('registerButton').addEventListener('click', () => {
+            const id = document.getElementById('registerId').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const name = document.getElementById('registerName').value.trim();
+            
+            if (!id || !password || !name) {
+                alert('请填写完整信息');
+                return;
+            }
+            
+            // 使用匿名登录先创建账户
+            auth.signInAnonymously()
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    
+                    // 存储用户信息到数据库
+                    return db.ref(`users/${user.uid}`).set({
+                        id: id,
+                        name: name,
+                        password: password,
+                        role: 'User', // 默认角色
+                        status: 'pending', // 默认状态为待审核
+                        createdAt: firebase.database.ServerValue.TIMESTAMP
+                    });
+                })
+                .then(() => {
+                    alert('注册成功，请等待管理员审核激活您的账号');
+                    
+                    // 显示等待审核界面
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('registerForm').style.display = 'none';
+                    document.getElementById('pendingForm').style.display = 'block';
+                    document.getElementById('authTitle').textContent = '账号审核中';
+                })
+                .catch((error) => {
+                    console.error('注册错误:', error);
+                    alert('注册失败: ' + error.message);
+                });
+        });
+
+        // 用户登录
+        document.getElementById('loginButton').addEventListener('click', () => {
+            const id = document.getElementById('loginId').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!id || !password) {
+                alert('请填写ID和密码');
+                return;
+            }
+            
+            // 在数据库中查找用户
+            db.ref('users').orderByChild('id').equalTo(id).once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        let userData = null;
+                        let userId = null;
+                        
+                        // 获取用户信息
+                        snapshot.forEach((childSnapshot) => {
+                            userId = childSnapshot.key;
+                            userData = childSnapshot.val();
+                        });
+                        
+                        // 验证密码
+                        if (userData && password === userData.password) {
+                            // 检查用户状态
+                            if (userData.status === 'pending') {
+                                // 显示等待审核界面
+                                document.getElementById('loginForm').style.display = 'none';
+                                document.getElementById('registerForm').style.display = 'none';
+                                document.getElementById('pendingForm').style.display = 'block';
+                                document.getElementById('authTitle').textContent = '账号审核中';
+                                return;
+                            } else if (userData.status === 'active') {
+                                // 密码正确，使用匿名登录
+                                return auth.signInAnonymously()
+                                    .then((userCredential) => {
+                                        // 更新用户状态
+                                        currentUser = userCredential.user;
+                                        userRole = userData.role || 'User';
+                                        
+                                        // 将用户ID存储到当前用户中（用于后续关联）
+                                        db.ref(`users/${userCredential.user.uid}`).update({
+                                            dbUserId: userId,
+                                            id: userData.id,
+                                            name: userData.name,
+                                            role: userData.role,
+                                            status: userData.status
+                                        }).then(() => {
+                                            // 显示用户信息
+                                            document.getElementById('userName').textContent = userData.name;
+                                            document.getElementById('userRole').textContent = userRole;
+                                            document.getElementById('userInfo').style.display = 'flex';
+                                            document.getElementById('authContainer').style.display = 'none';
+                                        });
+                                    });
+                            } else {
+                                alert('您的账号状态异常，请联系管理员');
+                            }
+                        } else {
+                            alert('密码错误');
+                        }
+                    } else {
+                        alert('用户不存在');
+                    }
+                })
+                .catch((error) => {
+                    console.error('登录错误:', error);
+                    alert('登录失败: ' + error.message);
+                });
+        });
+
+        // 登出功能
+        function logout() {
+            auth.signOut()
+                .then(() => {
+                    currentUser = null;
+                    document.getElementById('authContainer').style.display = 'flex';
+                    document.getElementById('userInfo').style.display = 'none';
+                })
+                .catch((error) => {
+                    console.error('登出错误:', error);
+                });
+        }
+
+        // 添加库存查询函数 (修改为使用stockDb)
         function loadQuantitiesFromFirebase() {
             const locations = ['office', 'kepayan'];
             
             locations.forEach(location => {
-                db.ref(`inventory/${location}`).on('value', (snapshot) => {
+                stockDb.ref(`inventory/${location}`).on('value', (snapshot) => {
                     const data = snapshot.val();
                     
                     if (data) {
@@ -1917,6 +2330,142 @@
                 document.getElementById('high-perf-btn').style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
             }
             localStorage.setItem('lowPerfMode', isLowPerf);
+        }
+
+        // 打开管理员面板
+        function openAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'flex';
+            loadUsersList();
+        }
+        
+        // 加载用户列表
+        function loadUsersList() {
+            // 加载待审核用户
+            db.ref('users').orderByChild('status').equalTo('pending').once('value')
+                .then((snapshot) => {
+                    const pendingUsersDiv = document.getElementById('pendingUsersList');
+                    if (!snapshot.exists()) {
+                        pendingUsersDiv.innerHTML = '<p style="color: rgba(255,255,255,0.5);">没有待审核的用户</p>';
+                        return;
+                    }
+                    
+                    let pendingHtml = '';
+                    snapshot.forEach((childSnapshot) => {
+                        const userId = childSnapshot.key;
+                        const user = childSnapshot.val();
+                        
+                        pendingHtml += `
+                            <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+                                <div>
+                                    <div style="font-weight: bold;">${user.name} (${user.id})</div>
+                                    <div style="font-size: 12px; color: rgba(255,255,255,0.6);">注册时间: ${new Date(user.createdAt).toLocaleString()}</div>
+                                </div>
+                                <button onclick="approveUser('${userId}')" style="background: #4CAF50; border: none; color: white; padding: 5px 15px; border-radius: 4px; cursor: pointer;">
+                                    <span style="margin-right: 5px;">✓</span>审核
+                                </button>
+                            </div>
+                        `;
+                    });
+                    
+                    pendingUsersDiv.innerHTML = pendingHtml;
+                });
+            
+            // 加载所有用户，根据不同管理员权限显示不同内容
+            db.ref('users').once('value')
+                .then((snapshot) => {
+                    const allUsersDiv = document.getElementById('allUsersList');
+                    if (!snapshot.exists()) {
+                        allUsersDiv.innerHTML = '<p style="color: rgba(255,255,255,0.5);">没有用户</p>';
+                        return;
+                    }
+                    
+                    let allHtml = '';
+                    let currentUserRole = userRole; // 获取当前用户角色
+                    
+                    snapshot.forEach((childSnapshot) => {
+                        const userId = childSnapshot.key;
+                        const user = childSnapshot.val();
+                        
+                        // Admin只能看到User角色账号，SAdmin可以看到所有账号
+                        if (currentUserRole === 'Admin' && user.role !== 'User') {
+                            return; // 跳过非User账号
+                        }
+                        
+                        // 获取状态图标
+                        let statusIcon = '⏳';
+                        let statusColor = '#FFA500';
+                        if (user.status === 'active') {
+                            statusIcon = '✓';
+                            statusColor = '#4CAF50';
+                        }
+                        
+                        // 根据不同管理员类型，添加不同的角色管理按钮
+                        let roleManagementButton = '';
+                        if (currentUserRole === 'SAdmin') {
+                            if (user.role === 'User') {
+                                roleManagementButton = `<button onclick="changeUserRole('${userId}', 'User', 'Admin')" style="background: #2196F3; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">升为管理员</button>`;
+                            } else if (user.role === 'Admin') {
+                                roleManagementButton = `<button onclick="changeUserRole('${userId}', 'Admin', 'User')" style="background: #FF5722; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">降为用户</button>`;
+                            }
+                        }
+                        
+                        allHtml += `
+                            <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+                                <div>
+                                    <div style="font-weight: bold;">${user.name} (${user.id})</div>
+                                    <div style="font-size: 12px; margin-top: 3px;">
+                                        <span style="color: ${statusColor}; margin-right: 5px;">${statusIcon}</span>
+                                        <span style="color: rgba(255,255,255,0.6);">角色: ${user.role || 'User'}</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    ${user.status !== 'active' ? 
+                                    `<button onclick="approveUser('${userId}')" style="background: #4CAF50; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">
+                                        激活
+                                    </button>` : ''}
+                                    ${roleManagementButton}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    allUsersDiv.innerHTML = allHtml;
+                });
+        }
+        
+        // 审核通过用户
+        function approveUser(userId) {
+            db.ref(`users/${userId}`).update({
+                status: 'active'
+            }).then(() => {
+                alert('用户审核通过');
+                loadUsersList(); // 重新加载用户列表
+            }).catch(error => {
+                console.error('审核用户失败:', error);
+                alert('审核用户失败: ' + error.message);
+            });
+        }
+        
+        // 修改用户角色
+        function changeUserRole(userId, currentRole, newRole) {
+            if (confirm(`确定要将该用户角色从 ${currentRole} 更改为 ${newRole} 吗？`)) {
+                db.ref(`users/${userId}`).update({
+                    role: newRole
+                }).then(() => {
+                    alert(`用户角色已更新为 ${newRole}`);
+                    loadUsersList(); // 重新加载用户列表
+                }).catch(error => {
+                    console.error('更新角色失败:', error);
+                    alert('更新角色失败: ' + error.message);
+                });
+            }
+        }
+
+        // 返回登录页面
+        function backToLogin() {
+            document.getElementById('pendingForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('authTitle').textContent = '用户登录';
         }
     </script>
 
