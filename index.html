@@ -966,12 +966,13 @@
         <span id="userRole" class="role">游客</span>
         <span class="logout" onclick="logout()">退出登录</span>
         <!-- 管理员按钮 - 仅对Admin和SAdmin显示 -->
-        <span class="admin-button admin-only" onclick="openAdminPanel()" style="
+        <span id="adminButton" style="
             margin-left: 10px;
             cursor: pointer;
             padding: 4px 10px;
             background: rgba(0, 100, 255, 0.3);
-            border-radius: 5px;">管理</span>
+            border-radius: 5px;
+            display: none;" onclick="openAdminPanel()">管理</span>
     </div>
     
     <!-- 管理员面板 -->
@@ -1312,6 +1313,9 @@
         const db = authApp.database();
         const auth = authApp.auth();
         
+        // 设置会话持久化
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        
         // 初始化库存查询用Firebase (使用secondary app)
         const stockApp = firebase.initializeApp(stockFirebaseConfig, "stock");
         const stockDb = stockApp.database();
@@ -1387,18 +1391,19 @@
         // 应用基于角色的权限控制
         function applyRoleBasedPermissions(role) {
             // 根据不同角色显示/隐藏功能
+            const adminButton = document.getElementById('adminButton');
+            
             switch(role) {
                 case 'SAdmin':
                     // 超级管理员拥有所有权限
-                    document.querySelectorAll('.admin-only, .sadmin-only').forEach(el => {
+                    adminButton.style.display = 'inline-block';
+                    document.querySelectorAll('.sadmin-only').forEach(el => {
                         el.style.display = 'block';
                     });
                     break;
                 case 'Admin':
                     // 管理员拥有管理员权限
-                    document.querySelectorAll('.admin-only').forEach(el => {
-                        el.style.display = 'block';
-                    });
+                    adminButton.style.display = 'inline-block';
                     // 隐藏超级管理员权限
                     document.querySelectorAll('.sadmin-only').forEach(el => {
                         el.style.display = 'none';
@@ -1407,7 +1412,8 @@
                 case 'User':
                 default:
                     // 普通用户权限
-                    document.querySelectorAll('.admin-only, .sadmin-only').forEach(el => {
+                    adminButton.style.display = 'none';
+                    document.querySelectorAll('.sadmin-only').forEach(el => {
                         el.style.display = 'none';
                     });
                     break;
@@ -1439,8 +1445,11 @@
                 return;
             }
             
-            // 使用匿名登录先创建账户
-            auth.signInAnonymously()
+            // 创建一个基于用户ID的唯一邮箱格式字符串
+            const emailLike = `${id}@order.app`;
+            
+            // 在Firebase Authentication中创建用户
+            auth.createUserWithEmailAndPassword(emailLike, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
                     
@@ -1465,7 +1474,13 @@
                 })
                 .catch((error) => {
                     console.error('注册错误:', error);
-                    alert('注册失败: ' + error.message);
+                    
+                    // 如果是邮箱已存在错误，提示用户
+                    if (error.code === 'auth/email-already-in-use') {
+                        alert('此ID已被注册，请使用其他ID');
+                    } else {
+                        alert('注册失败: ' + error.message);
+                    }
                 });
         });
 
@@ -1503,27 +1518,28 @@
                                 document.getElementById('authTitle').textContent = '账号审核中';
                                 return;
                             } else if (userData.status === 'active') {
-                                // 密码正确，使用匿名登录
-                                return auth.signInAnonymously()
+                                // 创建一个基于用户ID的唯一邮箱格式字符串（实际不需要是真实邮箱）
+                                const emailLike = `${id}@order.app`;
+                                
+                                // 尝试登录现有账户
+                                auth.signInWithEmailAndPassword(emailLike, password)
                                     .then((userCredential) => {
-                                        // 更新用户状态
-                                        currentUser = userCredential.user;
-                                        userRole = userData.role || 'User';
-                                        
-                                        // 将用户ID存储到当前用户中（用于后续关联）
-                                        db.ref(`users/${userCredential.user.uid}`).update({
-                                            dbUserId: userId,
-                                            id: userData.id,
-                                            name: userData.name,
-                                            role: userData.role,
-                                            status: userData.status
-                                        }).then(() => {
-                                            // 显示用户信息
-                                            document.getElementById('userName').textContent = userData.name;
-                                            document.getElementById('userRole').textContent = userRole;
-                                            document.getElementById('userInfo').style.display = 'flex';
-                                            document.getElementById('authContainer').style.display = 'none';
-                                        });
+                                        // 登录成功，更新用户状态
+                                        handleSuccessfulLogin(userCredential.user, userData);
+                                    })
+                                    .catch((error) => {
+                                        // 如果账户不存在，创建新账户
+                                        if (error.code === 'auth/user-not-found') {
+                                            // 创建新的Firebase Auth账户
+                                            return auth.createUserWithEmailAndPassword(emailLike, password)
+                                                .then((userCredential) => {
+                                                    // 创建成功，绑定用户信息
+                                                    return handleSuccessfulLogin(userCredential.user, userData);
+                                                });
+                                        } else {
+                                            console.error('登录错误:', error);
+                                            alert('登录失败: ' + error.message);
+                                        }
                                     });
                             } else {
                                 alert('您的账号状态异常，请联系管理员');
@@ -1540,6 +1556,35 @@
                     alert('登录失败: ' + error.message);
                 });
         });
+
+        // 处理登录成功后的操作
+        function handleSuccessfulLogin(authUser, userData) {
+            // 更新用户状态
+            currentUser = authUser;
+            userRole = userData.role || 'User';
+            
+            // 确保Firebase Auth用户记录与数据库中的用户数据一致
+            return db.ref(`users/${authUser.uid}`).set({
+                id: userData.id,
+                name: userData.name,
+                password: userData.password,
+                role: userData.role,
+                status: userData.status,
+                createdAt: userData.createdAt || firebase.database.ServerValue.TIMESTAMP
+            }).then(() => {
+                // 显示用户信息
+                document.getElementById('userName').textContent = userData.name;
+                document.getElementById('userRole').textContent = userRole;
+                document.getElementById('userInfo').style.display = 'flex';
+                document.getElementById('authContainer').style.display = 'none';
+                
+                // 应用权限
+                applyRoleBasedPermissions(userRole);
+                
+                // 加载库存数据
+                loadQuantitiesFromFirebase();
+            });
+        }
 
         // 登出功能
         function logout() {
@@ -2116,18 +2161,8 @@
             
             toggleItems(); // 初始化商品选择框
             
-            // 先进行匿名认证
-            firebase.auth().signInAnonymously()
-                .then(() => {
-                    console.log('Anonymous auth successful');
-                })
-                .catch((error) => {
-                    console.error('Anonymous auth failed:', error);
-                    const productList = document.getElementById('productList');
-                    if (productList) {
-                        productList.innerHTML = '<div class="error-message">无法连接到数据库，请稍后再试</div>';
-                    }
-                });
+            // 不再需要匿名登录初始化，认证状态监听器会处理登录状态
+            console.log('初始化完成');
         }
 
         // 添加选择效果的JavaScript
@@ -2287,7 +2322,7 @@
         });
 
         // 修改认证状态监听
-        firebase.auth().onAuthStateChanged((user) => {
+        auth.onAuthStateChanged((user) => {
             if (user) {
                 console.log('User is signed in:', user.uid);
                 loadQuantitiesFromFirebase();
