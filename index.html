@@ -977,7 +977,7 @@
         </div>
     </div>
 
-    <h1>Stock Order13288</h1>
+    <h1>Stock Order black</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h3 style="margin: 0;">Select Shop</h3>
         <!-- 这里保留设置按钮 -->
@@ -1923,9 +1923,10 @@
     <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Stock quantity now will auto update from stock system!.</p>
  
     <!-- PWA更新提示 -->
-    <div id="update-notification" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37); z-index: 9999;">
-        <p style="margin: 0 0 15px 0; text-align: center; font-weight: bold;">🔄 新版本可用!</p>
-        <button id="update-button" style="width: 100%; background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: all 0.3s;">立即更新</button>
+    <div id="update-notification" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80%; max-width: 400px; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 40px rgba(31, 38, 135, 0.5); z-index: 9999; text-align: center;">
+        <p style="margin: 0 0 20px 0; font-size: 1.4em; font-weight: bold;">🔄 新版本可用!</p>
+        <p style="margin: 0 0 25px 0; font-size: 1.1em; opacity: 0.9;">请点击下方按钮更新到最新版本</p>
+        <button id="update-button" style="width: 100%; background: rgba(255, 255, 255, 0.25); color: white; border: 1px solid rgba(255, 255, 255, 0.4); padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1em; transition: all 0.3s;">立即更新</button>
     </div>
 
     <script>
@@ -2019,10 +2020,10 @@
                 // 更新按钮添加悬停效果
                 const updateButton = document.getElementById('update-button');
                 updateButton.addEventListener('mouseover', function() {
-                    this.style.background = 'rgba(255, 255, 255, 0.3)';
+                    this.style.background = 'rgba(255, 255, 255, 0.4)';
                 });
                 updateButton.addEventListener('mouseout', function() {
-                    this.style.background = 'rgba(255, 255, 255, 0.2)';
+                    this.style.background = 'rgba(255, 255, 255, 0.25)';
                 });
                 
                 // 清除旧的事件监听器
