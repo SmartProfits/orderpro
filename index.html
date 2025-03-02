@@ -977,7 +977,7 @@
         </div>
     </div>
 
-    <h1>Stock Order</h1>
+    <h1>Stock Order13288</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h3 style="margin: 0;">Select Shop</h3>
         <!-- 这里保留设置按钮 -->
@@ -1931,8 +1931,13 @@
     <script>
         // PWA Service Worker 注册
         if ('serviceWorker' in navigator) {
-            let refreshing = false;
-            let updateNotificationShown = false;
+            // 存储全局状态
+            const PWA_STATE = {
+                refreshing: false,
+                updateReady: false,
+                newWorker: null,
+                updateNotificationShown: false
+            };
 
             window.addEventListener('load', function() {
                 // 使用相对路径注册Service Worker
@@ -1943,15 +1948,20 @@
                         
                         // 检查更新
                         registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            console.log('发现新的Service Worker版本');
+                            // 获取正在安装的 Service Worker
+                            PWA_STATE.newWorker = registration.installing;
+                            console.log('发现新的Service Worker版本，状态:', PWA_STATE.newWorker.state);
                             
-                            newWorker.addEventListener('statechange', () => {
-                                console.log('Service Worker状态变化:', newWorker.state);
-                                // 当新的Service Worker安装完成并等待激活
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // 监听新 Service Worker 的状态变化
+                            PWA_STATE.newWorker.addEventListener('statechange', () => {
+                                console.log('Service Worker状态变化:', PWA_STATE.newWorker.state);
+                                
+                                // 当新的 Service Worker 安装完成并等待激活
+                                if (PWA_STATE.newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('新版本已准备就绪，等待用户确认');
+                                    // 标记更新已准备就绪
+                                    PWA_STATE.updateReady = true;
                                     // 显示更新通知
-                                    console.log('新版本已准备就绪，显示更新通知');
                                     showUpdateNotification();
                                 }
                             });
@@ -1959,10 +1969,12 @@
                         
                         // 更频繁地检查更新 (每30秒)
                         setInterval(() => {
-                            console.log('检查Service Worker更新...');
-                            registration.update().catch(err => {
-                                console.error('更新检查失败:', err);
-                            });
+                            if (!PWA_STATE.updateReady && !PWA_STATE.updateNotificationShown) {
+                                console.log('定期检查Service Worker更新...');
+                                registration.update().catch(err => {
+                                    console.error('更新检查失败:', err);
+                                });
+                            }
                         }, 30000);
                     })
                     .catch(function(error) {
@@ -1978,12 +1990,15 @@
                     });
                 });
                 
-                // 监听控制权变化
+                // 不再自动处理控制权变化，改为等待用户确认后手动处理
                 navigator.serviceWorker.addEventListener('controllerchange', function() {
-                    if (!refreshing) {
-                        console.log('Service Worker控制权发生变化，刷新页面');
+                    if (PWA_STATE.refreshing) return;
+                    console.log('Service Worker控制权发生变化');
+                    // 只有在用户点击了更新按钮后才刷新页面
+                    if (PWA_STATE.userAcceptedUpdate) {
+                        console.log('用户已确认更新，刷新页面');
+                        PWA_STATE.refreshing = true;
                         window.location.reload();
-                        refreshing = true;
                     }
                 });
             });
@@ -1991,11 +2006,15 @@
             // 显示更新通知
             function showUpdateNotification() {
                 // 防止重复显示通知
-                if (updateNotificationShown) return;
+                if (PWA_STATE.updateNotificationShown) {
+                    console.log('更新通知已经显示，不再重复显示');
+                    return;
+                }
                 
+                console.log('显示更新通知');
                 const notification = document.getElementById('update-notification');
                 notification.style.display = 'block';
-                updateNotificationShown = true;
+                PWA_STATE.updateNotificationShown = true;
                 
                 // 更新按钮添加悬停效果
                 const updateButton = document.getElementById('update-button');
@@ -2006,21 +2025,24 @@
                     this.style.background = 'rgba(255, 255, 255, 0.2)';
                 });
                 
-                // 移除之前可能存在的事件监听器
-                updateButton.removeEventListener('click', updateClickHandler);
+                // 清除旧的事件监听器
+                updateButton.onclick = null;
                 
-                // 更新按钮点击事件
-                updateButton.addEventListener('click', updateClickHandler);
-            }
-            
-            function updateClickHandler() {
-                if (navigator.serviceWorker.controller) {
-                    // 通知Service Worker跳过等待
-                    navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
-                    // 只有在用户点击按钮后才隐藏通知
-                    document.getElementById('update-notification').style.display = 'none';
-                    updateNotificationShown = false;
-                }
+                // 添加新的事件监听器
+                updateButton.addEventListener('click', function() {
+                    console.log('用户点击了更新按钮');
+                    // 标记用户已接受更新
+                    PWA_STATE.userAcceptedUpdate = true;
+                    
+                    if (PWA_STATE.newWorker && navigator.serviceWorker.controller) {
+                        // 通知 Service Worker 跳过等待
+                        console.log('发送skipWaiting消息到Service Worker');
+                        navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+                        
+                        // 隐藏通知
+                        notification.style.display = 'none';
+                    }
+                });
             }
         }
     </script>
