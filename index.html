@@ -25,6 +25,49 @@
             // 保存事件以便稍后触发
             deferredPrompt = e;
             console.log('可以安装PWA了!');
+            
+            // 检查是否应该显示PWA安装提示
+            const shouldShowPrompt = () => {
+                // 检查是否已经安装为PWA
+                if (window.matchMedia('(display-mode: standalone)').matches || 
+                    window.navigator.standalone === true) {
+                    return false;
+                }
+                
+                // 检查用户是否之前选择了"稍后安装"
+                const laterTimestamp = localStorage.getItem('pwaInstallLater');
+                if (laterTimestamp) {
+                    const hoursSinceLater = (Date.now() - parseInt(laterTimestamp)) / (1000 * 60 * 60);
+                    // 如果24小时内选择了"稍后"，则不显示
+                    if (hoursSinceLater < 24) {
+                        return false;
+                    }
+                }
+                
+                // 检查是否已经显示过安装提示
+                const promptShown = localStorage.getItem('pwaInstallPromptShown');
+                if (promptShown) {
+                    const daysSinceShown = (Date.now() - parseInt(promptShown)) / (1000 * 60 * 60 * 24);
+                    // 如果7天内已经显示过，则不再显示
+                    if (daysSinceShown < 7) {
+                        return false;
+                    }
+                }
+                
+                return true;
+            };
+            
+            // 页面加载后立即显示安装提示
+            if (deferredPrompt && shouldShowPrompt()) {
+                setTimeout(() => {
+                    showPWAInstallPrompt();
+                }, 1000); // 延迟1秒显示，给页面完全加载的时间
+            }
+        });
+        
+        // 当PWA成功安装后
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('PWA已成功安装');
         });
     </script>
     
@@ -2811,8 +2854,15 @@
         
         // 显示PWA安装提示
         function showPWAInstallPrompt() {
-            // 如果有安装提示事件并且用户在移动设备上
-            if (deferredPrompt && (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone|iPad|iPod/i))) {
+            // 检查是否已经安装过PWA
+            if (window.matchMedia('(display-mode: standalone)').matches || 
+                window.navigator.standalone === true) {
+                console.log('应用已经以PWA模式安装');
+                return; // 已经安装过，不显示提示
+            }
+            
+            // 如果有安装提示事件
+            if (deferredPrompt) {
                 const promptElement = document.getElementById('pwa-install-prompt');
                 promptElement.style.display = 'block';
                 
@@ -2827,12 +2877,19 @@
                     deferredPrompt = null;
                     // 隐藏提示
                     promptElement.style.display = 'none';
+                    
+                    // 存储用户已经看到安装提示到localStorage
+                    localStorage.setItem('pwaInstallPromptShown', Date.now());
                 });
                 
                 // 绑定"稍后"按钮事件
                 document.getElementById('pwa-install-later').addEventListener('click', () => {
                     promptElement.style.display = 'none';
+                    // 存储用户选择"稍后"到localStorage，24小时内不再显示
+                    localStorage.setItem('pwaInstallLater', Date.now());
                 });
+            } else {
+                console.log('没有可用的安装提示事件或用户不在移动设备上');
             }
         }
 
