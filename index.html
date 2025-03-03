@@ -7,6 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Airport Stock Request</title>
     
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
     <!-- PWA相关标记 -->
     <meta name="theme-color" content="#000000">
     <link rel="manifest" href="./manifest.json">
@@ -975,9 +980,63 @@
         .user-info #userName {
             font-weight: 500;
             padding: 4px 10px;
-            background: rgba(255, 255, 255, 0.1);
+            /* 移除背景和边框 */
+            background: transparent;
             border-radius: 5px;
             margin-right: 8px;
+            /* 发光效果集中在文字上 */
+            text-shadow: 0 0 8px rgba(79, 195, 247, 0.7);
+            animation: usernameTextGlow 2s infinite alternate;
+            transition: all 0.3s ease;
+            cursor: pointer; /* 添加指针样式提示可交互 */
+        }
+        
+        /* 添加鼠标悬停效果 */
+        .user-info #userName:hover {
+            transform: translateY(-2px);
+            /* 更强的文字发光效果 */
+            text-shadow: 0 0 15px rgba(79, 195, 247, 0.9), 0 0 20px rgba(0, 195, 255, 0.8);
+        }
+        
+        /* 创建用户名文字发光动画 */
+        @keyframes usernameTextGlow {
+            0% {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+            }
+            100% {
+                text-shadow: 0 0 10px rgba(79, 195, 247, 0.8), 0 0 15px rgba(79, 195, 247, 0.6), 0 0 20px rgba(79, 195, 247, 0.4);
+            }
+        }
+        
+        /* 点击用户名时的效果 */
+        .user-info #userName:active {
+            transform: scale(0.95);
+            text-shadow: 0 0 25px rgba(79, 195, 247, 1);
+        }
+
+        /* Light Mode 下的用户名发光动画 */
+        body:not(.dark-mode) .user-info #userName {
+            /* 移除背景 */
+            background: transparent;
+            color: #333;
+            animation: usernameTextGlowLight 2s infinite alternate;
+        }
+        
+        /* Light Mode下的悬停效果 */
+        body:not(.dark-mode) .user-info #userName:hover {
+            transform: translateY(-2px);
+            /* 更强的文字发光效果 */
+            text-shadow: 0 0 15px rgba(33, 150, 243, 0.8), 0 0 20px rgba(33, 150, 243, 0.6);
+        }
+        
+        /* Light Mode下的文字发光动画 */
+        @keyframes usernameTextGlowLight {
+            0% {
+                text-shadow: 0 0 5px rgba(33, 150, 243, 0.3);
+            }
+            100% {
+                text-shadow: 0 0 10px rgba(33, 150, 243, 0.7), 0 0 15px rgba(33, 150, 243, 0.5), 0 0 20px rgba(33, 150, 243, 0.3);
+            }
         }
 
         .user-info .role {
@@ -992,11 +1051,6 @@
         body:not(.dark-mode) .user-info {
             background: rgba(255, 255, 255, 0.9);
             border: 1px solid rgba(0, 0, 0, 0.1);
-            color: #333;
-        }
-
-        body:not(.dark-mode) .user-info #userName {
-            background: rgba(0, 0, 0, 0.05);
             color: #333;
         }
 
@@ -1178,19 +1232,42 @@
             
             <!-- 登录表单 -->
             <div id="loginForm" class="auth-form">
-                <input type="text" id="loginId" placeholder="Enter ID" required>
-                <input type="password" id="loginPassword" placeholder="Enter Password" required>
-                <button id="loginButton">Login</button>
-                <div class="switch-form" onclick="switchToRegister()">No account? Click to register</div>
+                <div style="position: relative;">
+                    <span class="material-icons" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5);">person</span>
+                    <input type="text" id="loginId" placeholder="Enter ID" required style="padding-left: 35px;">
+                </div>
+                <div style="position: relative;">
+                    <span class="material-icons" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5);">lock</span>
+                    <input type="password" id="loginPassword" placeholder="Enter Password" required style="padding-left: 35px;">
+                </div>
+                <button id="loginButton">
+                    <span class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 5px;">login</span>Login
+                </button>
+                <div class="switch-form" onclick="switchToRegister()">
+                    <span class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 5px;">how_to_reg</span>No account? Click to register
+                </div>
             </div>
             
             <!-- 注册表单 -->
             <div id="registerForm" class="auth-form" style="display: none;">
-                <input type="text" id="registerId" placeholder="Set ID" required>
-                <input type="password" id="registerPassword" placeholder="Set Password" required>
-                <input type="text" id="registerName" placeholder="Enter Name" required>
-                <button id="registerButton">Register</button>
-                <div class="switch-form" onclick="switchToLogin()">Already have an account? Click to login</div>
+                <div style="position: relative;">
+                    <span class="material-icons" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5);">badge</span>
+                    <input type="text" id="registerId" placeholder="Set ID" required style="padding-left: 35px;">
+                </div>
+                <div style="position: relative;">
+                    <span class="material-icons" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5);">lock</span>
+                    <input type="password" id="registerPassword" placeholder="Set Password" required style="padding-left: 35px;">
+                </div>
+                <div style="position: relative;">
+                    <span class="material-icons" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5);">person</span>
+                    <input type="text" id="registerName" placeholder="Enter Name" required style="padding-left: 35px;">
+                </div>
+                <button id="registerButton">
+                    <span class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 5px;">app_registration</span>Register
+                </button>
+                <div class="switch-form" onclick="switchToLogin()">
+                    <span class="material-icons" style="font-size: 16px; vertical-align: middle; margin-right: 5px;">login</span>Already have an account? Click to login
+                </div>
             </div>
             
             <!-- 等待审核界面 -->
@@ -1205,21 +1282,24 @@
 
     <!-- 用户信息显示 -->
     <div id="userInfo" class="user-info" style="display: none;">
-        <span id="userName">Not logged in</span>
+        <span id="userName" style="display: flex; align-items: center; gap: 5px;">
+            <span class="material-icons-outlined">account_circle</span>
+            <span class="username-text">Not logged in</span>
+        </span>
         <span id="userRole" class="role">Guest</span>
-        <span class="logout" onclick="logout()">Logout</span>
+        <span class="logout" onclick="logout()">
+            <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 2px;">logout</span>Logout
+        </span>
         <!-- 管理员按钮 - 仅对Admin和SAdmin显示 -->
         <span id="adminButton" style="
             margin-left: 10px;
             cursor: pointer;
             padding: 4px 10px;
-            background: rgba(0, 100, 255, 0.2);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 100, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 5px;
-            transition: all 0.3s ease;
-            display: none;" onclick="openAdminPanel()">Manage</span>
+            display: none;" onclick="openAdminPanel()">
+            <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 2px;">admin_panel_settings</span>Manage
+        </span>
     </div>
     
     <!-- 管理员面板 -->
@@ -1261,6 +1341,7 @@
         class="glass-effect">
         <div class="preview-header">
             <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="material-icons-round" style="font-size: 20px;">receipt_long</span>
                 <span>订单预览</span>
                 <div class="preview-addon-switch">
                     <label>
@@ -1269,11 +1350,12 @@
                     </label>
                 </div>
             </div>
-            <span style="cursor: pointer;" onclick="togglePreview()">×</span>
+            <span class="material-icons-round" style="cursor: pointer; font-size: 22px;" onclick="togglePreview()">close</span>
         </div>
         <div id="preview-content"></div>
         <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.2);">
-            <button class="whatsapp-button" onclick="copyAndSendWhatsApp()" style="width: 100%;">
+            <button class="whatsapp-button" onclick="copyAndSendWhatsApp()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span class="material-icons-round" style="font-size: 18px;">content_copy</span>
                 Copy And Paste to WhatsApp
             </button>
         </div>
@@ -1295,14 +1377,30 @@
         z-index: 1000;
         display: none;
         align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        line-height: 1;
-        padding: 0;
-        text-align: center;
-        "
+        justify-content: center;"
         onclick="togglePreview()">
-        <span style="display: flex; align-items: center; justify-content: center;">📋</span>
+        <span class="material-icons-round" style="font-size: 28px; color: rgba(255, 255, 255, 0.8);">description</span>
+    </div>
+
+    <!-- 设置图标 -->
+    <div id="settings-icon" style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        cursor: pointer;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;"
+        onclick="toggleSettings()">
+        <span class="material-icons-round" style="font-size: 28px; color: rgba(255, 255, 255, 0.8);">settings</span>
     </div>
 
     <!-- 保留设置面板，但调整位置 -->
@@ -1315,47 +1413,59 @@
         z-index: 1000;
         display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="margin: 0;">Settings</h3>
-            <span style="cursor: pointer;" onclick="toggleSettings()">×</span>
+            <h3 style="margin: 0; display: flex; align-items: center;">
+                <span class="material-icons-round" style="font-size: 20px; margin-right: 8px;">settings</span>Settings
+            </h3>
+            <span class="material-icons-round" style="cursor: pointer; font-size: 22px;" onclick="toggleSettings()">close</span>
         </div>
         
         <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 10px;">Theme</label>
+            <label style="display: block; margin-bottom: 10px; display: flex; align-items: center;">
+                <span class="material-icons-round" style="font-size: 18px; margin-right: 8px;">palette</span>Theme
+            </label>
             <div style="display: flex; gap: 10px;">
                 <button id="dark-mode-btn" 
                         onclick="changeTheme('dark')" 
-                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
-                    Dark Mode 🌙
+                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <span class="material-icons-round" style="font-size: 16px;">dark_mode</span>
+                    Dark Mode
                 </button>
                 <button id="light-mode-btn" 
                         onclick="changeTheme('light')" 
-                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
-                    Light Mode 🌞
+                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <span class="material-icons-round" style="font-size: 16px;">light_mode</span>
+                    Light Mode
                 </button>
             </div>
         </div>
         
         <!-- 添加低性能模式选项 -->
         <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 10px;">Performance Mode</label>
+            <label style="display: block; margin-bottom: 10px; display: flex; align-items: center;">
+                <span class="material-icons-round" style="font-size: 18px; margin-right: 8px;">speed</span>Performance Mode
+            </label>
             <div style="display: flex; gap: 10px;">
                 <button id="high-perf-btn" 
                         onclick="togglePerformanceMode(false)" 
-                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
-                    High 💫
+                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <span class="material-icons-round" style="font-size: 16px;">hd</span>
+                    High
                 </button>
                 <button id="low-perf-btn" 
                         onclick="togglePerformanceMode(true)" 
-                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
-                    Smooth ✨
+                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <span class="material-icons-round" style="font-size: 16px;">rocket</span>
+                    Smooth
                 </button>
             </div>
         </div>
         
         <div>
-            <label style="display: block; margin-bottom: 10px;">Font Size</label>
+            <label style="display: block; margin-bottom: 10px; display: flex; align-items: center;">
+                <span class="material-icons-round" style="font-size: 18px; margin-right: 8px;">format_size</span>Font Size
+            </label>
             <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 0.8em;">小</span>
+                <span class="material-icons-round" style="font-size: 16px;">text_decrease</span>
                 <input type="range" 
                        id="font-size-selector" 
                        min="0" 
@@ -1364,28 +1474,32 @@
                        value="1"
                        style="flex-grow: 1;"
                        onchange="changeFontSize(this.value)">
-                <span style="font-size: 1.2em;">大</span>
+                <span class="material-icons-round" style="font-size: 20px;">text_increase</span>
             </div>
         </div>
 
         <div style="margin-top: 20px;">
-            <label style="display: block; margin-bottom: 10px;">Vibration</label>
+            <label style="display: block; margin-bottom: 10px; display: flex; align-items: center;">
+                <span class="material-icons-round" style="font-size: 18px; margin-right: 8px;">vibration</span>Vibration
+            </label>
             <div style="display: flex; gap: 10px;">
                 <button id="vibration-on-btn" 
                         onclick="toggleVibration(true)" 
-                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
-                    On 📳
+                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <span class="material-icons-round" style="font-size: 16px;">notifications_active</span>
+                    On
                 </button>
                 <button id="vibration-off-btn" 
                         onclick="toggleVibration(false)" 
-                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center;">
-                    Off 🔕
+                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                    <span class="material-icons-round" style="font-size: 16px;">notifications_off</span>
+                    Off
                 </button>
             </div>
         </div>
     </div>
 
-    <h1>SmartProfits Stock Order12</h1>
+    <h1>SmartProfits Stock Order</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h3 style="margin: 0;">Select Shop</h3>
         <!-- 这里保留设置按钮 -->
@@ -1400,13 +1514,8 @@
             cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            line-height: 1;
-            padding: 0;
-            text-align: center;
-            ">
-            <span style="display: flex; align-items: center; justify-content: center;">⚙️</span>
+            justify-content: center;">
+            <span class="material-icons-round" style="font-size: 24px; color: rgba(255, 255, 255, 0.8);">settings</span>
         </div>
     </div>
 
@@ -1414,42 +1523,42 @@
         <div class="shop-card" onclick="selectShop(this, '*JKL*')">
             <input type="radio" name="store" value="*JKL*" id="jkl">
             <label for="jkl">
-                <span class="shop-icon">🛍️</span>
+                <span class="shop-icon material-icons-round" style="font-size: 24px;">shopping_bag</span>
                 <span class="shop-name">JKL</span>
             </label>
         </div>
         <div class="shop-card" onclick="selectShop(this, '*TOM*')">
             <input type="radio" name="store" value="*TOM*" id="tom">
             <label for="tom">
-                <span class="shop-icon">🏬</span>
+                <span class="shop-icon material-icons-round" style="font-size: 24px;">storefront</span>
                 <span class="shop-name">TOM</span>
             </label>
         </div>
         <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Dalam*')">
             <input type="radio" name="store" value="*Ole-Ole Dalam*" id="ole">
             <label for="ole">
-                <span class="shop-icon">🏪</span>
+                <span class="shop-icon material-icons-round" style="font-size: 24px;">store</span>
                 <span class="shop-name">Ole-Ole Dalam</span>
             </label>
         </div>
         <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Luar*')">
             <input type="radio" name="store" value="*Ole-Ole Luar*" id="new">
             <label for="new">
-                <span class="shop-icon">🏠</span>
+                <span class="shop-icon material-icons-round" style="font-size: 24px;">home</span>
                 <span class="shop-name">Ole-Ole Luar</span>
             </label>
         </div>
         <div class="shop-card" onclick="selectShop(this, '*Wrapping(AA)*')">
             <input type="radio" name="store" value="*Wrapping(AA)*" id="aa">
             <label for="aa">
-                <span class="shop-icon">🧳</span>
+                <span class="shop-icon material-icons-round" style="font-size: 24px;">card_giftcard</span>
                 <span class="shop-name">Wrapping(AA)</span>
             </label>
         </div>
         <div class="shop-card" onclick="selectShop(this, '*Wrapping(MAS)*')">
             <input type="radio" name="store" value="*Wrapping(MAS)*" id="mas">
             <label for="mas">
-                <span class="shop-icon">🧳</span>
+                <span class="shop-icon material-icons-round" style="font-size: 24px;">redeem</span>
                 <span class="shop-name">Wrapping(MAS)</span>
             </label>
         </div>
@@ -1460,62 +1569,65 @@
         <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
             <input type="radio" name="category" value="BanHeang" id="banheang">
             <label for="banheang">
-                <span class="category-icon">🍪</span>
+                <span class="category-icon material-icons-round" style="font-size: 24px;">cookie</span>
                 <span>BanHeang</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'HopHup')">
             <input type="radio" name="category" value="HopHup" id="hophup">
             <label for="hophup">
-                <span class="category-icon">🥮</span>
+                <span class="category-icon material-icons-round" style="font-size: 24px;">bakery_dining</span>
                 <span>HopHup</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Chocolate')">
             <input type="radio" name="category" value="Chocolate" id="chocolate">
             <label for="chocolate">
-                <span class="category-icon">🍫</span>
+                <span class="category-icon material-icons-round" style="font-size: 24px;">restaurant</span>
                 <span>Chocolate</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Sotong')">
             <input type="radio" name="category" value="Sotong" id="sotong">
             <label for="sotong">
-                <span class="category-icon">🦑</span>
+                <span class="category-icon material-icons-round" style="font-size: 24px;">set_meal</span>
                 <span>Sotong</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Coffee')">
             <input type="radio" name="category" value="Coffee" id="coffee">
             <label for="coffee">
-                <span class="category-icon">☕</span>
+                <span class="category-icon material-icons-round" style="font-size: 24px;">coffee</span>
                 <span>Coffee</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Amplang')">
             <input type="radio" name="category" value="Amplang" id="amplang">
             <label for="amplang">
-                <span class="category-icon">🌕</span>
+                <span class="category-icon material-icons-round" style="font-size: 24px;">grain</span>
                 <span>Amplang</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Other')">
             <input type="radio" name="category" value="Other" id="other">
             <label for="other">
-                <span class="category-icon">🎁</span>
+                <span class="category-icon material-icons-round" style="font-size: 24px;">category</span>
                 <span>Other</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Wrapping')">
             <input type="radio" name="category" value="Wrapping" id="wrapping">
             <label for="Wrapping">
-                <span class="category-icon">🧸</span>
+                <span class="category-icon material-icons-round" style="font-size: 24px;">card_giftcard</span>
                 <span>Wrapping</span>
             </label>
         </div>
     </div>
 
-    <input type="text" id="productSearch" placeholder="Search..." oninput="searchProduct()" autocomplete="off" />
+    <div style="position: relative; margin-bottom: 15px;">
+        <span class="material-icons-round" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.7); pointer-events: none; z-index: 10;">search</span>
+        <input type="text" id="productSearch" placeholder="Search..." oninput="searchProduct()" autocomplete="off" style="padding-left: 35px; width: 100%; box-sizing: border-box;" />
+    </div>
     <div id="suggestions"></div>
     <h3>Select items (default quantity is 1）</h3>
     <div id="productList"></div>
@@ -1592,7 +1704,7 @@
                         }
                         
                         // 正常状态的用户
-                        document.getElementById('userName').textContent = userData.name || '用户';
+                        document.getElementById('userName').querySelector('.username-text').textContent = userData.name || '用户';
                         userRole = userData.role || 'User';
                         document.getElementById('userRole').textContent = userRole;
                         
@@ -1616,7 +1728,7 @@
                             status: 'active', // 访客用户直接设为激活状态
                             createdAt: firebase.database.ServerValue.TIMESTAMP
                         }).then(() => {
-                            document.getElementById('userName').textContent = '访客';
+                            document.getElementById('userName').querySelector('.username-text').textContent = '访客';
                             document.getElementById('userRole').textContent = 'User';
                             document.getElementById('userInfo').style.display = 'flex';
                             document.getElementById('authContainer').style.display = 'none';
@@ -1846,7 +1958,7 @@
                         })
                         .then(() => {
                             // 显示用户信息
-                            document.getElementById('userName').textContent = userData.name;
+                            document.getElementById('userName').querySelector('.username-text').textContent = userData.name;
                             document.getElementById('userRole').textContent = userRole;
                             document.getElementById('userInfo').style.display = 'flex';
                             document.getElementById('authContainer').style.display = 'none';
@@ -1932,7 +2044,9 @@
                 
                 // 添加查看图片按钮（如果有图片URL）
                 const viewImageButton = product.imageUrl ? 
-                    `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">View</button>` : '';
+                    `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">
+                        <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 3px;">image</span>View
+                    </button>` : '';
                 
                 label.innerHTML = `${product.name} <span class="${stockClass}">${stockText} ${viewImageButton}</span>`;
             }
@@ -2135,7 +2249,9 @@
                 
                 // 添加查看图片按钮
                 const viewImageButton = product.imageUrl ? 
-                    `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">View</button>` : '';
+                    `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">
+                        <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 3px;">image</span>View
+                    </button>` : '';
 
                 div.innerHTML = `
                     <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
@@ -2143,13 +2259,17 @@
                         ${product.name}
                         ${viewImageButton}
                     </label>
-                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">
+                        <span class="material-icons-round" style="font-size: 18px;">add</span>
+                    </button>
                     <input type="number"
                            id="quantity${product.id}"
                            min="1"
                            value="${currentQuantity}"
                            readonly>
-                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">
+                        <span class="material-icons-round" style="font-size: 18px;">remove</span>
+                    </button>
                 `;
                 productList.appendChild(div);
             });
@@ -2412,9 +2532,13 @@
             div.innerHTML = `
                 <input type="checkbox" id="item${product.id}" checked onchange="saveItem(${product.id}, '${product.name}')">
                 <label for="item${product.id}">${product.name} <span class="${stockClass}">${stockText}</span></label>
-                <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">+</button>
+                <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">
+                    <span class="material-icons-round" style="font-size: 18px;">add</span>
+                </button>
                 <input type="number" id="quantity${product.id}" min="1" value="1" onchange="saveQuantity(${product.id})">
-                <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">-</button>
+                <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">
+                    <span class="material-icons-round" style="font-size: 18px;">remove</span>
+                </button>
             `;
             productList.appendChild(div);
 
