@@ -8,11 +8,25 @@
     <title>Airport Stock Request</title>
     
     <!-- PWA相关标记 -->
-    <meta name="theme-color" content="#4a90e2">
+    <meta name="theme-color" content="#000000">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./icons/s2.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <script>
+        // 保存安装提示事件
+        let deferredPrompt;
+
+        // 监听beforeinstallprompt事件
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // 阻止Chrome 67及更早版本自动显示安装提示
+            e.preventDefault();
+            // 保存事件以便稍后触发
+            deferredPrompt = e;
+            console.log('可以安装PWA了!');
+        });
+    </script>
     
     <style>
         #productList label span {
@@ -1324,7 +1338,7 @@
         </div>
     </div>
 
-    <h1>Stock Order13288</h1>
+    <h1>SmartProfits Stock Order</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h3 style="margin: 0;">Select Shop</h3>
         <!-- 这里保留设置按钮 -->
@@ -1792,6 +1806,9 @@
                             
                             // 应用权限
                             applyRoleBasedPermissions(userRole);
+                            
+                            // 显示PWA安装提示
+                            showPWAInstallPrompt();
                         });
                 });
         }
@@ -2783,6 +2800,43 @@
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('authTitle').textContent = '用户登录';
         }
+
+        // 登录相关代码
+        function login() {
+            // ... existing code ...
+            
+            // 登录成功后显示PWA安装提示
+            showPWAInstallPrompt();
+        }
+        
+        // 显示PWA安装提示
+        function showPWAInstallPrompt() {
+            // 如果有安装提示事件并且用户在移动设备上
+            if (deferredPrompt && (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone|iPad|iPod/i))) {
+                const promptElement = document.getElementById('pwa-install-prompt');
+                promptElement.style.display = 'block';
+                
+                // 绑定安装事件
+                document.getElementById('pwa-install-now').addEventListener('click', async () => {
+                    // 显示安装提示
+                    deferredPrompt.prompt();
+                    // 等待用户响应
+                    const { outcome } = await deferredPrompt.userChoice;
+                    console.log(`用户选择: ${outcome}`);
+                    // 清除提示事件
+                    deferredPrompt = null;
+                    // 隐藏提示
+                    promptElement.style.display = 'none';
+                });
+                
+                // 绑定"稍后"按钮事件
+                document.getElementById('pwa-install-later').addEventListener('click', () => {
+                    promptElement.style.display = 'none';
+                });
+            }
+        }
+
+        let updateNotificationShown = false;
     </script>
 
     <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Stock quantity now will auto update from stock system!.</p>
@@ -2889,5 +2943,48 @@
             }
         }
     </script>
+
+    <!-- 添加PWA安装提示对话框 -->
+    <div id="pwa-install-prompt" style="
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        z-index: 9999;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    ">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="margin: 0 0 8px 0; font-size: 16px;">安装应用</h3>
+                <p style="margin: 0; font-size: 14px;">添加到主屏幕，获得更好的体验！</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button id="pwa-install-later" style="
+                    background: rgba(255, 255, 255, 0.2);
+                    border: none;
+                    color: white;
+                    padding: 8px 12px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                ">稍后</button>
+                <button id="pwa-install-now" style="
+                    background: #4285F4;
+                    border: none;
+                    color: white;
+                    padding: 8px 15px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: bold;
+                ">立即安装</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
