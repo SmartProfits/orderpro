@@ -903,22 +903,204 @@
             color: white;
             font-size: 14px;
             margin-bottom: 10px;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        .user-info #userName {
+            font-weight: 500;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin-right: 8px;
         }
 
         .user-info .role {
-            margin-left: 10px;
-            padding: 2px 8px;
-            border-radius: 10px;
             font-size: 12px;
-            background: rgba(255, 255, 255, 0.2);
+            padding: 3px 8px;
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 15px;
+        }
+
+        /* Light Mode 下的用户信息样式 */
+        body:not(.dark-mode) .user-info {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        body:not(.dark-mode) .user-info #userName {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        body:not(.dark-mode) .user-info .role {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            color: #333;
         }
 
         .user-info .logout {
             margin-left: auto;
             cursor: pointer;
             padding: 4px 10px;
-            background: rgba(255, 0, 0, 0.3);
+            background: rgba(255, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 0, 0, 0.3);
             border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .user-info .logout:hover {
+            background: rgba(255, 0, 0, 0.3);
+        }
+
+        #adminButton {
+            margin-left: 10px;
+            cursor: pointer;
+            padding: 4px 10px;
+            background: rgba(0, 100, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 100, 255, 0.3);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        #adminButton:hover {
+            background: rgba(0, 100, 255, 0.3);
+        }
+
+        /* Light Mode 下的按钮样式 */
+        body:not(.dark-mode) .user-info .logout {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+        }
+
+        body:not(.dark-mode) .user-info .logout:hover {
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        body:not(.dark-mode) #adminButton {
+            background: rgba(0, 100, 255, 0.1);
+            border: 1px solid rgba(0, 100, 255, 0.2);
+        }
+
+        body:not(.dark-mode) #adminButton:hover {
+            background: rgba(0, 100, 255, 0.2);
+        }
+
+        /* 管理员面板样式优化 */
+        #adminPanel .auth-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+        }
+
+        #adminPanel .user-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        #adminPanel .user-card .user-info-section {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        #adminPanel .user-card .user-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        #adminPanel .user-card .user-meta {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #adminPanel .user-card .user-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Light Mode 下的管理员面板样式 */
+        body:not(.dark-mode) #adminPanel .auth-box {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        body:not(.dark-mode) #adminPanel .user-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        body:not(.dark-mode) #adminPanel .user-card .user-meta {
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        body:not(.dark-mode) #adminPanel .user-card .user-status {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333;
+        }
+
+        .action-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-button.approve:hover {
+            background: rgba(76, 175, 80, 0.3);
+        }
+
+        .action-button.promote:hover {
+            background: rgba(33, 150, 243, 0.3);
+        }
+
+        .action-button.demote:hover {
+            background: rgba(255, 152, 0, 0.3);
+        }
+
+        .action-button.delete:hover {
+            background: rgba(244, 67, 54, 0.3);
+        }
+
+        /* Light Mode hover effects */
+        body:not(.dark-mode) .action-button.approve:hover {
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        body:not(.dark-mode) .action-button.promote:hover {
+            background: rgba(33, 150, 243, 0.2);
+        }
+
+        body:not(.dark-mode) .action-button.demote:hover {
+            background: rgba(255, 152, 0, 0.2);
+        }
+
+        body:not(.dark-mode) .action-button.delete:hover {
+            background: rgba(244, 67, 54, 0.2);
         }
     </style>
     
@@ -970,8 +1152,12 @@
             margin-left: 10px;
             cursor: pointer;
             padding: 4px 10px;
-            background: rgba(0, 100, 255, 0.3);
+            background: rgba(0, 100, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 100, 255, 0.3);
             border-radius: 5px;
+            transition: all 0.3s ease;
             display: none;" onclick="openAdminPanel()">Manage</span>
     </div>
     
@@ -1864,7 +2050,20 @@
             const productList = document.getElementById('productList');
             productList.innerHTML = '';
 
-            products.forEach(product => {
+            // 根据库存状态排序商品
+            const sortedProducts = [...products].sort((a, b) => {
+                const stockA = stockMap[a.name] || 0;
+                const stockB = stockMap[b.name] || 0;
+                
+                // 如果两个商品都有库存或都没有库存，保持原有顺序
+                if ((stockA > 0) === (stockB > 0)) {
+                    return 0;
+                }
+                // 有库存的排在前面
+                return stockA > 0 ? -1 : 1;
+            });
+
+            sortedProducts.forEach(product => {
                 const div = document.createElement('div');
                 const isChecked = selectedItems[product.id] ? 'checked' : '';
                 const defaultQuantity = product.defaultQuantity || 1;
@@ -2410,7 +2609,7 @@
                 .then((snapshot) => {
                     const pendingUsersDiv = document.getElementById('pendingUsersList');
                     if (!snapshot.exists()) {
-                        pendingUsersDiv.innerHTML = '<p style="color: rgba(255,255,255,0.5);">没有待审核的用户</p>';
+                        pendingUsersDiv.innerHTML = '<p style="color: rgba(255,255,255,0.5);">No pending users</p>';
                         return;
                     }
                     
@@ -2420,14 +2619,20 @@
                         const user = childSnapshot.val();
                         
                         pendingHtml += `
-                            <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                                <div>
-                                    <div style="font-weight: bold;">${user.name} (${user.id})</div>
-                                    <div style="font-size: 12px; color: rgba(255,255,255,0.6);">注册时间: ${new Date(user.createdAt).toLocaleString()}</div>
+                            <div class="user-card">
+                                <div class="user-info-section">
+                                    <span class="user-name">${user.name} (${user.id})</span>
+                                    <span class="user-meta">Registration time: ${new Date(user.createdAt).toLocaleString()}</span>
+                                    <span class="user-status">
+                                        <span style="color: #FFA500;">⏳</span>
+                                        <span>Pending</span>
+                                    </span>
                                 </div>
-                                <button onclick="approveUser('${userId}')" style="background: #4CAF50; border: none; color: white; padding: 5px 15px; border-radius: 4px; cursor: pointer;">
-                                    <span style="margin-right: 5px;">✓</span>审核
-                                </button>
+                                <div style="margin-top: 10px;">
+                                    <button onclick="approveUser('${userId}')" class="action-button approve">
+                                        <span style="margin-right: 5px;">✓</span>Approve
+                                    </button>
+                                </div>
                             </div>
                         `;
                     });
@@ -2435,28 +2640,26 @@
                     pendingUsersDiv.innerHTML = pendingHtml;
                 });
             
-            // 加载所有用户，根据不同管理员权限显示不同内容
+            // 加载所有用户
             db.ref('users').once('value')
                 .then((snapshot) => {
                     const allUsersDiv = document.getElementById('allUsersList');
                     if (!snapshot.exists()) {
-                        allUsersDiv.innerHTML = '<p style="color: rgba(255,255,255,0.5);">没有用户</p>';
+                        allUsersDiv.innerHTML = '<p style="color: rgba(255,255,255,0.5);">No users</p>';
                         return;
                     }
                     
                     let allHtml = '';
-                    let currentUserRole = userRole; // 获取当前用户角色
+                    let currentUserRole = userRole;
                     
                     snapshot.forEach((childSnapshot) => {
                         const userId = childSnapshot.key;
                         const user = childSnapshot.val();
                         
-                        // Admin只能看到User角色账号，SAdmin可以看到所有账号
                         if (currentUserRole === 'Admin' && user.role !== 'User') {
-                            return; // 跳过非User账号
+                            return;
                         }
                         
-                        // 获取状态图标
                         let statusIcon = '⏳';
                         let statusColor = '#FFA500';
                         if (user.status === 'active') {
@@ -2464,35 +2667,36 @@
                             statusColor = '#4CAF50';
                         }
                         
-                        // 根据不同管理员类型，添加不同的角色管理按钮
                         let roleManagementButton = '';
                         if (currentUserRole === 'SAdmin') {
                             if (user.role === 'User') {
-                                roleManagementButton = `<button onclick="changeUserRole('${userId}', 'User', 'Admin')" style="background: #2196F3; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Promote to Admin</button>`;
+                                roleManagementButton = `<button onclick="changeUserRole('${userId}', 'User', 'Admin')" class="action-button promote">Promote to Admin</button>`;
                             } else if (user.role === 'Admin') {
-                                roleManagementButton = `<button onclick="changeUserRole('${userId}', 'Admin', 'User')" style="background: #FF5722; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">Demote to User</button>`;
+                                roleManagementButton = `<button onclick="changeUserRole('${userId}', 'Admin', 'User')" class="action-button demote">Demote to User</button>`;
                             }
                             
-                            // Add delete button for SAdmin (except for their own account)
                             if (user.id !== currentUser.uid) {
-                                roleManagementButton += `<button onclick="deleteUser('${userId}')" style="background: #F44336; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Delete</button>`;
+                                roleManagementButton += `<button onclick="deleteUser('${userId}')" class="action-button delete">Delete</button>`;
                             }
                         }
                         
                         allHtml += `
-                            <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                                <div>
-                                    <div style="font-weight: bold;">${user.name} (${user.id})</div>
-                                    <div style="font-size: 12px; margin-top: 3px;">
-                                        <span style="color: ${statusColor}; margin-right: 5px;">${statusIcon}</span>
-                                        <span style="color: rgba(255,255,255,0.6);">角色: ${user.role || 'User'}</span>
+                            <div class="user-card">
+                                <div class="user-info-section">
+                                    <span class="user-name">${user.name} (${user.id})</span>
+                                    <div style="display: flex; gap: 10px; align-items: center;">
+                                        <span class="user-status">
+                                            <span style="color: ${statusColor};">${statusIcon}</span>
+                                            <span>${user.status === 'active' ? 'Active' : 'Pending'}</span>
+                                        </span>
+                                        <span class="user-status" style="background: ${user.role === 'SAdmin' ? 'rgba(156, 39, 176, 0.1)' : user.role === 'Admin' ? 'rgba(33, 150, 243, 0.1)' : 'rgba(76, 175, 80, 0.1)'}">
+                                            ${user.role || 'User'}
+                                        </span>
                                     </div>
                                 </div>
-                                <div>
+                                <div style="margin-top: 10px; display: flex; gap: 10px;">
                                     ${user.status !== 'active' ? 
-                                    `<button onclick="approveUser('${userId}')" style="background: #4CAF50; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px;">
-                                        激活
-                                    </button>` : ''}
+                                    `<button onclick="approveUser('${userId}')" class="action-button approve">Activate</button>` : ''}
                                     ${roleManagementButton}
                                 </div>
                             </div>
