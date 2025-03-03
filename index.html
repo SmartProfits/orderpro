@@ -20,13 +20,16 @@
 
         // 监听beforeinstallprompt事件
         window.addEventListener('beforeinstallprompt', (e) => {
-            // 阻止Chrome 67及更早版本自动显示安装提示
-            e.preventDefault();
-            // 保存事件以便稍后触发
-            deferredPrompt = e;
-            console.log('可以安装PWA了!');
+            // 不再阻止默认的Chrome安装提示
+            // e.preventDefault(); -- 移除这行以允许Chrome显示原生提示
             
-            // 检查是否应该显示PWA安装提示
+            // 仍然保存事件引用，以便可以通过某些用户交互触发
+            deferredPrompt = e;
+            console.log('Chrome原生PWA安装提示已触发');
+            
+            // 不再自动调用自定义安装提示
+            // 注释掉之前的自动提示代码
+            /*
             const shouldShowPrompt = () => {
                 // 检查是否已经安装为PWA
                 if (window.matchMedia('(display-mode: standalone)').matches || 
@@ -63,6 +66,7 @@
                     showPWAInstallPrompt();
                 }, 1000); // 延迟1秒显示，给页面完全加载的时间
             }
+            */
         });
         
         // 当PWA成功安装后
@@ -2848,8 +2852,9 @@
         function login() {
             // ... existing code ...
             
-            // 登录成功后显示PWA安装提示
-            showPWAInstallPrompt();
+            // 不再显示自定义的PWA安装提示
+            // 注释掉此行，让Chrome显示原生的安装提示
+            // showPWAInstallPrompt();
         }
         
         // 显示PWA安装提示
@@ -2861,35 +2866,27 @@
                 return; // 已经安装过，不显示提示
             }
             
-            // 如果有安装提示事件
+            // 如果有安装提示事件，触发Chrome原生安装提示
             if (deferredPrompt) {
-                const promptElement = document.getElementById('pwa-install-prompt');
-                promptElement.style.display = 'block';
+                // 直接触发Chrome原生的安装提示
+                deferredPrompt.prompt();
                 
-                // 绑定安装事件
-                document.getElementById('pwa-install-now').addEventListener('click', async () => {
-                    // 显示安装提示
-                    deferredPrompt.prompt();
-                    // 等待用户响应
-                    const { outcome } = await deferredPrompt.userChoice;
-                    console.log(`用户选择: ${outcome}`);
+                // 跟踪用户的选择
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    console.log('用户的安装选择: ' + choiceResult.outcome);
+                    
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('用户接受了安装');
+                    } else {
+                        console.log('用户取消了安装');
+                    }
+                    
                     // 清除提示事件
                     deferredPrompt = null;
-                    // 隐藏提示
-                    promptElement.style.display = 'none';
-                    
-                    // 存储用户已经看到安装提示到localStorage
-                    localStorage.setItem('pwaInstallPromptShown', Date.now());
-                });
-                
-                // 绑定"稍后"按钮事件
-                document.getElementById('pwa-install-later').addEventListener('click', () => {
-                    promptElement.style.display = 'none';
-                    // 存储用户选择"稍后"到localStorage，24小时内不再显示
-                    localStorage.setItem('pwaInstallLater', Date.now());
                 });
             } else {
-                console.log('没有可用的安装提示事件或用户不在移动设备上');
+                console.log('没有可用的安装提示事件，或PWA安装条件尚未满足');
+                console.log('提示：请确保已使用过该应用一段时间后，Chrome才会提供安装选项');
             }
         }
 
