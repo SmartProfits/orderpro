@@ -173,23 +173,62 @@
             console.log('PWA已成功安装');
         });
         
-        // 用户信息显示功能
-        function showUserInfo() {
-            const userInfo = document.getElementById('userInfo');
-            if (userInfo.style.display === 'none' || userInfo.style.display === '') {
-                userInfo.style.display = 'flex';
-                
-                // 添加高亮效果到底部导航User按钮
-                highlightNavItem('person');
-                
-                // 3秒后自动隐藏
+        // 左侧仪表板（Dashboard）显示/隐藏功能
+        function toggleDashboard() {
+            const dashboard = document.getElementById('side-dashboard');
+            const overlay = document.getElementById('dashboard-overlay');
+            const isOpen = dashboard.style.transform === 'translateX(0px)';
+            
+            if (isOpen) {
+                // 关闭仪表板
+                dashboard.style.transform = 'translateX(-100%)';
+                overlay.style.opacity = '0';
                 setTimeout(() => {
-                    userInfo.style.display = 'none';
-                    resetNavHighlights();
-                }, 3000);
-            } else {
-                userInfo.style.display = 'none';
+                    overlay.style.display = 'none';
+                }, 300);
                 resetNavHighlights();
+            } else {
+                // 打开仪表板，并更新用户信息
+                dashboard.style.transform = 'translateX(0px)';
+                overlay.style.display = 'block';
+                setTimeout(() => {
+                    overlay.style.opacity = '1';
+                }, 10);
+                
+                // 更新仪表板中的用户信息
+                updateDashboardUserInfo();
+                
+                // 高亮当前按钮
+                highlightNavItem('menu');
+            }
+        }
+        
+        // 更新仪表板中的用户信息
+        function updateDashboardUserInfo() {
+            // 从Firebase获取当前用户数据
+            const user = firebase.auth().currentUser;
+            if (user) {
+                // 从数据库获取用户信息
+                db.ref(`users/${user.uid}`).once('value').then((snapshot) => {
+                    const userData = snapshot.val();
+                    if (userData) {
+                        document.getElementById('dashboardUserName').textContent = userData.name || '用户';
+                        document.getElementById('dashboardUserRole').textContent = userData.role || 'User';
+                        
+                        // 检查是否应该显示管理按钮
+                        const role = userData.role || 'User';
+                        const adminButton = document.getElementById('dashboardAdminButton');
+                        if (role === 'Admin' || role === 'SAdmin') {
+                            adminButton.style.display = 'flex';
+                        } else {
+                            adminButton.style.display = 'none';
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('dashboardUserName').textContent = 'Not logged in';
+                document.getElementById('dashboardUserRole').textContent = 'Guest';
+                document.getElementById('dashboardAdminButton').style.display = 'none';
             }
         }
         
@@ -201,6 +240,7 @@
             // 根据图标名称找到对应的导航项ID
             const navItemMap = {
                 'person': 'userNavItem',
+                'menu': 'menuNavItem',
                 'receipt_long': 'previewNavItem',
                 'settings': 'settingsNavItem'
             };
@@ -1478,31 +1518,28 @@
         </div>
     </div>
 
-    <!-- 用户信息显示 -->
-    <div id="userInfo" class="user-info" style="display: none;">
-        <span id="userName" style="display: flex; align-items: center; gap: 5px;">
-            <span class="material-icons-outlined">account_circle</span>
-            <span class="username-text">Not logged in</span>
-        </span>
-        <span id="userRole" class="role">Guest</span>
-        <span class="logout" onclick="logout()">
-            <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 2px;">logout</span>Logout
-        </span>
-        <!-- 管理员按钮 - 仅对Admin和SAdmin显示 -->
-        <span id="adminButton" style="
-            margin-left: 10px;
-            cursor: pointer;
-            padding: 4px 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            display: none;" onclick="openAdminPanel()">
-            <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 2px;">admin_panel_settings</span>Manage
-        </span>
-    </div>
-    
-    <!-- 管理员面板 -->
-    <div id="adminPanel" class="auth-container" style="display: none;">
-        <div class="auth-box" style="max-width: 500px; max-height: 80vh; overflow-y: auto;">
+    <!-- 管理面板 -->
+    <div id="adminPanel" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        overflow-y: auto;">
+        
+        <div class="glass-effect" style="
+            width: 95%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+            border-radius: 10px;">
+            
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2>User Management</h2>
                 <span style="cursor: pointer; font-size: 24px;" onclick="document.getElementById('adminPanel').style.display = 'none'">×</span>
@@ -1523,6 +1560,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 
     <!-- 原有的页面内容 -->
@@ -1540,7 +1578,7 @@
         <div class="preview-header">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <span class="material-icons-round" style="font-size: 20px;">receipt_long</span>
-                <span>订单预览</span>
+                <span>Order List</span>
                 <div class="preview-addon-switch">
                     <label>
                         <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()">
@@ -1560,25 +1598,7 @@
     </div>
 
     <!-- 修改预览图标的样式 -->
-    <div id="preview-icon" style="
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        border-radius: 25px;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        cursor: pointer;
-        z-index: 1000;
-        display: none; /* 隐藏，因为功能已移至底部导航 */
-        align-items: center;
-        justify-content: center;"
-        onclick="togglePreview()">
-        <span class="material-icons-round" style="font-size: 28px; color: rgba(255, 255, 255, 0.8);">description</span>
-    </div>
+
 
     <!-- 设置图标 -->
     <div id="settings-icon" style="
@@ -1698,7 +1718,7 @@
 
     <h1>SmartProfits Stock Order</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
-        <h3 style="margin: 0;">Select Shop</h3>
+        <h3 style="margin: 0;">Outlet</h3>
         <!-- 移除单独的设置按钮，因为我们已经在底部导航有设置按钮 -->
     </div>
 
@@ -1882,17 +1902,11 @@
                             document.getElementById('pendingForm').style.display = 'block';
                             document.getElementById('authTitle').textContent = 'Account Pending';
                             document.getElementById('authContainer').style.display = 'flex';
-                            document.getElementById('userInfo').style.display = 'none';
                             return;
                         }
                         
                         // 正常状态的用户
-                        document.getElementById('userName').querySelector('.username-text').textContent = userData.name || '用户';
                         userRole = userData.role || 'User';
-                        document.getElementById('userRole').textContent = userRole;
-                        
-                        // 显示用户信息栏
-                        document.getElementById('userInfo').style.display = 'flex';
                         
                         // 隐藏登录界面
                         document.getElementById('authContainer').style.display = 'none';
@@ -1911,9 +1925,6 @@
                             status: 'active', // 访客用户直接设为激活状态
                             createdAt: firebase.database.ServerValue.TIMESTAMP
                         }).then(() => {
-                            document.getElementById('userName').querySelector('.username-text').textContent = '访客';
-                            document.getElementById('userRole').textContent = 'User';
-                            document.getElementById('userInfo').style.display = 'flex';
                             document.getElementById('authContainer').style.display = 'none';
                             // 加载库存数据
                             loadQuantitiesFromFirebase();
@@ -1923,7 +1934,6 @@
             } else {
                 // 用户未登录
                 document.getElementById('authContainer').style.display = 'flex';
-                document.getElementById('userInfo').style.display = 'none';
                 currentUser = null;
             }
         });
@@ -2143,7 +2153,7 @@
                             // 显示用户信息
                             document.getElementById('userName').querySelector('.username-text').textContent = userData.name;
                             document.getElementById('userRole').textContent = userRole;
-                            document.getElementById('userInfo').style.display = 'flex';
+                            // 移除对userInfo的引用
                             document.getElementById('authContainer').style.display = 'none';
                             
                             // 应用权限
@@ -2161,7 +2171,7 @@
                 .then(() => {
                     currentUser = null;
                     document.getElementById('authContainer').style.display = 'flex';
-                    document.getElementById('userInfo').style.display = 'none';
+                    // 移除对userInfo的引用
                 })
                 .catch((error) => {
                     console.error('Logout error:', error);
@@ -2924,6 +2934,7 @@
         document.addEventListener('click', function(event) {
             const settingsPanel = document.getElementById('settings-panel');
             const userMenu = document.getElementById('user-menu');
+            const dashboard = document.getElementById('side-dashboard');
             const bottomNav = document.querySelector('.bottom-nav');
             
             // 关闭设置面板
@@ -2934,13 +2945,15 @@
                 resetNavHighlights();
             }
             
-            // 关闭用户菜单
-            if (userMenu.style.display === 'flex' && 
+            // 关闭用户菜单 (保留但实际上不再使用)
+            if (userMenu && userMenu.style.display === 'flex' && 
                 !userMenu.contains(event.target) && 
                 !bottomNav.contains(event.target)) {
                 userMenu.style.display = 'none';
                 resetNavHighlights();
             }
+            
+            // 关闭仪表板(不需要处理，因为有专门的overlay)
         });
 
         // 修改认证状态监听
@@ -3372,23 +3385,129 @@
 
     <!-- 底部导航栏 -->
     <div class="bottom-nav">
-        <!-- 用户按钮 -->
-        <div class="bottom-nav-item" id="userNavItem" onclick="showUserInfo()">
-            <span class="material-icons">person</span>
-            <span class="label">User</span>
+        <!-- 菜单按钮 (替换原来的用户按钮) -->
+        <div class="bottom-nav-item" id="menuNavItem" onclick="toggleDashboard()">
+            <span class="material-icons">menu</span>
+            <span class="label">Menu</span>
         </div>
         
         <!-- 订单预览按钮 -->
         <div class="bottom-nav-item" id="previewNavItem" onclick="togglePreview()">
-            <span class="material-icons">receipt_long</span>
-            <span class="label">订单预览</span>
+            <span class="material-icons-round">description</span>
+            <span class="label">Order</span>
         </div>
         
         <!-- 设置按钮 -->
         <div class="bottom-nav-item" id="settingsNavItem" onclick="toggleSettings()">
             <span class="material-icons">settings</span>
-            <span class="label">设置</span>
+            <span class="label">Setting</span>
         </div>
+    </div>
+
+    <!-- 左侧仪表板 -->
+    <div id="side-dashboard" class="glass-effect" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100%;
+        background: rgba(20, 25, 40, 0.85);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        z-index: 1500;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        overflow-y: auto;">
+        
+        <!-- 仪表板头部 -->
+        <div style="padding: 25px 20px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin: 0; font-size: 20px; font-weight: 600; color: #fff;">Dashboard</h2>
+                <span class="material-icons" style="font-size: 24px; cursor: pointer; color: rgba(255, 255, 255, 0.7);" 
+                     onclick="toggleDashboard()">close</span>
+            </div>
+            
+            <!-- 用户信息卡片 -->
+            <div style="
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 10px;
+                padding: 15px;
+                margin-top: 5px;">
+                <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                    <span class="material-icons" style="font-size: 40px; margin-right: 15px; color: #4285F4;">account_circle</span>
+                    <div>
+                        <div style="font-size: 18px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                             id="dashboardUserName">Not logged in</div>
+                        <div style="font-size: 14px; color: rgba(255, 255, 255, 0.7);" id="dashboardUserRole">Guest</div>
+                    </div>
+                </div>
+                
+                <!-- 管理和登出按钮 -->
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <!-- 管理按钮 - 仅对Admin和SAdmin显示 -->
+                    <button id="dashboardAdminButton" style="
+                        flex: 1;
+                        padding: 8px 0;
+                        border-radius: 5px;
+                        background: rgba(255, 255, 255, 0.1);
+                        border: none;
+                        color: white;
+                        font-size: 14px;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 6px;
+                        display: none;" 
+                        onclick="openAdminPanel(); toggleDashboard();">
+                        <span class="material-icons" style="font-size: 16px;">admin_panel_settings</span>
+                        Manage
+                    </button>
+                    
+                    <!-- 登出按钮 -->
+                    <button style="
+                        flex: 1;
+                        padding: 8px 0;
+                        border-radius: 5px;
+                        background: rgba(255, 255, 255, 0.1);
+                        border: none;
+                        color: white;
+                        font-size: 14px;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 6px;" 
+                        onclick="logout()">
+                        <span class="material-icons" style="font-size: 16px;">logout</span>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 仪表板主体内容区域 - 可以在这里添加更多菜单项和功能 -->
+        <div style="padding: 20px; flex-grow: 1;">
+            <!-- 这里可以添加更多的仪表板功能区域 -->
+        </div>
+    </div>
+
+    <!-- 仪表板背景遮罩 -->
+    <div id="dashboard-overlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1499;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;"
+        onclick="toggleDashboard()">
     </div>
 </body>
 </html>
