@@ -20,6 +20,32 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
     <style>
+        /* 去除滚动条但保留滚动功能 */
+        html, body {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+            overflow-y: auto;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* WebKit浏览器（Chrome、Safari等） */
+        ::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            background: transparent;
+        }
+        
+        /* 确保内容不会溢出视口 */
+        body {
+            position: relative;
+            max-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 70px; /* 为底部导航栏留出空间 */
+            box-sizing: border-box;
+        }
+        
         /* 底部导航栏动画效果 */
         .nav-item {
             position: relative;
@@ -107,6 +133,24 @@
 
         body:not(.dark-mode) .bottom-nav-item:active {
             background: rgba(0, 0, 0, 0.05);
+        }
+
+        /* 所有滚动容器也应用无滚动条样式 */
+        #preview-window, #settings-panel, #user-menu, .modal-content, 
+        #admin-panel, #productList, #suggestions {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        
+        #preview-window::-webkit-scrollbar, 
+        #settings-panel::-webkit-scrollbar, 
+        #user-menu::-webkit-scrollbar,
+        .modal-content::-webkit-scrollbar,
+        #admin-panel::-webkit-scrollbar,
+        #productList::-webkit-scrollbar,
+        #suggestions::-webkit-scrollbar {
+            display: none;
+            width: 0;
         }
     </style>
     
@@ -3346,8 +3390,5 @@
             <span class="label">设置</span>
         </div>
     </div>
-
-    <!-- 适配底部导航栏的内边距 -->
-    <div style="height: 70px;"></div>
 </body>
 </html>
