@@ -19,10 +19,164 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
+    <style>
+        /* 底部导航栏动画效果 */
+        .nav-item {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 30%;
+            width: 40%;
+            height: 3px;
+            background-color: #4285F4;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            color: rgba(255, 255, 255, 1);
+        }
+        
+        .nav-item.active {
+            color: #4285F4;
+        }
+        
+        .nav-item.active::after {
+            transform: scaleX(1);
+        }
+        
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+        
+        /* 底部导航栏样式 - 从index2.html复制而来 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(20, 25, 40, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body:not(.dark-mode) .bottom-nav {
+            background: rgba(245, 245, 245, 0.9);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.7);
+            width: 33.33%;
+            height: 100%;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        body:not(.dark-mode) .bottom-nav-item {
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .bottom-nav-item.active {
+            color: #4285F4;
+        }
+
+        .bottom-nav-item span.label {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .bottom-nav-item:active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body:not(.dark-mode) .bottom-nav-item:active {
+            background: rgba(0, 0, 0, 0.05);
+        }
+    </style>
+    
     <script>
         // 保存安装提示事件
         let deferredPrompt;
 
+        // 监听beforeinstallprompt事件
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // 不再阻止默认的Chrome安装提示
+            // e.preventDefault(); -- 移除这行以允许Chrome显示原生提示
+            
+            // 仍然保存事件引用，以便可以通过某些用户交互触发
+            deferredPrompt = e;
+            console.log('Chrome原生PWA安装提示已触发');
+        });
+        
+        // 当PWA成功安装后
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('PWA已成功安装');
+        });
+        
+        // 用户信息显示功能
+        function showUserInfo() {
+            const userInfo = document.getElementById('userInfo');
+            if (userInfo.style.display === 'none' || userInfo.style.display === '') {
+                userInfo.style.display = 'flex';
+                
+                // 添加高亮效果到底部导航User按钮
+                highlightNavItem('person');
+                
+                // 3秒后自动隐藏
+                setTimeout(() => {
+                    userInfo.style.display = 'none';
+                    resetNavHighlights();
+                }, 3000);
+            } else {
+                userInfo.style.display = 'none';
+                resetNavHighlights();
+            }
+        }
+        
+        // 高亮显示当前选中的导航项
+        function highlightNavItem(iconName) {
+            // 重置所有高亮
+            resetNavHighlights();
+            
+            // 根据图标名称找到对应的导航项ID
+            const navItemMap = {
+                'person': 'userNavItem',
+                'receipt_long': 'previewNavItem',
+                'settings': 'settingsNavItem'
+            };
+            
+            const itemId = navItemMap[iconName];
+            if (itemId) {
+                const navItem = document.getElementById(itemId);
+                if (navItem) {
+                    navItem.classList.add('active');
+                }
+            }
+        }
+        
+        // 重置所有导航高亮
+        function resetNavHighlights() {
+            document.querySelectorAll('.bottom-nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+        
         // 监听beforeinstallprompt事件
         window.addEventListener('beforeinstallprompt', (e) => {
             // 不再阻止默认的Chrome安装提示
@@ -1375,7 +1529,7 @@
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         cursor: pointer;
         z-index: 1000;
-        display: none;
+        display: none; /* 隐藏，因为功能已移至底部导航 */
         align-items: center;
         justify-content: center;"
         onclick="togglePreview()">
@@ -1396,7 +1550,7 @@
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         cursor: pointer;
         z-index: 1000;
-        display: flex;
+        display: none; /* 隐藏，因为功能已移至底部导航 */
         align-items: center;
         justify-content: center;"
         onclick="toggleSettings()">
@@ -1405,13 +1559,16 @@
 
     <!-- 保留设置面板，但调整位置 -->
     <div id="settings-panel" class="glass-effect" style="
-        position: absolute;
-        top: 180px;
-        right: 20px;
+        position: fixed;
+        bottom: 70px;
+        right: 16px;
         width: 250px;
-        padding: 20px;
-        z-index: 1000;
-        display: none;">
+        padding: 15px;
+        border-radius: 10px;
+        z-index: 1001;
+        display: none;
+        max-height: calc(100% - 100px);
+        overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3 style="margin: 0; display: flex; align-items: center;">
                 <span class="material-icons-round" style="font-size: 20px; margin-right: 8px;">settings</span>Settings
@@ -1426,7 +1583,7 @@
             <div style="display: flex; gap: 10px;">
                 <button id="dark-mode-btn" 
                         onclick="changeTheme('dark')" 
-                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                        style="flex: 1; padding: 8px; border-radiuszz: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;">
                     <span class="material-icons-round" style="font-size: 16px;">dark_mode</span>
                     Dark Mode
                 </button>
@@ -1441,9 +1598,7 @@
         
         <!-- 添加低性能模式选项 -->
         <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 10px; display: flex; align-items: center;">
-                <span class="material-icons-round" style="font-size: 18px; margin-right: 8px;">speed</span>Performance Mode
-            </label>
+            <label style="display: block; margin-bottom: 10px;">Performance Mode</label>
             <div style="display: flex; gap: 10px;">
                 <button id="high-perf-btn" 
                         onclick="togglePerformanceMode(false)" 
@@ -1461,11 +1616,9 @@
         </div>
         
         <div>
-            <label style="display: block; margin-bottom: 10px; display: flex; align-items: center;">
-                <span class="material-icons-round" style="font-size: 18px; margin-right: 8px;">format_size</span>Font Size
-            </label>
+            <label style="display: block; margin-bottom: 10px;">Font Size</label>
             <div style="display: flex; align-items: center; gap: 10px;">
-                <span class="material-icons-round" style="font-size: 16px;">text_decrease</span>
+                <span style="font-size: 0.8em;">小</span>
                 <input type="range" 
                        id="font-size-selector" 
                        min="0" 
@@ -1474,7 +1627,7 @@
                        value="1"
                        style="flex-grow: 1;"
                        onchange="changeFontSize(this.value)">
-                <span class="material-icons-round" style="font-size: 20px;">text_increase</span>
+                <span style="font-size: 1.2em;">大</span>
             </div>
         </div>
 
@@ -1502,63 +1655,49 @@
     <h1>SmartProfits Stock Order</h1>
     <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
         <h3 style="margin: 0;">Select Shop</h3>
-        <!-- 这里保留设置按钮 -->
-        <div id="settings-button" style="
-            width: 40px;
-            height: 40px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;">
-            <span class="material-icons-round" style="font-size: 24px; color: rgba(255, 255, 255, 0.8);">settings</span>
-        </div>
+        <!-- 移除单独的设置按钮，因为我们已经在底部导航有设置按钮 -->
     </div>
 
     <div class="shop-container">
         <div class="shop-card" onclick="selectShop(this, '*JKL*')">
             <input type="radio" name="store" value="*JKL*" id="jkl">
             <label for="jkl">
-                <span class="shop-icon material-icons-round" style="font-size: 24px;">shopping_bag</span>
+                <span class="shop-icon">🛍️</span>
                 <span class="shop-name">JKL</span>
             </label>
         </div>
         <div class="shop-card" onclick="selectShop(this, '*TOM*')">
             <input type="radio" name="store" value="*TOM*" id="tom">
             <label for="tom">
-                <span class="shop-icon material-icons-round" style="font-size: 24px;">storefront</span>
+                <span class="shop-icon">🏬</span>
                 <span class="shop-name">TOM</span>
             </label>
         </div>
         <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Dalam*')">
             <input type="radio" name="store" value="*Ole-Ole Dalam*" id="ole">
             <label for="ole">
-                <span class="shop-icon material-icons-round" style="font-size: 24px;">store</span>
+                <span class="shop-icon">🏪</span>
                 <span class="shop-name">Ole-Ole Dalam</span>
             </label>
         </div>
         <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Luar*')">
             <input type="radio" name="store" value="*Ole-Ole Luar*" id="new">
             <label for="new">
-                <span class="shop-icon material-icons-round" style="font-size: 24px;">home</span>
+                <span class="shop-icon">🏠</span>
                 <span class="shop-name">Ole-Ole Luar</span>
             </label>
         </div>
         <div class="shop-card" onclick="selectShop(this, '*Wrapping(AA)*')">
             <input type="radio" name="store" value="*Wrapping(AA)*" id="aa">
             <label for="aa">
-                <span class="shop-icon material-icons-round" style="font-size: 24px;">card_giftcard</span>
+                <span class="shop-icon">🧳</span>
                 <span class="shop-name">Wrapping(AA)</span>
             </label>
         </div>
         <div class="shop-card" onclick="selectShop(this, '*Wrapping(MAS)*')">
             <input type="radio" name="store" value="*Wrapping(MAS)*" id="mas">
             <label for="mas">
-                <span class="shop-icon material-icons-round" style="font-size: 24px;">redeem</span>
+                <span class="shop-icon">🧳</span>
                 <span class="shop-name">Wrapping(MAS)</span>
             </label>
         </div>
@@ -1569,64 +1708,64 @@
         <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
             <input type="radio" name="category" value="BanHeang" id="banheang">
             <label for="banheang">
-                <span class="category-icon material-icons-round" style="font-size: 24px;">cookie</span>
+                <span class="category-icon">🍪</span>
                 <span>BanHeang</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'HopHup')">
             <input type="radio" name="category" value="HopHup" id="hophup">
             <label for="hophup">
-                <span class="category-icon material-icons-round" style="font-size: 24px;">bakery_dining</span>
+                <span class="category-icon">🥮</span>
                 <span>HopHup</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Chocolate')">
             <input type="radio" name="category" value="Chocolate" id="chocolate">
             <label for="chocolate">
-                <span class="category-icon material-icons-round" style="font-size: 24px;">restaurant</span>
+                <span class="category-icon">🍫</span>
                 <span>Chocolate</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Sotong')">
             <input type="radio" name="category" value="Sotong" id="sotong">
             <label for="sotong">
-                <span class="category-icon material-icons-round" style="font-size: 24px;">set_meal</span>
+                <span class="category-icon">🦑</span>
                 <span>Sotong</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Coffee')">
             <input type="radio" name="category" value="Coffee" id="coffee">
             <label for="coffee">
-                <span class="category-icon material-icons-round" style="font-size: 24px;">coffee</span>
+                <span class="category-icon">☕</span>
                 <span>Coffee</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Amplang')">
             <input type="radio" name="category" value="Amplang" id="amplang">
             <label for="amplang">
-                <span class="category-icon material-icons-round" style="font-size: 24px;">grain</span>
+                <span class="category-icon">🌕</span>
                 <span>Amplang</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Other')">
             <input type="radio" name="category" value="Other" id="other">
             <label for="other">
-                <span class="category-icon material-icons-round" style="font-size: 24px;">category</span>
+                <span class="category-icon">🎁</span>
                 <span>Other</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Wrapping')">
             <input type="radio" name="category" value="Wrapping" id="wrapping">
             <label for="Wrapping">
-                <span class="category-icon material-icons-round" style="font-size: 24px;">card_giftcard</span>
+                <span class="category-icon">🧸</span>
                 <span>Wrapping</span>
             </label>
         </div>
     </div>
 
-    <div style="position: relative; margin-bottom: 15px;">
-        <span class="material-icons-round" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.7); pointer-events: none; z-index: 10;">search</span>
-        <input type="text" id="productSearch" placeholder="Search..." oninput="searchProduct()" autocomplete="off" style="padding-left: 35px; width: 100%; box-sizing: border-box;" />
+    <div style="position: relative; margin-bottom: 15px; margin-top: 15px;">
+        <span class="material-icons" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5); pointer-events: none; z-index: 10;">search</span>
+        <input type="text" id="productSearch" placeholder="Search..." oninput="searchProduct()" autocomplete="off" style="padding-left: 35px; width: calc(100% - 35px); position: relative;" />
     </div>
     <div id="suggestions"></div>
     <h3>Select items (default quantity is 1）</h3>
@@ -2653,10 +2792,16 @@
                 previewWindow.style.display = 'block';
                 previewIcon.style.display = 'none';
                 allowAutoShow = true;  // 用户主动显示时，允许自动显示
+                
+                // 高亮底部导航栏中的订单预览按钮
+                highlightNavItem('receipt_long');
             } else {
                 previewWindow.style.display = 'none';
                 previewIcon.style.display = 'flex';
                 allowAutoShow = false;  // 用户主动关闭时，禁止自动显示
+                
+                // 重置底部导航高亮
+                resetNavHighlights();
             }
         }
 
@@ -2671,11 +2816,16 @@
         // 添加设置相关的函数
         function toggleSettings() {
             const panel = document.getElementById('settings-panel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                // 高亮底部导航栏中的设置按钮
+                highlightNavItem('settings');
+            } else {
+                panel.style.display = 'none';
+                // 重置底部导航高亮
+                resetNavHighlights();
+            }
         }
-
-        // 初始化设置按钮点击事件
-        document.getElementById('settings-button').addEventListener('click', toggleSettings);
 
         // 修改字体大小调整函数
         function changeFontSize(value) {
@@ -2729,12 +2879,23 @@
         // 添加点击外部关闭设置面板的功能
         document.addEventListener('click', function(event) {
             const settingsPanel = document.getElementById('settings-panel');
-            const settingsButton = document.getElementById('settings-button');
+            const userMenu = document.getElementById('user-menu');
+            const bottomNav = document.querySelector('.bottom-nav');
             
-            if (!settingsPanel.contains(event.target) && 
-                !settingsButton.contains(event.target) && 
-                settingsPanel.style.display === 'block') {
+            // 关闭设置面板
+            if (settingsPanel.style.display === 'block' && 
+                !settingsPanel.contains(event.target) && 
+                !bottomNav.contains(event.target)) {
                 settingsPanel.style.display = 'none';
+                resetNavHighlights();
+            }
+            
+            // 关闭用户菜单
+            if (userMenu.style.display === 'flex' && 
+                !userMenu.contains(event.target) && 
+                !bottomNav.contains(event.target)) {
+                userMenu.style.display = 'none';
+                resetNavHighlights();
             }
         });
 
@@ -3164,5 +3325,29 @@
             </div>
         </div>
     </div>
+
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <!-- 用户按钮 -->
+        <div class="bottom-nav-item" id="userNavItem" onclick="showUserInfo()">
+            <span class="material-icons">person</span>
+            <span class="label">User</span>
+        </div>
+        
+        <!-- 订单预览按钮 -->
+        <div class="bottom-nav-item" id="previewNavItem" onclick="togglePreview()">
+            <span class="material-icons">receipt_long</span>
+            <span class="label">订单预览</span>
+        </div>
+        
+        <!-- 设置按钮 -->
+        <div class="bottom-nav-item" id="settingsNavItem" onclick="toggleSettings()">
+            <span class="material-icons">settings</span>
+            <span class="label">设置</span>
+        </div>
+    </div>
+
+    <!-- 适配底部导航栏的内边距 -->
+    <div style="height: 70px;"></div>
 </body>
 </html>
