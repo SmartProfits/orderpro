@@ -19,6 +19,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
+    <!-- 替换玻璃效果和动画的CSS样式 -->
     <style>
         /* 去除滚动条但保留滚动功能 */
         html, body {
@@ -61,7 +62,7 @@
             height: 3px;
             background-color: #4285F4;
             transform: scaleX(0);
-            transition: transform 0.3s ease;
+            /* 移除过渡效果 */
         }
         
         .nav-item:hover {
@@ -77,29 +78,27 @@
         }
         
         .nav-item:active {
-            transform: scale(0.95);
+            /* 移除缩放效果 */
         }
         
-        /* 底部导航栏样式 - 从index2.html复制而来 */
+        /* 底部导航栏样式 - 扁平设计 */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             height: 60px;
-            background: rgba(20, 25, 40, 0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: #1a2035; /* 纯色背景 */
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 1000;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid #3a4255;
         }
 
         body:not(.dark-mode) .bottom-nav {
-            background: rgba(245, 245, 245, 0.9);
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            background: #f5f5f5; /* 纯色背景 */
+            border-top: 1px solid #e0e0e0;
         }
 
         .bottom-nav-item {
@@ -177,23 +176,16 @@
         function toggleDashboard() {
             const dashboard = document.getElementById('side-dashboard');
             const overlay = document.getElementById('dashboard-overlay');
-            const isOpen = dashboard.style.transform === 'translateX(0px)';
             
-            if (isOpen) {
+            if (dashboard.style.display === 'flex') {
                 // 关闭仪表板
-                dashboard.style.transform = 'translateX(-100%)';
-                overlay.style.opacity = '0';
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                }, 300);
+                dashboard.style.display = 'none';
+                overlay.style.display = 'none';
                 resetNavHighlights();
             } else {
-                // 打开仪表板，并更新用户信息
-                dashboard.style.transform = 'translateX(0px)';
+                // 打开仪表板
+                dashboard.style.display = 'flex';
                 overlay.style.display = 'block';
-                setTimeout(() => {
-                    overlay.style.opacity = '1';
-                }, 10);
                 
                 // 更新仪表板中的用户信息
                 updateDashboardUserInfo();
@@ -391,14 +383,14 @@
             }
         }
 
-        /* 添加全局背景渐变 */
+        /* 添加全局背景 */
         body {
             font-family: Arial, sans-serif;
             padding: 15px;
             margin: 0;
-            background: linear-gradient(135deg, #6e8efb, #ff8e8e);
+            background: #3a4b6b; /* 纯色背景替代渐变 */
             color: #333;
-            transition: background-color 0.3s, color 0.3s;
+            transition: none; /* 移除过渡动画 */
             min-height: 100vh;
         }
 
@@ -410,18 +402,16 @@
 
         /* 修改黑暗模式背景 */
         body.dark-mode {
-            background: linear-gradient(135deg, #1a1f35, #000000);
+            background: #1a1f35; /* 纯色背景替代渐变 */
             color: #e0e0e0;
         }
 
         /* 添加玻璃态效果的通用类 */
         .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            border-radius: 10px;
+            background: #2a3142; /* 深色纯色背景 */
+            border: 1px solid #3a4255;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
         }
 
         /* Light Mode 下的玻璃态效果和文字颜色 */
@@ -434,9 +424,9 @@
         body:not(.dark-mode) .contact-info,
         body:not(.dark-mode) .shop-card,
         body:not(.dark-mode) .category-card {
-            background: rgba(255, 255, 255, 0.95);  /* 近乎纯白的背景 */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);  /* 柔和的阴影 */
-            border: 1px solid rgba(0, 0, 0, 0.1);  /* 淡灰色边框 */
+            background: #ffffff;  /* 纯白色背景 */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);  /* 简化阴影 */
+            border: 1px solid #e0e0e0;  /* 淡灰色边框 */
             color: #333333;
         }
 
@@ -691,39 +681,28 @@
             font-size: 4rem;
             font-weight: bold;
             text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: #2a3142; /* 纯色背景 */
             padding: 20px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border-radius: 8px;
+            border: 1px solid #3a4255;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             margin: 20px auto;
             max-width: 80%;
             position: relative;
             overflow: hidden;
-            animation: glowingTitle 3s ease-in-out infinite;
         }
 
-        /* 添加标题动画效果 */
+        /* Light Mode 下的标题样式 */
+        body:not(.dark-mode) h1 {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            color: #333333;
+        }
+
+        /* 删除标题动画效果 */
         @keyframes glowingTitle {
-            0% {
-                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
-                             0 0 10px rgba(255, 255, 255, 0.8),
-                             0 0 15px rgba(255, 255, 255, 0.8);
-                transform: translateY(0);
-            }
-            50% {
-                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
-                             0 0 35px rgba(255, 255, 255, 0.8),
-                             0 0 40px rgba(255, 255, 255, 0.8);
-                transform: translateY(-5px);
-            }
-            100% {
-                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8),
-                             0 0 10px rgba(255, 255, 255, 0.8),
-                             0 0 15px rgba(255, 255, 255, 0.8);
-                transform: translateY(0);
+            0%, 50%, 100% {
+                /* 移除动画效果 */
             }
         }
 
@@ -810,14 +789,13 @@
             overflow: hidden;
         }
 
+        /* 删除卡片动画效果 */
         .shop-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.2);
+            background: #323a4e; /* 简单的颜色变化 */
         }
 
         .shop-card.selected {
             border: 2px solid #4CAF50;
-            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
         }
 
         .shop-card input[type="radio"] {
@@ -861,14 +839,13 @@
             overflow: hidden;
         }
 
+        /* 删除卡片动画效果 */
         .category-card:hover {
-            transform: translateY(-3px);
-            background: rgba(255, 255, 255, 0.2);
+            background: #323a4e; /* 简单的颜色变化 */
         }
 
         .category-card.selected {
             border: 2px solid #2196F3;
-            box-shadow: 0 0 15px rgba(33, 150, 243, 0.3);
         }
 
         .category-card input[type="radio"] {
@@ -976,18 +953,15 @@
         /* Light Mode 下卡片的悬停效果 */
         body:not(.dark-mode) .shop-card:hover,
         body:not(.dark-mode) .category-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background: #f5f5f5;
         }
 
-        /* Light Mode 下选中卡片的悬停效果 */
         body:not(.dark-mode) .shop-card.selected:hover {
-            background: rgba(76, 175, 80, 0.15);  /* 稍深的淡绿色背景 */
+            background: #f0f9f0;
         }
 
         body:not(.dark-mode) .category-card.selected:hover {
-            background: rgba(33, 150, 243, 0.15);  /* 稍深的淡蓝色背景 */
+            background: #f0f5fd;
         }
 
         /* 设置面板的样式 */
@@ -1564,8 +1538,12 @@
         overflow-y: auto;
         z-index: 1000;
         padding: 15px;
-        display: none;"
-        class="glass-effect">
+        display: none;
+        background: #2a3142; /* 纯色背景替代半透明 */
+        border: 1px solid #3a4255;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        color: #ffffff;">
         <div class="preview-header">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <span class="material-icons-round" style="font-size: 20px;">receipt_long</span>
@@ -1580,7 +1558,7 @@
             <span class="material-icons-round" style="cursor: pointer; font-size: 22px;" onclick="togglePreview()">close</span>
         </div>
         <div id="preview-content"></div>
-        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.2);">
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #3a4255;">
             <button class="whatsapp-button" onclick="copyAndSendWhatsApp()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
                 <span class="material-icons-round" style="font-size: 18px;">content_copy</span>
                 Copy And Paste to WhatsApp
@@ -1613,17 +1591,21 @@
     </div>
 
     <!-- 保留设置面板，但调整位置 -->
-    <div id="settings-panel" class="glass-effect" style="
+    <div id="settings-panel" style="
         position: fixed;
         bottom: 70px;
         right: 16px;
         width: 250px;
         padding: 15px;
-        border-radius: 10px;
+        border-radius: 8px;
         z-index: 1001;
         display: none;
         max-height: calc(100% - 100px);
-        overflow-y: auto;">
+        overflow-y: auto;
+        background: #2a3142; /* 纯色背景 */
+        border: 1px solid #3a4255;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        color: #ffffff;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3 style="margin: 0; display: flex; align-items: center;">
                 <span class="material-icons-round" style="font-size: 20px; margin-right: 8px;">settings</span>Settings
@@ -1653,7 +1635,9 @@
         
         <!-- 添加低性能模式选项 -->
         <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 10px;">Performance Mode</label>
+            <label style="display: block; margin-bottom: 10px; display: flex; align-items: center;">
+                <span class="material-icons-round" style="font-size: 18px; margin-right: 8px;">speed</span>Performance
+            </label>
             <div style="display: flex; gap: 10px;">
                 <button id="high-perf-btn" 
                         onclick="togglePerformanceMode(false)" 
@@ -1670,25 +1654,8 @@
             </div>
         </div>
         
-        <div>
-            <label style="display: block; margin-bottom: 10px;">Font Size</label>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="display: flex; align-items: center; justify-content: center;">
-                    <span class="material-icons-round" style="font-size: 16px;">text_decrease</span>
-                </span>
-                <input type="range" 
-                       id="font-size-selector" 
-                       min="0" 
-                       max="2" 
-                       step="1" 
-                       value="1"
-                       style="flex-grow: 1;"
-                       onchange="changeFontSize(this.value)">
-                <span style="display: flex; align-items: center; justify-content: center;">
-                    <span class="material-icons-round" style="font-size: 20px;">text_increase</span>
-                </span>
-            </div>
-        </div>
+
+        
 
         <div style="margin-top: 20px;">
             <label style="display: block; margin-bottom: 10px; display: flex; align-items: center;">
@@ -1709,6 +1676,28 @@
                 </button>
             </div>
         </div>
+        <div style="margin-top: 20px;">
+            <label style="display: block; margin-bottom: 10px; display: flex; align-items: center;">
+                <span class="material-icons-round" style="font-size: 18px; margin-right: 8px;">format_size</span>Font Size
+            </label>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="display: flex; align-items: center; justify-content: center;">
+                    <span class="material-icons-round" style="font-size: 16px;">text_decrease</span>
+                </span>
+                <input type="range" 
+                       id="font-size-selector" 
+                       min="0" 
+                       max="2" 
+                       step="1" 
+                       value="1"
+                       style="flex-grow: 1;"
+                       onchange="changeFontSize(this.value)">
+                <span style="display: flex; align-items: center; justify-content: center;">
+                    <span class="material-icons-round" style="font-size: 20px;">text_increase</span>
+                </span>
+            </div>
+        </div>
+        
     </div>
 
     <h1>SmartProfits Stock Order</h1>
@@ -3416,21 +3405,17 @@
     </div>
 
     <!-- 左侧仪表板 -->
-    <div id="side-dashboard" class="glass-effect" style="
+    <div id="side-dashboard" style="
         position: fixed;
         top: 0;
         left: 0;
         width: 280px;
         height: 100%;
-        background: rgba(20, 25, 40, 0.85);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
+        background: #1a2035; /* 纯色背景替代半透明 */
         z-index: 1500;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        display: flex;
+        display: none; /* 直接用display控制显示/隐藏，不用transform和transition */
         flex-direction: column;
-        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        border-right: 1px solid #3a4255;
         overflow-y: auto;">
         
         <!-- 仪表板头部 -->
