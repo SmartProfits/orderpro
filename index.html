@@ -1058,48 +1058,6 @@
             background: rgba(0, 0, 0, 0.1);
         }
 
-        /* 低性能模式的样式 */
-        .low-perf-mode .glass-effect,
-        .low-perf-mode #productList div,
-        .low-perf-mode button,
-        .low-perf-mode #result,
-        .low-perf-mode #productSearch,
-        .low-perf-mode #suggestions,
-        .low-perf-mode .contact-info,
-        .low-perf-mode .shop-card,
-        .low-perf-mode .category-card,
-        .low-perf-mode #settings-panel,
-        .low-perf-mode #preview-window,
-        .low-perf-mode #preview-icon {
-            /* 替换所有磨砂玻璃效果为简单半透明背景 */
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-            background: rgba(255, 255, 255, 0.8) !important;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
-        }
-
-        /* 深色模式下的低性能样式 */
-        .low-perf-mode.dark-mode .glass-effect,
-        .low-perf-mode.dark-mode #productList div,
-        .low-perf-mode.dark-mode button,
-        .low-perf-mode.dark-mode #result,
-        .low-perf-mode.dark-mode #productSearch,
-        .low-perf-mode.dark-mode #suggestions,
-        .low-perf-mode.dark-mode .contact-info,
-        .low-perf-mode.dark-mode .shop-card,
-        .low-perf-mode.dark-mode .category-card,
-        .low-perf-mode.dark-mode #settings-panel,
-        .low-perf-mode.dark-mode #preview-window,
-        .low-perf-mode.dark-mode #preview-icon {
-            background: rgba(30, 30, 30, 0.8) !important;
-        }
-
-        /* 禁用所有动画效果 */
-        .low-perf-mode * {
-            animation: none !important;
-            transition: none !important;
-        }
-
         /* 登录和注册界面样式 */
         .auth-container {
             position: fixed;
@@ -1633,30 +1591,8 @@
             </div>
         </div>
         
-        <!-- 添加低性能模式选项 -->
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 10px; display: flex; align-items: center;">
-                <span class="material-icons-round" style="font-size: 18px; margin-right: 8px;">speed</span>Performance
-            </label>
-            <div style="display: flex; gap: 10px;">
-                <button id="high-perf-btn" 
-                        onclick="togglePerformanceMode(false)" 
-                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                    <span class="material-icons-round" style="font-size: 16px;">hd</span>
-                    High
-                </button>
-                <button id="low-perf-btn" 
-                        onclick="togglePerformanceMode(true)" 
-                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                    <span class="material-icons-round" style="font-size: 16px;">rocket</span>
-                    Smooth
-                </button>
-            </div>
-        </div>
+        <!-- 删除了低性能模式选项 -->
         
-
-        
-
         <div style="margin-top: 20px;">
             <label style="display: block; margin-bottom: 10px; display: flex; align-items: center;">
                 <span class="material-icons-round" style="font-size: 18px; margin-right: 8px;">vibration</span>Vibration
@@ -2614,12 +2550,12 @@
                 if (hasAddOn) {
                     result += ' 💥Add On💥';
                 }
-                result += '\n\n';
-                // 添加Order By信息
+                result += '\n';
+                // 添加Order By信息，不空行
                 result += 'Order By: (' + userName + ')\n\n';
             } else {
                 result += 'Kedai: 未选择\n';
-                // 添加Order By信息
+                // 添加Order By信息，不空行
                 result += 'Order By: (' + userName + ')\n\n';
             }
 
@@ -2642,11 +2578,8 @@
                             stock: stock
                         });
 
-                        if (category === 'Chocolate') {
-                            totalItems += 1;
-                        } else {
-                            totalItems += parseInt(quantity);
-                        }
+                        // 修复totalItems计算，确保每个商品都被计入
+                        totalItems += parseInt(quantity);
                         break;
                     }
                 }
@@ -2673,7 +2606,7 @@
                 }
             }
 
-            result += '\nAirport Stock Order: smartprofits.github.io/order/';
+            result += '\n_App Version 1.1_';
             return result;
         }
 
@@ -2802,10 +2735,7 @@
         }
 
         function addRippleEffect(element, event) {
-            // 在低性能模式下不添加涟漪效果
-            if (document.body.classList.contains('low-perf-mode')) {
-                return;
-            }
+            // 删除了低性能模式检查
             
             const ripple = document.createElement('div');
             ripple.classList.add('ripple');
@@ -2907,9 +2837,7 @@
             const isVibrationEnabled = localStorage.getItem('vibration-enabled') !== 'disabled';
             toggleVibration(isVibrationEnabled);
             
-            // 加载性能模式设置
-            const isLowPerfMode = localStorage.getItem('lowPerfMode') === 'true';
-            togglePerformanceMode(isLowPerfMode);
+            // 删除了性能模式设置的代码
         });
 
         // 修改主题切换函数
@@ -2969,38 +2897,6 @@
                 }
             }
         });
-
-        // 添加低性能模式的处理逻辑
-        const lowPerfModeToggle = document.getElementById('lowPerfModeToggle');
-        lowPerfModeToggle.addEventListener('change', function() {
-            if (this.checked) {
-                document.body.classList.add('low-perf-mode');
-            } else {
-                document.body.classList.remove('low-perf-mode');
-            }
-            // 保存设置到 localStorage
-            localStorage.setItem('lowPerfMode', this.checked);
-        });
-
-        // 页面加载时检查之前的设置
-        if (localStorage.getItem('lowPerfMode') === 'true') {
-            lowPerfModeToggle.checked = true;
-            document.body.classList.add('low-perf-mode');
-        }
-
-        // 添加性能模式切换函数
-        function togglePerformanceMode(isLowPerf) {
-            if (isLowPerf) {
-                document.body.classList.add('low-perf-mode');
-                document.getElementById('low-perf-btn').style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-                document.getElementById('high-perf-btn').style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-            } else {
-                document.body.classList.remove('low-perf-mode');
-                document.getElementById('low-perf-btn').style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                document.getElementById('high-perf-btn').style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-            }
-            localStorage.setItem('lowPerfMode', isLowPerf);
-        }
 
         // 打开管理员面板
         function openAdminPanel() {
