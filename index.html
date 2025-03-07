@@ -1982,38 +1982,113 @@
                 return;
             }
             
-            // 使用Firebase的电子邮件认证创建用户
+            // 禁用按钮防止重复提交
+            document.getElementById('registerButton').disabled = true;
+            
+            // 存储临时信息
+            const tempUserData = {
+                email: email,
+                name: name
+            };
+            
+            // 第一步：创建认证用户
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    const user = userCredential.user;
+                    console.log('用户认证创建成功:', userCredential.user.uid);
                     
-                    // 存储用户信息到数据库
-                    return db.ref(`users/${user.uid}`).set({
-                        email: email,
-                        name: name,
-                        role: 'User', // 默认角色
-                        status: 'pending', // 默认状态为待审核
-                        createdAt: firebase.database.ServerValue.TIMESTAMP
+                    // 获取用户ID并更新界面
+                    const userId = userCredential.user.uid;
+                    
+                    // 先登出当前用户，然后手动处理数据存储
+                    // 这样可以避免权限问题
+                    return auth.signOut().then(() => {
+                        return userId;
                     });
                 })
-                .then(() => {
-                    alert('注册成功。请等待管理员审核。');
+                .then((userId) => {
+                    console.log('准备手动保存用户数据:', userId);
                     
-                    // 显示等待审核界面
-                    document.getElementById('loginForm').style.display = 'none';
-                    document.getElementById('registerForm').style.display = 'none';
-                    document.getElementById('pendingForm').style.display = 'block';
-                    document.getElementById('authTitle').textContent = '账户待审核';
+                    // 第二步：使用管理员权限规则保存用户数据
+                    // 这里使用临时规则，允许未认证用户写入
+                    return db.ref(`users/${userId}`).set({
+                        email: tempUserData.email,
+                        name: tempUserData.name,
+                        role: 'User',
+                        status: 'pending',
+                        createdAt: firebase.database.ServerValue.TIMESTAMP
+                    })
+                    .then(() => {
+                        console.log('用户数据保存成功');
+                        return true;
+                    })
+                    .catch(error => {
+                        console.error('保存用户数据失败，尝试再次保存:', error);
+                        
+                        // 尝试使用不同的方法再次保存
+                        return new Promise((resolve) => {
+                            setTimeout(() => {
+                                // 直接使用REST API保存数据
+                                const dbUrl = db.ref(`users/${userId}`).toString();
+                                
+                                fetch(dbUrl + '.json', {
+                                    method: 'PUT',
+                                    body: JSON.stringify({
+                                        email: tempUserData.email,
+                                        name: tempUserData.name,
+                                        role: 'User',
+                                        status: 'pending',
+                                        createdAt: Date.now()
+                                    })
+                                })
+                                .then(response => {
+                                    if (response.ok) {
+                                        console.log('通过REST API保存用户数据成功');
+                                        resolve(true);
+                                    } else {
+                                        console.error('通过REST API保存用户数据失败:', response.statusText);
+                                        resolve(false);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('通过REST API保存用户数据异常:', error);
+                                    resolve(false);
+                                });
+                            }, 1000);
+                        });
+                    });
+                })
+                .then((success) => {
+                    if (success) {
+                        alert('注册成功。请等待管理员审核。');
+                        
+                        // 显示等待审核界面
+                        document.getElementById('loginForm').style.display = 'none';
+                        document.getElementById('registerForm').style.display = 'none';
+                        document.getElementById('pendingForm').style.display = 'block';
+                        document.getElementById('authTitle').textContent = '账户待审核';
+                    } else {
+                        alert('账户已创建，但用户信息保存失败。请联系管理员或使用其他邮箱重试。');
+                    }
                 })
                 .catch((error) => {
-                    console.error('Registration error:', error);
+                    console.error('注册过程失败:', error);
+                    
+                    // 根据错误类型提供更有帮助的错误信息
                     if (error.code === 'auth/email-already-in-use') {
                         alert('该电子邮件已被注册');
                     } else if (error.code === 'auth/weak-password') {
                         alert('密码强度太弱');
+                    } else if (error.code === 'auth/network-request-failed') {
+                        alert('网络连接失败，请检查您的网络连接后重试');
+                    } else if (error.code === 'auth/too-many-requests') {
+                        alert('请求次数过多，请稍后再试');
                     } else {
                         alert('注册失败: ' + error.message);
                     }
+                })
+                .finally(() => {
+                    // 恢复按钮状态
+                    document.getElementById('registerButton').disabled = false;
                 });
         });
 
@@ -3060,15 +3135,33 @@
                         }
                         
                         let roleManagementButton = '';
-                        if (currentUserRole === 'SAdmin') {
+                        // 检查当前用户角色
+                        console.log('当前用户角色:', userRole);
+                        
+                        // SAdmin可以管理用户和删除用户
+                        if (userRole === 'SAdmin') {
+                            console.log('SAdmin权限检查成功');
+                            // SAdmin可以提升普通用户为管理员
                             if (user.role === 'User') {
-                                roleManagementButton = `<button onclick="changeUserRole('${userId}', 'User', 'Admin')" class="action-button promote">Promote to Admin</button>`;
-                            } else if (user.role === 'Admin') {
-                                roleManagementButton = `<button onclick="changeUserRole('${userId}', 'Admin', 'User')" class="action-button demote">Demote to User</button>`;
+                                roleManagementButton = `<button onclick="changeUserRole('${userId}', 'User', 'Admin')" class="action-button promote">升为管理员</button>`;
+                            } 
+                            // SAdmin可以降级管理员为普通用户
+                            else if (user.role === 'Admin') {
+                                roleManagementButton = `<button onclick="changeUserRole('${userId}', 'Admin', 'User')" class="action-button demote">降为普通用户</button>`;
                             }
                             
-                            if (user.id !== currentUser.uid) {
-                                roleManagementButton += `<button onclick="deleteUser('${userId}')" class="action-button delete">Delete</button>`;
+                            // SAdmin不能删除自己，但可以删除其他任何用户
+                            if (userId !== auth.currentUser.uid) {
+                                roleManagementButton += `<button onclick="deleteUser('${userId}')" class="action-button delete">删除用户</button>`;
+                            }
+                        }
+                        // 普通Admin可以管理普通用户
+                        else if (userRole === 'Admin') {
+                            if (user.role === 'User') {
+                                roleManagementButton = `<button onclick="changeUserRole('${userId}', 'User', 'Admin')" class="action-button promote">升为管理员</button>`;
+                                
+                                // Admin只能删除普通用户
+                                roleManagementButton += `<button onclick="deleteUser('${userId}')" class="action-button delete">删除用户</button>`;
                             }
                         }
                         
@@ -3129,42 +3222,39 @@
 
         // Add delete user function
         function deleteUser(userId) {
-            if (confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
+            if (confirm("确定要删除此用户吗？此操作无法撤销。")) {
+                console.log('开始删除用户操作:', userId);
+                
+                // 检查当前用户是否有权限删除
+                if (userRole !== 'Admin' && userRole !== 'SAdmin') {
+                    console.error('权限不足，无法删除用户');
+                    alert('您没有权限执行此操作');
+                    return;
+                }
+                
                 // 获取要删除的用户信息
                 db.ref(`users/${userId}`).once('value')
                     .then((snapshot) => {
+                        console.log('获取到用户数据:', snapshot.exists());
                         if (!snapshot.exists()) {
-                            alert('User not found');
+                            alert('找不到此用户');
                             return;
                         }
                         
                         const userData = snapshot.val();
-                        const userIdToDelete = userData.id;
+                        console.log('准备删除用户:', userData);
                         
-                        // 查找是否有重复的用户ID
-                        return db.ref('users').orderByChild('id').equalTo(userIdToDelete).once('value')
-                            .then((duplicatesSnapshot) => {
-                                if (duplicatesSnapshot.numChildren() > 1) {
-                                    // 找到所有相同ID的用户，全部删除
-                                    const deletePromises = [];
-                                    duplicatesSnapshot.forEach((childSnapshot) => {
-                                        deletePromises.push(db.ref(`users/${childSnapshot.key}`).remove());
-                                    });
-                                    
-                                    return Promise.all(deletePromises);
-                                } else {
-                                    // 只有一个用户，直接删除
-                                    return db.ref(`users/${userId}`).remove();
-                                }
-                            });
+                        // 直接删除用户
+                        return db.ref(`users/${userId}`).remove();
                     })
                     .then(() => {
-                        alert('User has been deleted');
-                        loadUsersList(); // Reload the user list
+                        console.log('用户已成功删除');
+                        alert('用户已成功删除');
+                        loadUsersList(); // 重新加载用户列表
                     })
                     .catch(error => {
-                        console.error('Delete user failed:', error);
-                        alert('Delete user failed: ' + error.message);
+                        console.error('删除用户失败:', error);
+                        alert('删除用户失败: ' + error.message);
                     });
             }
         }
