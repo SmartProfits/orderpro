@@ -3138,7 +3138,7 @@
                         // 检查当前用户角色
                         console.log('当前用户角色:', userRole);
                         
-                        // SAdmin可以管理用户和删除用户
+                        // 只有SAdmin可以管理用户角色和删除用户
                         if (userRole === 'SAdmin') {
                             console.log('SAdmin权限检查成功');
                             // SAdmin可以提升普通用户为管理员
@@ -3151,18 +3151,15 @@
                             }
                             
                             // SAdmin不能删除自己，但可以删除其他任何用户
-                            if (userId !== auth.currentUser.uid) {
+                            if (userId !== currentUser.uid) {
                                 roleManagementButton += `<button onclick="deleteUser('${userId}')" class="action-button delete">删除用户</button>`;
                             }
                         }
-                        // 普通Admin可以管理普通用户
+                        // Admin没有管理用户的权限
                         else if (userRole === 'Admin') {
-                            if (user.role === 'User') {
-                                roleManagementButton = `<button onclick="changeUserRole('${userId}', 'User', 'Admin')" class="action-button promote">升为管理员</button>`;
-                                
-                                // Admin只能删除普通用户
-                                roleManagementButton += `<button onclick="deleteUser('${userId}')" class="action-button delete">删除用户</button>`;
-                            }
+                            // Admin不能升级/降级用户角色
+                            // Admin不能删除用户
+                            console.log('Admin角色没有用户管理权限');
                         }
                         
                         allHtml += `
@@ -3207,28 +3204,38 @@
         
         // 修改用户角色
         function changeUserRole(userId, currentRole, newRole) {
-            if (confirm(`Are you sure you want to change this user's role from ${currentRole} to ${newRole}?`)) {
+            if (confirm(`确定要将此用户角色从 ${currentRole} 变更为 ${newRole} 吗？`)) {
+                console.log(`准备将用户角色从 ${currentRole} 变更为 ${newRole}`);
+                
+                // 检查当前用户是否有SAdmin权限
+                if (userRole !== 'SAdmin') {
+                    console.error('权限不足，只有超级管理员才能变更用户角色');
+                    alert('权限不足: 只有超级管理员才能变更用户角色');
+                    return;
+                }
+                
                 db.ref(`users/${userId}`).update({
                     role: newRole
                 }).then(() => {
-                    alert(`User role updated to ${newRole}`);
+                    console.log('用户角色已成功变更');
+                    alert('用户角色已更新');
                     loadUsersList(); // 重新加载用户列表
                 }).catch(error => {
-                    console.error('Role update failed:', error);
-                    alert('Role update failed: ' + error.message);
+                    console.error('角色更新失败:', error);
+                    alert('角色更新失败: ' + error.message);
                 });
             }
         }
 
-        // Add delete user function
+        // 删除用户函数
         function deleteUser(userId) {
             if (confirm("确定要删除此用户吗？此操作无法撤销。")) {
                 console.log('开始删除用户操作:', userId);
                 
-                // 检查当前用户是否有权限删除
-                if (userRole !== 'Admin' && userRole !== 'SAdmin') {
-                    console.error('权限不足，无法删除用户');
-                    alert('您没有权限执行此操作');
+                // 检查当前用户是否有SAdmin权限
+                if (userRole !== 'SAdmin') {
+                    console.error('权限不足，只有超级管理员才能删除用户');
+                    alert('权限不足: 只有超级管理员才能删除用户');
                     return;
                 }
                 
