@@ -151,6 +151,261 @@
             display: none;
             width: 0;
         }
+        
+        /* 布局切换按钮样式 */
+        .view-toggle-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .view-toggle-btn.active {
+            background: rgba(66, 133, 244, 0.5);
+            border-color: rgba(66, 133, 244, 0.7);
+            box-shadow: 0 0 5px rgba(66, 133, 244, 0.5);
+        }
+        
+        body:not(.dark-mode) .view-toggle-btn {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        body:not(.dark-mode) .view-toggle-btn.active {
+            background: rgba(66, 133, 244, 0.3);
+            border-color: rgba(66, 133, 244, 0.5);
+        }
+        
+        /* 网格视图样式 */
+        #productList.grid-view {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        #productList.grid-view > div {
+            /* 基本卡片容器样式 */
+            background: rgba(255, 255, 255, 0.1); /* 恢复半透明背景 */
+            padding: 15px;
+            border-radius: 10px; /* 恢复原始圆角 */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 恢复原始阴影 */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 180px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden; /* 防止内容溢出 */
+        }
+        
+        body:not(.dark-mode) #productList.grid-view > div {
+            background: rgba(0, 0, 0, 0.05); /* 保持非暗黑模式下的半透明样式 */
+        }
+        
+        #productList.grid-view .product-image {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            object-fit: cover;
+            background-color: #3a4255;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #productList.grid-view .product-image span {
+            font-size: 40px;
+        }
+        
+        #productList.grid-view input[type="checkbox"] {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+        }
+        
+        #productList.grid-view .product-name {
+            margin-top: 5px;
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+            /* 确保高度一致，溢出文本设置省略号 */
+            height: 2.4em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        #productList.grid-view .stock-info {
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 0.85em;
+            margin-top: 2px;
+            margin-bottom: 8px;
+            color: #00CED1 !important; /* 默认显示青色 */
+        }
+        
+        #productList.grid-view .stock-info.zero-stock {
+            color: #ff4444 !important; /* 无库存显示红色 */
+        }
+        
+        body.dark-mode #productList.grid-view .stock-info.zero-stock {
+            color: #ff4444 !important; /* 黑暗模式下无库存保持红色 */
+        }
+        
+        #productList.grid-view .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        #productList.grid-view .quantity-btn {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        @media (max-width: 768px) {
+            #productList.grid-view {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px; /* 减小间距以增加卡片空间 */
+                padding: 0 5px; /* 减小外边距 */
+            }
+            
+            #productList.grid-view > div {
+                /* 确保在两列时卡片大小一致 */
+                min-height: 200px;
+                height: 100%;
+                width: 100%; /* 确保卡片占满列宽 */
+                max-width: 100%; /* 防止溢出 */
+                box-sizing: border-box; /* 确保内边距计入宽度 */
+            }
+            
+            #productList.grid-view .product-name {
+                font-size: 0.95rem; /* 稍微缩小字体 */
+                line-height: 1.2; /* 减小行高 */
+                height: 2.4em; /* 2行高度限制 */
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2; /* 限制为两行 */
+                margin-bottom: 4px;
+            }
+            
+            #productList.grid-view .price {
+                font-size: 0.9rem; /* 稍微减小价格字体 */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #productList.grid-view {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px; /* 在小屏幕上进一步减小间距 */
+                padding: 0; /* 移除外边距 */
+            }
+            
+            #productList.grid-view > div {
+                padding: 10px; /* 减小内边距以增加内容区域 */
+                min-height: 180px;
+                width: 100%; /* 确保卡片占满列宽 */
+            }
+            
+            #productList.grid-view .product-image {
+                width: 55px; /* 稍微减小图片尺寸 */
+                height: 55px;
+            }
+            
+            #productList.grid-view .product-name {
+                font-size: 0.9rem; /* 进一步缩小字体 */
+                -webkit-line-clamp: 2; /* 仍保持两行 */
+                margin: 3px 0;
+            }
+            
+            #productList.grid-view .price {
+                font-size: 0.85rem; /* 更小的价格字体 */
+            }
+            
+            #productList.grid-view .stock-info {
+                font-size: 0.8em; /* 减小库存信息字体 */
+                margin: 1px 0 5px 0; /* 缩小边距 */
+            }
+            
+            #productList.grid-view .product-buttons {
+                display: flex;
+                justify-content: center;
+                gap: 5px; /* 减小按钮间距 */
+            }
+            
+            #productList.grid-view button {
+                padding: 4px 8px; /* 减小按钮内边距 */
+                font-size: 0.8rem; /* 减小按钮字体 */
+            }
+        }
+
+        #productList.grid-view .view-image-btn {
+            display: none !important;
+        }
+
+        /* 确保网格视图中产品图片不受view-image-btn的影响 */
+        #productList.grid-view label {
+            margin-top: 5px;
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* 为网格视图添加产品名称和库存的样式 */
+        #productList.grid-view .product-name {
+            margin-top: 5px;
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #productList.grid-view .stock-info {
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 0.85em;
+            margin-top: 2px;
+            margin-bottom: 8px;
+            color: #00CED1 !important; /* 默认显示青色 */
+        }
+
+        #productList.grid-view .stock-info.zero-stock {
+            color: #ff4444 !important; /* 无库存显示红色 */
+        }
+
+        /* 黑暗模式下网格视图的库存信息颜色 */
+        body.dark-mode #productList.grid-view .stock-info {
+            color: #00CED1; /* 黑暗模式下保持青色 */
+        }
+
+        body.dark-mode #productList.grid-view .stock-info.zero-stock {
+            color: #ff4444; /* 黑暗模式下无库存保持红色 */
+        }
     </style>
     
     <script>
@@ -345,9 +600,11 @@
         .shop-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr) !important; /* 强制2列 */
-            gap: 20px;
-            margin: 20px 0;
+            gap: 12px; /* 减小间距 */
+            margin: 15px 0;
             width: 100%;
+            padding: 0 5px; /* 添加少量内边距 */
+            box-sizing: border-box;
         }
 
         .container {
@@ -1927,6 +2184,17 @@
         <span class="material-icons" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5); pointer-events: none; z-index: 10;">search</span>
         <input type="text" id="productSearch" placeholder="Search..." oninput="searchProduct()" autocomplete="off" style="padding-left: 35px; width: calc(100% - 35px); position: relative;" />
     </div>
+
+    <!-- 添加布局切换按钮 -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 10px; gap: 10px;">
+        <button id="listViewBtn" onclick="toggleView('list')" class="view-toggle-btn active">
+            <span class="material-icons">view_list</span>
+        </button>
+        <button id="gridViewBtn" onclick="toggleView('grid')" class="view-toggle-btn">
+            <span class="material-icons">grid_view</span>
+        </button>
+    </div>
+
     <div id="suggestions"></div>
     <h3>Select items (default quantity is 1）</h3>
     <div id="productList"></div>
@@ -2443,9 +2711,6 @@
                     
                     // 更新所有商品的显示
                     for (const [productId, product] of Object.entries(window.allProducts || {})) {
-                        const label = document.querySelector(`label[for="item${product.id}"]`);
-                        if (!label) continue;
-                        
                         // 检查是否是新品
                         const isNew = newProductsData[product.id];
                         const newUntil = isNew ? new Date(isNew.until) : null;
@@ -2466,14 +2731,34 @@
                         const stockClass = stock === 0 ? 'zero-stock' : '';
                         const stockText = stock === 0 ? '(No Stock)' : `(Stock: ${stock})`;
                         
-                        // 添加查看图片按钮（如果有图片URL）
-                        const viewImageButton = product.imageUrl ? 
-                            `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">
-                                <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 3px;">image</span>View
-                            </button>` : '';
-                        
-                        // 更新标签内容，将新品标记放在库存文本旁边
-                        label.innerHTML = `${product.name} <span class="${stockClass}">${stockText} ${newBadge}</span> ${viewImageButton}`;
+                        // 区分网格视图和列表视图的更新方式
+                        if (currentView === 'grid') {
+                            // 网格视图：更新独立的stock-info元素
+                            const stockElement = document.getElementById(`stock${product.id}`);
+                            if (stockElement) {
+                                stockElement.className = `stock-info ${stockClass}`;
+                                stockElement.innerHTML = `${stockText} ${newBadge}`;
+                            }
+                            
+                            // 确保产品名称正确显示
+                            const nameElement = document.querySelector(`span.product-name[for="item${product.id}"]`);
+                            if (nameElement) {
+                                nameElement.innerHTML = product.name;
+                            }
+                        } else {
+                            // 列表视图：更新label内容
+                            const label = document.querySelector(`label[for="item${product.id}"]`);
+                            if (!label) continue;
+                            
+                            // 添加查看图片按钮（如果有图片URL）
+                            const viewImageButton = product.imageUrl ? 
+                                `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">
+                                    <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 3px;">image</span>View
+                                </button>` : '';
+                            
+                            // 更新标签内容，将新品标记放在库存文本旁边
+                            label.innerHTML = `${product.name} <span class="${stockClass}">${stockText} ${newBadge}</span> ${viewImageButton}`;
+                        }
                     }
                 })
                 .catch(error => {
@@ -2696,23 +2981,60 @@
                 const defaultQuantity = product.defaultQuantity || 1;
                 const currentQuantity = selectedItems[product.id] || defaultQuantity;
                 
-                div.innerHTML = `
-                    <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
-                    <label for="item${product.id}">
-                        ${product.name}
-                    </label>
-                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">
-                        <span class="material-icons-round" style="font-size: 18px;">add</span>
-                    </button>
-                    <input type="number"
-                           id="quantity${product.id}"
-                           min="1"
-                           value="${currentQuantity}"
-                           readonly>
-                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">
-                        <span class="material-icons-round" style="font-size: 18px;">remove</span>
-                    </button>
-                `;
+                if (currentView === 'grid') {
+                    // 网格视图的HTML模板
+                    const hasImage = product.imageUrl ? true : false;
+                    const imageHTML = hasImage ? 
+                        `<img src="${product.imageUrl}" alt="${product.name}" class="product-image">` : 
+                        `<div class="product-image"><span class="material-icons">inventory_2</span></div>`;
+                    
+                    // 在网格视图中，使用独立的元素显示产品名称和库存信息
+                    div.innerHTML = `
+                        <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
+                        ${imageHTML}
+                        <span class="product-name" for="item${product.id}" onclick="document.getElementById('item${product.id}').click()">${product.name}</span>
+                        <span class="stock-info" id="stock${product.id}"></span>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">
+                                <span class="material-icons-round" style="font-size: 18px;">add</span>
+                            </button>
+                            <input type="number"
+                                   id="quantity${product.id}"
+                                   min="1"
+                                   value="${currentQuantity}"
+                                   readonly>
+                            <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">
+                                <span class="material-icons-round" style="font-size: 18px;">remove</span>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // 列表视图的原始HTML
+                    const viewImageButton = product.imageUrl ? 
+                        `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">
+                            <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 3px;">image</span>View
+                        </button>` : '';
+                    
+                    div.innerHTML = `
+                        <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
+                        <label for="item${product.id}">
+                            ${product.name}
+                            ${viewImageButton}
+                        </label>
+                        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">
+                            <span class="material-icons-round" style="font-size: 18px;">add</span>
+                        </button>
+                        <input type="number"
+                               id="quantity${product.id}"
+                               min="1"
+                               value="${currentQuantity}"
+                               readonly>
+                        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">
+                            <span class="material-icons-round" style="font-size: 18px;">remove</span>
+                        </button>
+                    `;
+                }
+                
                 productList.appendChild(div);
             });
             
@@ -2731,33 +3053,63 @@
                 const defaultQuantity = product.defaultQuantity || 1;
                 const currentQuantity = selectedItems[product.id] || defaultQuantity;
                 
-                // 添加查看图片按钮
-                const viewImageButton = product.imageUrl ? 
-                    `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">
-                        <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 3px;">image</span>View
-                    </button>` : '';
-
-                div.innerHTML = `
-                    <div style="position: relative;">
+                if (currentView === 'grid') {
+                    // 网格视图的HTML模板 - 确保不显示View按钮
+                    const hasImage = product.imageUrl ? true : false;
+                    const imageHTML = hasImage ? 
+                        `<img src="${product.imageUrl}" alt="${product.name}" class="product-image">` : 
+                        `<div class="product-image"><span class="material-icons">inventory_2</span></div>`;
+                    
+                    // 在网格视图中，使用独立的元素显示产品名称和库存信息
+                    div.innerHTML = `
                         <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
-                        ${newBadge}
-                        <label for="item${product.id}">
-                            ${product.name}
-                            ${viewImageButton}
-                        </label>
-                    </div>
-                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">
-                        <span class="material-icons-round" style="font-size: 18px;">add</span>
-                    </button>
-                    <input type="number"
-                           id="quantity${product.id}"
-                           min="1"
-                           value="${currentQuantity}"
-                           readonly>
-                    <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">
-                        <span class="material-icons-round" style="font-size: 18px;">remove</span>
-                    </button>
-                `;
+                        ${imageHTML}
+                        <span class="product-name" for="item${product.id}" onclick="document.getElementById('item${product.id}').click()">${product.name}</span>
+                        <span class="stock-info" id="stock${product.id}"></span>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">
+                                <span class="material-icons-round" style="font-size: 18px;">add</span>
+                            </button>
+                            <input type="number"
+                                   id="quantity${product.id}"
+                                   min="1"
+                                   value="${currentQuantity}"
+                                   readonly>
+                            <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">
+                                <span class="material-icons-round" style="font-size: 18px;">remove</span>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // 列表视图的原始HTML
+                    // 添加查看图片按钮
+                    const viewImageButton = product.imageUrl ? 
+                        `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}')">
+                            <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 3px;">image</span>View
+                        </button>` : '';
+
+                    div.innerHTML = `
+                        <div style="position: relative;">
+                            <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
+                            <label for="item${product.id}">
+                                ${product.name}
+                                ${viewImageButton}
+                            </label>
+                        </div>
+                        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">
+                            <span class="material-icons-round" style="font-size: 18px;">add</span>
+                        </button>
+                        <input type="number"
+                               id="quantity${product.id}"
+                               min="1"
+                               value="${currentQuantity}"
+                               readonly>
+                        <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)">
+                            <span class="material-icons-round" style="font-size: 18px;">remove</span>
+                        </button>
+                    `;
+                }
+                
                 productList.appendChild(div);
             });
             
@@ -3000,7 +3352,7 @@
                 }
             }
 
-            result += '\n_App Version 1.2_';
+            result += '\n_App Version 1.3_';
             return result;
         }
 
@@ -3736,6 +4088,50 @@
             
             // 每小时检查一次
             setInterval(cleanupExpiredNewProducts, 60 * 60 * 1000);
+        });
+
+        // 当前布局视图模式
+        let currentView = localStorage.getItem('view-mode') || 'list';
+        
+        // 切换列表/网格视图
+        function toggleView(viewMode) {
+            currentView = viewMode;
+            localStorage.setItem('view-mode', viewMode);
+            
+            const productList = document.getElementById('productList');
+            const listBtn = document.getElementById('listViewBtn');
+            const gridBtn = document.getElementById('gridViewBtn');
+            
+            // 切换按钮状态
+            if (viewMode === 'list') {
+                productList.classList.remove('grid-view');
+                listBtn.classList.add('active');
+                gridBtn.classList.remove('active');
+            } else {
+                productList.classList.add('grid-view');
+                listBtn.classList.remove('active');
+                gridBtn.classList.add('active');
+            }
+            
+            // 刷新当前产品列表
+            const selectedCategory = document.querySelector('input[name="category"]:checked');
+            if (selectedCategory) {
+                const categoryValue = selectedCategory.value;
+                if (categories[categoryValue]) {
+                    loadProducts(categories[categoryValue]);
+                }
+            }
+            
+            // 震动反馈
+            vibrate();
+        }
+        
+        // 页面加载后应用保存的视图模式
+        document.addEventListener('DOMContentLoaded', function() {
+            // 其他现有事件监听器...
+            
+            // 应用保存的视图模式
+            toggleView(currentView);
         });
     </script>
 
