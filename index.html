@@ -2727,6 +2727,9 @@
                         if ([601, 602, 603].includes(product.id)) { // 这三个商品的ID
                             stock = Math.floor(stock / 60); // 取整数部分
                         }
+                         if ([604, 605].includes(product.id)) { // 这三个商品的ID
+                            stock = Math.floor(stock / 30); // 取整数部分
+                        }
                 
                         const stockClass = stock === 0 ? 'zero-stock' : '';
                         const stockText = stock === 0 ? '(No Stock)' : `(Stock: ${stock})`;
