@@ -2730,6 +2730,12 @@
                          if ([604, 605].includes(product.id)) { // 这三个商品的ID
                             stock = Math.floor(stock / 30); // 取整数部分
                         }
+			 if ([606, 607， 610].includes(product.id)) { // 这三个商品的ID
+                            stock = Math.floor(stock / 80); // 取整数部分
+                        }
+			 if ([608, 609].includes(product.id)) { // 这三个商品的ID
+                            stock = Math.floor(stock / 70); // 取整数部分
+                        }
                 
                         const stockClass = stock === 0 ? 'zero-stock' : '';
                         const stockText = stock === 0 ? '(No Stock)' : `(Stock: ${stock})`;
@@ -2923,7 +2929,12 @@
                 { id: 602, name: "Amplang Udang", unit: 'bdl', defaultQuantity: 1 },
                 { id: 603, name: "Amplang Sotong", unit: 'bdl', defaultQuantity: 1 },
 		{ id: 604, name: "Amplang Ikan 30Pkt", unit: 'bdl', defaultQuantity: 1 },
-                { id: 605, name: "Amplang Udang 30pkt", unit: 'bdl', defaultQuantity: 1 }
+                { id: 605, name: "Amplang Udang 30pkt", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 606, name: "Amplang Pandan 180g", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 607, name: "Amplang Tomyum 180g", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 608, name: "Amplang Sotong 200g", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 609, name: "Amplang Udang 200g", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 610, name: "Amplang Ikan 200g", unit: 'bdl', defaultQuantity: 1 }
             ],
             Other: [
                  { id: 701, name: "Fruity Gummy Assorted" },
