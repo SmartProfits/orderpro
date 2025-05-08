@@ -1100,7 +1100,7 @@
         }
 
         .shop-name {
-            font-size: 1em;
+            font-size: 1.2em;
             font-weight: bold;
         }
 
@@ -2118,7 +2118,7 @@
                 <span class="shop-name">Ole-Ole Tawau</span>
             </label>
         </div>
-        <div class="shop-card" onclick="selectShop(this, '*Wisma Merdeka*')">
+		        <div class="shop-card" onclick="selectShop(this, '*Wisma Merdeka*')">
             <input type="radio" name="store" value="*Wisma Merdeka*" id="wm">
             <label for="wm">
                 <span class="shop-icon">🏢</span>
@@ -2734,7 +2734,15 @@
                         if ([601, 602, 603].includes(product.id)) { // 这三个商品的ID
                             stock = Math.floor(stock / 60); // 取整数部分
                         }
-                
+                         if ([604, 605].includes(product.id)) { // 这三个商品的ID
+                            stock = Math.floor(stock / 30); // 取整数部分
+                        }
+                        if ([606, 609, 610].includes(product.id)) { // 这三个商品的ID
+                            stock = Math.floor(stock / 80); // 取整数部分
+                        }
+                        if ([607, 608].includes(product.id)) { // 这三个商品的ID
+                            stock = Math.floor(stock / 70); // 取整数部分
+                        }
                         const stockClass = stock === 0 ? 'zero-stock' : '';
                         const stockText = stock === 0 ? '(No Stock)' : `(Stock: ${stock})`;
                         
@@ -2844,6 +2852,7 @@
                 { id: 157, name: "BH Dodol Coconut" },
                 { id: 158, name: "BH Dodol Pandan" },
                 { id: 159, name: "BH Durian Beh Teh Saw" },
+		{ id: 168, name: "Coconut Chip 50g" },
                 { id: 163, name: "Fruity Marshmallow" },
                 { id: 164, name: "Matcha Marshmallow" },
                 { id: 165, name: "Durian Marshmallow" },
@@ -2865,6 +2874,7 @@
                 { id: 213, name: "Salted Egg Fish Skin" },
                 { id: 214, name: "Salted Egg Fish Skin Spicy" },
                 { id: 215, name: "Salted Egg Salmon Skin" },
+		{ id: 222, name: "Salted Egg Salmon Skin Spicy" },
                 { id: 216, name: "Musang King Durian Candy" },
                 { id: 217, name: "HH Durian Cookies" },
                 { id: 218, name: "Fish Chips Classic" },
@@ -2921,9 +2931,16 @@
                 { id: 515, name: "Kopi Tenom Red" }
             ],
             Amplang: [
-                { id: 601, name: "Amplang Ikan", unit: 'pkt', defaultQuantity: 1 },
-                { id: 602, name: "Amplang Udang", unit: 'pkt', defaultQuantity: 1 },
-                { id: 603, name: "Amplang Sotong", unit: 'pkt', defaultQuantity: 1 }
+                { id: 601, name: "Amplang Ikan", unit: 'bdl', defaultQuantity: 1 },
+                { id: 602, name: "Amplang Udang", unit: 'bdl', defaultQuantity: 1 },
+                { id: 603, name: "Amplang Sotong", unit: 'bdl', defaultQuantity: 1 },
+				{ id: 604, name: "Amplang Ikan 30Pkt", unit: 'bdl', defaultQuantity: 1 },
+                { id: 605, name: "Amplang Udang 30pkt", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 606, name: "Amplang Pandan 180g", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 607, name: "Amplang Tomyum 180g", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 608, name: "Amplang Sotong 200g", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 609, name: "Amplang Udang 200g", unit: 'bdl', defaultQuantity: 1 },
+		{ id: 610, name: "Amplang Ikan 200g", unit: 'bdl', defaultQuantity: 1 }
             ],
             Other: [
                  { id: 701, name: "Fruity Gummy Assorted" },
