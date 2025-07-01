@@ -2185,6 +2185,13 @@
                 <span>Wrapping</span>
             </label>
         </div>
+ <div class="category-card" onclick="selectCategory(this, 'Office')">
+            <input type="radio" name="category" value="Office" id="Office">
+            <label for="Office">
+                <span class="category-icon">📦</span>
+                <span>Office</span>
+            </label>
+        </div>
     </div>
 
     <div style="position: relative; margin-bottom: 15px; margin-top: 15px;">
@@ -2970,7 +2977,15 @@
                  { id: 801, name: "Wrapping Machine", unit: 'roll' },
                 { id: 802, name: "Wrapping Mini" ,unit: 'roll'},
                 { id: 809, name: "Neck Pillow", unit: 'pc' }
+            ],
+            Office: [
+                 { id: 901, name: "Assorted candy", unit: 'ctn' },
+                { id: 902, name: "Assorted jelly" ,unit: 'ctn'},
+                { id: 903, name: "Dried mango", unit: 'ctn' },
+                { id: 904, name: "Coconut milk candy", unit: 'ctn' },
+                { id: 905, name: "Durian milk candy", unit: 'ctn' }
             ]
+            
         };
 
         // 创建全局商品映射以供updateStockDisplay使用
@@ -3387,7 +3402,7 @@
                 }
             }
 
-            result += '\n_App Version 1.3_';
+            result += '\n_App Version 1.4_';
             return result;
         }
 
