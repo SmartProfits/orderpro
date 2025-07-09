@@ -603,7 +603,7 @@
             gap: 3px; /* 减小间距 */
             margin: 15px 0;
             width: 100%;
-            padding: 0 5px; /* 添加少量内边距 */
+            padding: 1 5px; /* 添加少量内边距 */
             box-sizing: border-box;
         }
 
@@ -1063,7 +1063,7 @@
 
         .shop-card {
             position: relative;
-            padding: 10px;
+            padding: 3px;
             border-radius: 15px;
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -1090,7 +1090,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 22px;
+            gap: 7px;
             cursor: pointer;
         }
 
@@ -1113,7 +1113,7 @@
         .jkl-card label {
             position: relative;
             height: 100%;
-            min-height: 85px;
+            min-height: 130px;
         }
 
         .shop-image {
@@ -2114,10 +2114,10 @@
                 <span class="shop-name">JKL</span>
             </label>
         </div>
-        <div class="shop-card" onclick="selectShop(this, '*TOM*')">
+         <div class="shop-card jkl-card" onclick="selectShop(this, '*TOM*')">
             <input type="radio" name="store" value="*TOM*" id="tom">
             <label for="tom">
-                <span class="shop-icon">🏬</span>
+                <img src="shop/tom.png" alt="TOM" class="shop-image">
                 <span class="shop-name">TOM</span>
             </label>
         </div>
@@ -2128,20 +2128,20 @@
                 <span class="shop-name">Ole-Ole Dalam</span>
             </label>
         </div>
-        <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Luar*')">
-            <input type="radio" name="store" value="*Ole-Ole Luar*" id="new">
-            <label for="new">
-                <span class="shop-icon">🏠</span>
-                <span class="shop-name">Ole-Ole Luar</span>
-            </label>
-        </div>
-        <div class="shop-card" onclick="selectShop(this, '*Wrapping(AA)*')">
-            <input type="radio" name="store" value="*Wrapping(AA)*" id="aa">
-            <label for="aa">
-                <span class="shop-icon">🧳</span>
-                <span class="shop-name">Wrapping(AA)</span>
-            </label>
-        </div>
+         <div class="shop-card jkl-card" onclick="selectShop(this, '*Ole-Ole Luar*')">
+                <input type="radio" name="store" value="*Ole-Ole Luar*" id="new">
+                <label for="new">
+                    <img src="shop/luar.png" alt="new" class="shop-image">
+                    <span class="shop-name">Ole-Ole Luar</span>
+                </label>
+            </div>
+            <div class="shop-card jkl-card" onclick="selectShop(this, '*Wrapping(AA)*')">
+                <input type="radio" name="store" value="*Wrapping(AA)*" id="aa">
+                <label for="aa">
+                    <img src="shop/Aa.png" alt="Aa" class="shop-image">
+                    <span class="shop-name">Wrapping(AA)</span>
+                </label>
+            </div>
             <div class="shop-card jkl-card" onclick="selectShop(this, '*Wrapping(MAS)*')">
                 <input type="radio" name="store" value="*Wrapping(MAS)*" id="mas">
                 <label for="mas">
@@ -2149,20 +2149,22 @@
                     <span class="shop-name">Wrapping(MAS)</span>
                 </label>
             </div>
-        <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Tawau*')">
-            <input type="radio" name="store" value="*Ole-Ole Tawau*" id="twu">
-            <label for="twu">
-                <span class="shop-icon">🏡</span>
-                <span class="shop-name">Ole-Ole Tawau</span>
-            </label>
-        </div>
-		        <div class="shop-card" onclick="selectShop(this, '*Wisma Merdeka*')">
-            <input type="radio" name="store" value="*Wisma Merdeka*" id="wm">
-            <label for="wm">
-                <span class="shop-icon">🏢</span>
-                <span class="shop-name">Wisma Merdeka</span>
-            </label>
-        </div>
+
+        <div class="shop-card jkl-card" onclick="selectShop(this, '*Ole-Ole Tawau*')">
+                <input type="radio" name="store" value="*Ole-Ole Tawau*" id="twu">
+                <label for="twu">
+                    <img src="shop/tawau.png" alt="Ole-Ole Tawau" class="shop-image">
+                    <span class="shop-name">Ole-Ole Tawau</span>
+                </label>
+            </div>
+        
+<div class="shop-card jkl-card" onclick="selectShop(this, '*Wisma*')">
+                <input type="radio" name="store" value="*Wisma*" id="wisma">
+                <label for="wisma">
+                    <img src="shop/wisma.png" alt="Wisma" class="shop-image">
+                    <span class="shop-name">Wisma</span>
+                </label>
+            </div>
     </div>
 
     <h3>Category</h3>
@@ -3440,7 +3442,7 @@
                 }
             }
 
-            result += '\n_App Version 1.4_';
+            result += '\n_App Version 1.5_';
             return result;
         }
 
