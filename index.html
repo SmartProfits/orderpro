@@ -1104,6 +1104,38 @@
             font-weight: bold;
         }
 
+        /* JKL 卡片专用样式 */
+        .jkl-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .jkl-card label {
+            position: relative;
+            height: 100%;
+            min-height: 130px;
+        }
+
+        .shop-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+            z-index: 1;
+        }
+
+        .jkl-card .shop-name {
+            position: relative;
+            z-index: 2;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: auto;
+        }
+
         /* 分类选择样式 */
         .category-container {
             display: grid;
@@ -2069,10 +2101,10 @@
     </div>
 
     <div class="shop-container">
-        <div class="shop-card" onclick="selectShop(this, '*JKL*')">
+        <div class="shop-card jkl-card" onclick="selectShop(this, '*JKL*')">
             <input type="radio" name="store" value="*JKL*" id="jkl">
             <label for="jkl">
-                <span class="shop-icon">🛍️</span>
+                <img src="shop/jkl.png" alt="JKL" class="shop-image">
                 <span class="shop-name">JKL</span>
             </label>
         </div>
@@ -2104,13 +2136,13 @@
                 <span class="shop-name">Wrapping(AA)</span>
             </label>
         </div>
-        <div class="shop-card" onclick="selectShop(this, '*Wrapping(MAS)*')">
-            <input type="radio" name="store" value="*Wrapping(MAS)*" id="mas">
-            <label for="mas">
-                <span class="shop-icon">🧳</span>
-                <span class="shop-name">Wrapping(MAS)</span>
-            </label>
-        </div>
+            <div class="shop-card jkl-card" onclick="selectShop(this, '*Wrapping(MAS)*')">
+                <input type="radio" name="store" value="*Wrapping(MAS)*" id="mas">
+                <label for="mas">
+                    <img src="shop/Mas.png" alt="Mas" class="shop-image">
+                    <span class="shop-name">Wrapping(MAS)</span>
+                </label>
+            </div>
         <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Tawau*')">
             <input type="radio" name="store" value="*Ole-Ole Tawau*" id="twu">
             <label for="twu">
