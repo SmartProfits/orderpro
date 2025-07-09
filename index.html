@@ -1112,7 +1112,7 @@
 
         .jkl-card label {
             position: relative;
-            height: 100%;2
+            height: 100%;
             min-height: 85px;
         }
 
@@ -1130,10 +1130,16 @@
         .jkl-card .shop-name {
             position: relative;
             z-index: 1;
-            color: white;
+            color: white !important;
             padding: 0px 12px;
             border-radius: 8px;
             margin-top: auto;
+        }
+
+        /* 确保在任何模式下图片卡片的字体都是白色 */
+        body.dark-mode .jkl-card .shop-name,
+        body:not(.dark-mode) .jkl-card .shop-name {
+            color: white !important;
         }
 
         /* 分类选择样式 */
