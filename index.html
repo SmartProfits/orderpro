@@ -1127,19 +1127,36 @@
             z-index: 1;
         }
 
-        .jkl-card .shop-name {
-            position: relative;
-            z-index: 1;
-            color: white !important;
-            padding: 0px 12px;
-            border-radius: 8px;
-            margin-top: auto;
-        }
+     .jkl-card .shop-name {
+    position: relative;
+    z-index: 1;
+
+    /* 样式核心 */
+    color: white;                            /* 字体颜色 */
+    -webkit-text-stroke: 1px black;          /* 黑色描边，仅 WebKit 支持 */
+    text-shadow:
+        -1px -1px 0 black,
+         1px -1px 0 black,
+        -1px  1px 0 black,
+         1px  1px 0 black,
+         0   0   4px rgba(0,0,0,0.5);        /* 阴影增强可读性 */
+
+    font-weight: bold;                       /* 加粗更显眼 */
+    font-size: 19px;                         /* 根据需求调整 */
+
+    /* 背景修饰，增强文字与背景的区分 */
+    
+    padding: 4px 8px;
+    border-radius: 8px;
+
+    margin-top: auto;
+}
+
 
         /* 确保在任何模式下图片卡片的字体都是白色 */
         body.dark-mode .jkl-card .shop-name,
         body:not(.dark-mode) .jkl-card .shop-name {
-            color: white !important;
+            color: #ffffff !important;
         }
 
         /* 分类选择样式 */
@@ -2121,13 +2138,13 @@
                 <span class="shop-name">TOM</span>
             </label>
         </div>
-        <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Dalam*')">
-            <input type="radio" name="store" value="*Ole-Ole Dalam*" id="ole">
-            <label for="ole">
-                <span class="shop-icon">🏪</span>
-                <span class="shop-name">Ole-Ole Dalam</span>
-            </label>
-        </div>
+        <div class="shop-card jkl-card" onclick="selectShop(this, '*Ole-Ole Dalam*')">
+                <input type="radio" name="store" value="*Ole-Ole Dalam*" id="dalam">
+                <label for="dalam">
+                    <img src="shop/dalam.png" alt="dalam" class="shop-image">
+                    <span class="shop-name">Ole-Ole Dalam</span>
+                </label>
+            </div>
          <div class="shop-card jkl-card" onclick="selectShop(this, '*Ole-Ole Luar*')">
                 <input type="radio" name="store" value="*Ole-Ole Luar*" id="new">
                 <label for="new">
