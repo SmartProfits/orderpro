@@ -1079,7 +1079,7 @@
         }
 
         .shop-card.selected {
-            border: 2px solid #4CAF50;
+            border: 3px solid #5fe217;
         }
 
         .shop-card input[type="radio"] {
@@ -1157,6 +1157,54 @@
         body.dark-mode .jkl-card .shop-name,
         body:not(.dark-mode) .jkl-card .shop-name {
             color: #ffffff !important;
+        }
+
+        /* 大版本选中店铺样式 */
+        .shop-container.single-selected {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .shop-card.selected-large {
+            width: 80%;
+            max-width: 400px;
+            min-height: 200px;
+            transform: scale(1);
+            transition: all 0.3s ease;
+        }
+
+        .shop-card.selected-large label {
+            min-height: 200px;
+        }
+
+        .shop-card.selected-large .shop-name {
+            font-size: 1.8em;
+            padding: 12px 20px;
+        }
+
+        /* 重新选择按钮样式 */
+        .reselect-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .reselect-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* 隐藏未选中的店铺 */
+        .shop-container.single-selected .shop-card:not(.selected) {
+            display: none;
         }
 
         /* 分类选择样式 */
@@ -1280,6 +1328,17 @@
             border: 2px solid #4CAF50;  /* 绿色边框 */
             box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);  /* 绿色阴影 */
             background: rgba(76, 175, 80, 0.1);  /* 淡绿色背景 */
+        }
+
+        /* Light Mode 下的重新选择按钮样式 */
+        body:not(.dark-mode) .reselect-btn {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+
+        body:not(.dark-mode) .reselect-btn:hover {
+            background: rgba(0, 0, 0, 0.2);
         }
 
         /* Light Mode 下的分类卡片选中效果 */
@@ -3553,13 +3612,55 @@
         // 添加选择效果的JavaScript
         function selectShop(element, value) {
             vibrate(); // 添加震动反馈
+            const shopContainer = document.querySelector('.shop-container');
+            
             document.querySelectorAll('.shop-card').forEach(card => {
-                card.classList.remove('selected');
+                card.classList.remove('selected', 'selected-large');
             });
             
-            element.classList.add('selected');
+            element.classList.add('selected', 'selected-large');
             element.querySelector('input[type="radio"]').checked = true;
             addRippleEffect(element, event);
+            
+            // 添加单选模式类和重新选择按钮
+            shopContainer.classList.add('single-selected');
+            
+            // 检查是否已经有重新选择按钮，如果没有则添加
+            if (!shopContainer.querySelector('.reselect-btn')) {
+                const reselectBtn = document.createElement('button');
+                reselectBtn.className = 'reselect-btn';
+                reselectBtn.textContent = 'Change';
+                reselectBtn.onclick = reselectShop;
+                shopContainer.appendChild(reselectBtn);
+            }
+            
+            toggleItems();
+            updatePreview();
+        }
+
+        // 重新选择店铺函数
+        function reselectShop() {
+            vibrate(); // 添加震动反馈
+            const shopContainer = document.querySelector('.shop-container');
+            
+            // 移除单选模式
+            shopContainer.classList.remove('single-selected');
+            
+            // 移除所有选中状态
+            document.querySelectorAll('.shop-card').forEach(card => {
+                card.classList.remove('selected', 'selected-large');
+                const radio = card.querySelector('input[type="radio"]');
+                if (radio) radio.checked = false;
+            });
+            
+            // 移除重新选择按钮
+            const reselectBtn = shopContainer.querySelector('.reselect-btn');
+            if (reselectBtn) {
+                reselectBtn.remove();
+            }
+            
+            // 清空选中的商品和更新预览
+            Object.keys(selectedItems).forEach(key => delete selectedItems[key]);
             toggleItems();
             updatePreview();
         }
@@ -3690,8 +3791,9 @@
             document.getElementById('font-size-selector').value = savedFontSize;
             changeFontSize(savedFontSize);
             
-            // 加载保存的主题设置
-            const isDarkMode = localStorage.getItem('dark-mode') === 'enabled';
+            // 加载保存的主题设置 (默认使用 dark mode)
+            const darkModeSetting = localStorage.getItem('dark-mode');
+            const isDarkMode = darkModeSetting === null ? true : darkModeSetting === 'enabled';
             changeTheme(isDarkMode ? 'dark' : 'light');
             
             // 初始化震动设置
