@@ -3450,17 +3450,17 @@
             }
 
             if (selectedStore) {
-                result += 'Kedai: ' + selectedStore.value;
+                result += '🚩Kedai: ' + selectedStore.value;
                 if (hasAddOn) {
                     result += ' 💥Add On💥';
                 }
                 result += '\n';
                 // 添加Order By信息
-                result += 'Order By: (' + userName + ')\n\n';
+                result += '👤Order By: (' + userName + ')\n\n';
             } else {
                 result += 'Kedai: 未选择\n';
                 // 添加Order By信息
-                result += 'Order By: (' + userName + ')\n\n';
+                result += '👤Order By: (' + userName + ')\n\n';
             }
 
             const categorizedItems = {};
@@ -3497,11 +3497,11 @@
                 }
             }
 
-            result += `Total Items: ${totalItems}\n`;
+            result += `📦Total Items: ${totalItems}\n`;
 
             for (const [category, items] of Object.entries(categorizedItems)) {
                 if (items.length > 0) {
-                    result += `\n=== ${category} ===\n`;
+                    result += `\n🔹🔹🔹 ${category} 🔹🔹🔹\n`;
                     items.forEach(item => {
                         // 根据是否为WhatsApp使用不同的格式
                         if (forWhatsApp) {
@@ -3518,7 +3518,7 @@
                 }
             }
 
-            result += '\n_App Version 1.5_';
+            result += '\n_App Version 1.6_';
             return result;
         }
 
