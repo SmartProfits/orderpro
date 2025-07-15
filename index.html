@@ -29,6 +29,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
+            
         }
         
         /* WebKit浏览器（Chrome、Safari等） */
@@ -888,6 +889,8 @@
             color: white;
             border-radius: 10px;
             padding: 15px;
+            margin-bottom: 80px; /* 添加底部边距，确保不被导航栏遮挡 */
+            
         }
 
         /* 修改数量控制按钮样式 */
@@ -1884,6 +1887,11 @@
             font-size: 16px;
             vertical-align: middle;
             margin-left: 5px;
+             width: 50px;
+    height: 20px;
+    vertical-align: middle;
+    margin-left: 4px; /* 让它和文字或按钮有点间隔 */
+}
         }
         
         @keyframes pulseIcon {
@@ -1905,6 +1913,7 @@
             font-size: 16px;
             vertical-align: middle;
             margin-left: 5px;
+            
         }
     </style>
     
@@ -2252,11 +2261,11 @@
                 <span>BanHeang</span>
             </label>
         </div>
-        <div class="category-card" onclick="selectCategory(this, 'HopHup')">
-            <input type="radio" name="category" value="HopHup" id="hophup">
-            <label for="hophup">
+        <div class="category-card" onclick="selectCategory(this, 'HoeHup')">
+            <input type="radio" name="category" value="HoeHup" id="HoeHup">
+            <label for="HoeHup">
                 <span class="category-icon">🥮</span>
-                <span>HopHup</span>
+                <span>HoeHup</span>
             </label>
         </div>
         <div class="category-card" onclick="selectCategory(this, 'Chocolate')">
@@ -2848,7 +2857,7 @@
                         
                         // 新品标记代码
                         const newBadge = isStillNew ? 
-                            `<span class="material-icons-round new-badge">keyboard_double_arrow_up</span>` : '';
+                            `<img src="pic/new.png" class="new-badge" alt="New Badge">` : '';
                 
                         // 获取库存信息
                         let stock = stockMap[product.name] || 0;
@@ -4344,7 +4353,7 @@
         });
     </script>
 
-    <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).<br>🌟Stock quantity now will auto update</p>
+    <p class="contact-info">🌟If you have any questions or suggestion please contact me (Mark).</p>
  
     <!-- PWA更新提示 -->
     <div id="update-notification" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37); z-index: 9999;">
