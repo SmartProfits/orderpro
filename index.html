@@ -1915,6 +1915,64 @@
             margin-left: 5px;
             
         }
+
+        /* 公告横幅动画样式 */
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translate3d(0, 0, 0);
+            }
+            100% {
+                transform: translate3d(-100%, 0, 0);
+            }
+        }
+
+        /* 当显示公告时，页面内容需要下移 */
+        body.announcement-active {
+            padding-top: 44px;
+        }
+
+        /* 确保公告在任何模式下都能正确显示 */
+        #announcementBanner {
+            font-family: 'Arial', sans-serif;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* 公告横幅的响应式设计 */
+        @media (max-width: 768px) {
+            #announcementBanner {
+                font-size: 14px;
+                padding: 6px 0;
+            }
+            
+            body.announcement-active {
+                padding-top: 38px;
+            }
+            
+
+        }
+
+        @media (max-width: 480px) {
+            #announcementBanner {
+                font-size: 12px;
+                padding: 5px 0;
+            }
+            
+            body.announcement-active {
+                padding-top: 34px;
+            }
+        }
     </style>
     
     <!-- Firebase SDK -->
@@ -1923,6 +1981,34 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
 <body>
+    <!-- 公告横幅 -->
+    <div id="announcementBanner" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffd93d);
+        background-size: 300% 300%;
+        animation: gradientShift 3s ease infinite;
+        color: white;
+        font-weight: bold;
+        font-size: 16px;
+        padding: 8px 0;
+        z-index: 10000;
+        overflow: hidden;
+        white-space: nowrap;
+        display: none;
+        border-bottom: 2px solid rgba(255,255,255,0.3);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);">
+        <div id="announcementScrollText" style="
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll 15s linear infinite;
+            line-height: 1.2;">
+            <!-- 公告内容将在这里显示 -->
+        </div>
+    </div>
+
     <!-- 登录和注册界面 -->
     <div id="authContainer" class="auth-container">
         <div class="auth-box">
@@ -2010,6 +2096,7 @@
             <div class="admin-tabs">
                 <button class="tab-button active" onclick="showAdminTab('users')">用户管理</button>
                 <button class="tab-button" onclick="showAdminTab('products')">商品管理</button>
+                <button class="tab-button" onclick="showAdminTab('announcement')">公告管理</button>
             </div>
             
             <!-- 用户管理选项卡 -->
@@ -2030,6 +2117,222 @@
                         <!-- 类别选项由JavaScript动态生成 -->
                     </select>
                     <div id="productManagementList" class="product-management-list"></div>
+                </div>
+            </div>
+            
+            <!-- 公告管理选项卡 -->
+            <div id="announcement-tab" class="admin-tab-content" style="display: none;">
+                <h3>公告设置</h3>
+                <div class="announcement-management">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <input type="checkbox" id="announcementEnabled" onchange="toggleAnnouncement()">
+                            <span>启用公告</span>
+                        </label>
+                    </div>
+                    
+                    <div id="announcementSettings" style="display: none;">
+                        <!-- 公告文本 -->
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px;">公告内容:</label>
+                            <textarea id="announcementText" rows="3" style="
+                                width: 100%; 
+                                background: #3a3f55; 
+                                color: #fff; 
+                                border: 1px solid #4a5173; 
+                                border-radius: 5px; 
+                                padding: 10px; 
+                                resize: vertical;
+                                box-sizing: border-box;" 
+                                placeholder="请输入公告内容..."></textarea>
+                        </div>
+                        
+                        <!-- 字体设置 -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 5px;">字体大小:</label>
+                                <select id="announcementFontSize" style="
+                                    width: 100%; 
+                                    background: #3a3f55; 
+                                    color: #fff; 
+                                    border: 1px solid #4a5173; 
+                                    border-radius: 5px; 
+                                    padding: 8px;">
+                                    <option value="12px">小 (12px)</option>
+                                    <option value="14px">中小 (14px)</option>
+                                    <option value="16px" selected>中 (16px)</option>
+                                    <option value="18px">中大 (18px)</option>
+                                    <option value="20px">大 (20px)</option>
+                                    <option value="24px">超大 (24px)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px;">文字颜色:</label>
+                                <input type="color" id="announcementTextColor" value="#ffffff" style="
+                                    width: 100%; 
+                                    height: 40px; 
+                                    border: 1px solid #4a5173; 
+                                    border-radius: 5px; 
+                                    background: #3a3f55;">
+                            </div>
+                        </div>
+                        
+                        <!-- 背景设置 -->
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px;">背景样式:</label>
+                            <select id="announcementBgType" onchange="toggleBgSettings()" style="
+                                width: 100%; 
+                                background: #3a3f55; 
+                                color: #fff; 
+                                border: 1px solid #4a5173; 
+                                border-radius: 5px; 
+                                padding: 8px; 
+                                margin-bottom: 10px;">
+                                <option value="gradient">彩色渐变 (默认)</option>
+                                <option value="solid">纯色背景</option>
+                                <option value="custom">自定义渐变</option>
+                            </select>
+                            
+                            <div id="solidColorSettings" style="display: none;">
+                                <label style="display: block; margin-bottom: 5px;">背景颜色:</label>
+                                <input type="color" id="announcementBgColor" value="#4285f4" style="
+                                    width: 100%; 
+                                    height: 40px; 
+                                    border: 1px solid #4a5173; 
+                                    border-radius: 5px; 
+                                    background: #3a3f55;">
+                            </div>
+                            
+                            <div id="customGradientSettings" style="display: none;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px;">起始颜色:</label>
+                                        <input type="color" id="announcementGradientStart" value="#ff6b6b" style="
+                                            width: 100%; 
+                                            height: 35px; 
+                                            border: 1px solid #4a5173; 
+                                            border-radius: 5px;">
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 5px;">结束颜色:</label>
+                                        <input type="color" id="announcementGradientEnd" value="#4ecdc4" style="
+                                            width: 100%; 
+                                            height: 35px; 
+                                            border: 1px solid #4a5173; 
+                                            border-radius: 5px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 动画设置 -->
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px;">滚动速度:</label>
+                            <select id="announcementSpeed" style="
+                                width: 100%; 
+                                background: #3a3f55; 
+                                color: #fff; 
+                                border: 1px solid #4a5173; 
+                                border-radius: 5px; 
+                                padding: 8px;">
+                                <option value="20s">慢速 (20秒)</option>
+                                <option value="15s" selected>中速 (15秒)</option>
+                                <option value="10s">快速 (10秒)</option>
+                                <option value="8s">超快 (8秒)</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 时间设置 -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 5px;">开始时间:</label>
+                                <input type="datetime-local" id="announcementStartTime" style="
+                                    width: 100%; 
+                                    background: #3a3f55; 
+                                    color: #fff; 
+                                    border: 1px solid #4a5173; 
+                                    border-radius: 5px; 
+                                    padding: 8px;
+                                    box-sizing: border-box;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px;">结束时间:</label>
+                                <input type="datetime-local" id="announcementEndTime" style="
+                                    width: 100%; 
+                                    background: #3a3f55; 
+                                    color: #fff; 
+                                    border: 1px solid #4a5173; 
+                                    border-radius: 5px; 
+                                    padding: 8px;
+                                    box-sizing: border-box;">
+                            </div>
+                        </div>
+                        
+                        <!-- 预览区域 -->
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px;">预览效果:</label>
+                            <div id="announcementPreview" style="
+                                background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffd93d);
+                                background-size: 300% 300%;
+                                animation: gradientShift 3s ease infinite;
+                                color: white;
+                                font-weight: bold;
+                                font-size: 16px;
+                                padding: 8px 0;
+                                overflow: hidden;
+                                white-space: nowrap;
+                                border-radius: 5px;
+                                border: 1px solid #4a5173;
+                                text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+                                position: relative;">
+                                <div style="
+                                    display: inline-block;
+                                    padding-left: 100%;
+                                    animation: scroll 15s linear infinite;">
+                                    预览公告内容
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 操作按钮 -->
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <button onclick="previewAnnouncement()" style="
+                                flex: 1;
+                                background: #4CAF50;
+                                color: white;
+                                border: none;
+                                padding: 12px;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                font-size: 14px;">
+                                实时预览
+                            </button>
+                            <button onclick="saveAnnouncementSettings()" style="
+                                flex: 1;
+                                background: #2196F3;
+                                color: white;
+                                border: none;
+                                padding: 12px;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                font-size: 14px;">
+                                保存设置
+                            </button>
+                        </div>
+                        
+                        <!-- 当前公告状态和管理 -->
+                        <div id="currentAnnouncementStatus" style="
+                            background: #2a2d3e;
+                            border: 1px solid #4a5173;
+                            border-radius: 8px;
+                            padding: 15px;
+                            margin-top: 10px;">
+                            <h4 style="margin: 0 0 10px 0; color: #fff;">当前公告状态</h4>
+                            <div id="announcementStatusContent">
+                                <p style="color: #aaa; margin: 0;">正在检查公告状态...</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2932,8 +3235,6 @@
 		{ id: 174, name: "BH Tau Shar Pheah Original" },
 		{ id: 175, name: "BH Tau Shar Pheah Matcha" },
 		{ id: 176, name: "BH Tau Shar Pheah Paprika Seaweed" },
-		{ id: 177, name: "BH Tau Shar Pheah White Coffee" },
-		{ id: 178, name: "BH Tau Shar Pheah Cempedak" },
                 { id: 105, name: "BH Heong Pheah" },
                 { id: 106, name: "BH Beh Teh Saw" },
                 { id: 107, name: "BH Phong Pheah" },
@@ -2997,7 +3298,7 @@
                 { id: 163, name: "Fruity Marshmallow" },
                 { id: 164, name: "Matcha Marshmallow" },
                 { id: 165, name: "Durian Marshmallow" },
-		{ id: 179, name: "BH Shopping Bag" },
+		{ id: 177, name: "BH Shopping Bag" },
             ],
             HoeHup: [
                 { id: 201, name: "HH Durian Tart" },
@@ -4181,6 +4482,11 @@
                     loadProductsForAdmin();
                 }
             }
+            
+            // 如果是公告选项卡，加载当前的公告设置
+            if (tabName === 'announcement') {
+                loadAnnouncementSettings();
+            }
         }
         
         // 为管理面板加载商品列表
@@ -4665,7 +4971,535 @@
                     loadProducts(categories[selectedCategory]);
                 }
             }
+            
+            // 页面加载时检查并显示公告
+            checkAndShowAnnouncement();
         });
+        
+        // 公告管理相关函数
+        
+        // 切换公告开关
+        function toggleAnnouncement() {
+            const enabled = document.getElementById('announcementEnabled').checked;
+            const settings = document.getElementById('announcementSettings');
+            
+            if (enabled) {
+                settings.style.display = 'block';
+                // 设置默认时间为当前时间
+                const now = new Date();
+                const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                
+                document.getElementById('announcementStartTime').value = now.toISOString().slice(0, 16);
+                document.getElementById('announcementEndTime').value = tomorrow.toISOString().slice(0, 16);
+            } else {
+                settings.style.display = 'none';
+            }
+        }
+        
+        // 切换背景设置
+        function toggleBgSettings() {
+            const bgType = document.getElementById('announcementBgType').value;
+            const solidSettings = document.getElementById('solidColorSettings');
+            const customSettings = document.getElementById('customGradientSettings');
+            
+            // 隐藏所有设置
+            solidSettings.style.display = 'none';
+            customSettings.style.display = 'none';
+            
+            // 显示对应设置
+            if (bgType === 'solid') {
+                solidSettings.style.display = 'block';
+            } else if (bgType === 'custom') {
+                customSettings.style.display = 'block';
+            }
+        }
+        
+        // 实时预览公告
+        function previewAnnouncement() {
+            const text = document.getElementById('announcementText').value || '预览公告内容';
+            const fontSize = document.getElementById('announcementFontSize').value;
+            const textColor = document.getElementById('announcementTextColor').value;
+            const bgType = document.getElementById('announcementBgType').value;
+            const speed = document.getElementById('announcementSpeed').value;
+            
+            const preview = document.getElementById('announcementPreview');
+            const previewText = preview.querySelector('div');
+            
+            // 获取当前用户姓名用于预览
+            let creatorName = '管理员';
+            if (currentUser) {
+                const userNameElement = document.getElementById('userName').querySelector('.username-text');
+                if (userNameElement) {
+                    creatorName = userNameElement.textContent || '管理员';
+                }
+            }
+            
+            // 更新预览样式和内容（包含创建者信息）
+            preview.style.fontSize = fontSize;
+            preview.style.color = textColor;
+            const fullText = `【${creatorName} 发布】${text}`;
+            previewText.textContent = fullText;
+            previewText.style.animationDuration = speed;
+            
+            // 设置背景
+            if (bgType === 'solid') {
+                const bgColor = document.getElementById('announcementBgColor').value;
+                preview.style.background = bgColor;
+                preview.style.backgroundSize = 'initial';
+                preview.style.animation = 'none';
+            } else if (bgType === 'custom') {
+                const startColor = document.getElementById('announcementGradientStart').value;
+                const endColor = document.getElementById('announcementGradientEnd').value;
+                preview.style.background = `linear-gradient(45deg, ${startColor}, ${endColor})`;
+                preview.style.backgroundSize = 'initial';
+                preview.style.animation = 'none';
+            } else {
+                // 默认渐变
+                preview.style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffd93d)';
+                preview.style.backgroundSize = '300% 300%';
+                preview.style.animation = 'gradientShift 3s ease infinite';
+            }
+            
+            // 重启动画
+            previewText.style.animation = 'none';
+            setTimeout(() => {
+                previewText.style.animation = `scroll ${speed} linear infinite`;
+            }, 10);
+        }
+        
+        // 保存公告设置
+        function saveAnnouncementSettings() {
+            console.log('开始保存公告设置...');
+            
+            // 检查用户权限
+            if (!currentUser) {
+                alert('请先登录');
+                return;
+            }
+            
+            if (userRole !== 'Admin' && userRole !== 'SAdmin') {
+                alert('您没有权限设置公告');
+                return;
+            }
+            
+            const enabled = document.getElementById('announcementEnabled').checked;
+            console.log('公告启用状态:', enabled);
+            
+            if (!enabled) {
+                // 如果未启用，只保存启用状态并隐藏公告
+                console.log('正在关闭公告...');
+                db.ref('announcement').set({
+                    enabled: false
+                }).then(() => {
+                    console.log('公告关闭成功');
+                    alert('公告已关闭');
+                    hideAnnouncement();
+                }).catch(error => {
+                    console.error('保存失败:', error);
+                    alert('保存失败: ' + error.message);
+                });
+                return;
+            }
+            
+            const text = document.getElementById('announcementText').value;
+            const fontSize = document.getElementById('announcementFontSize').value;
+            const textColor = document.getElementById('announcementTextColor').value;
+            const bgType = document.getElementById('announcementBgType').value;
+            const speed = document.getElementById('announcementSpeed').value;
+            const startTime = document.getElementById('announcementStartTime').value;
+            const endTime = document.getElementById('announcementEndTime').value;
+            
+            console.log('获取的表单数据:', { text, fontSize, textColor, bgType, speed, startTime, endTime });
+            
+            if (!text.trim()) {
+                alert('请输入公告内容');
+                return;
+            }
+            
+            if (!startTime || !endTime) {
+                alert('请设置公告的开始和结束时间');
+                return;
+            }
+            
+            if (new Date(startTime) >= new Date(endTime)) {
+                alert('结束时间必须晚于开始时间');
+                return;
+            }
+            
+            // 准备背景设置
+            let backgroundSettings = {
+                type: bgType
+            };
+            
+            if (bgType === 'solid') {
+                backgroundSettings.color = document.getElementById('announcementBgColor').value;
+            } else if (bgType === 'custom') {
+                backgroundSettings.startColor = document.getElementById('announcementGradientStart').value;
+                backgroundSettings.endColor = document.getElementById('announcementGradientEnd').value;
+            }
+            
+            const announcementData = {
+                enabled: true,
+                text: text,
+                fontSize: fontSize,
+                textColor: textColor,
+                background: backgroundSettings,
+                speed: speed,
+                startTime: new Date(startTime).getTime(),
+                endTime: new Date(endTime).getTime(),
+                createdAt: firebase.database.ServerValue.TIMESTAMP,
+                createdBy: currentUser.uid
+            };
+            
+            console.log('准备保存到Firebase的数据:', announcementData);
+            
+            // 保存到Firebase
+            db.ref('announcement').set(announcementData)
+                .then(() => {
+                    console.log('公告设置保存成功到Firebase');
+                    alert('公告设置保存成功！');
+                    // 立即检查并显示公告
+                    checkAndShowAnnouncement();
+                })
+                .catch(error => {
+                    console.error('保存失败:', error);
+                    console.error('错误详情:', error.code, error.message);
+                    alert('保存失败: ' + error.message);
+                });
+        }
+        
+        // 加载公告设置
+        function loadAnnouncementSettings() {
+            db.ref('announcement').once('value')
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        
+                        // 设置启用状态
+                        document.getElementById('announcementEnabled').checked = data.enabled || false;
+                        
+                        if (data.enabled) {
+                            document.getElementById('announcementSettings').style.display = 'block';
+                            
+                            // 填充表单数据
+                            document.getElementById('announcementText').value = data.text || '';
+                            document.getElementById('announcementFontSize').value = data.fontSize || '16px';
+                            document.getElementById('announcementTextColor').value = data.textColor || '#ffffff';
+                            document.getElementById('announcementSpeed').value = data.speed || '15s';
+                            
+                            // 设置背景
+                            const bgType = data.background?.type || 'gradient';
+                            document.getElementById('announcementBgType').value = bgType;
+                            toggleBgSettings();
+                            
+                            if (bgType === 'solid' && data.background?.color) {
+                                document.getElementById('announcementBgColor').value = data.background.color;
+                            } else if (bgType === 'custom') {
+                                document.getElementById('announcementGradientStart').value = data.background?.startColor || '#ff6b6b';
+                                document.getElementById('announcementGradientEnd').value = data.background?.endColor || '#4ecdc4';
+                            }
+                            
+                            // 设置时间
+                            if (data.startTime) {
+                                document.getElementById('announcementStartTime').value = new Date(data.startTime).toISOString().slice(0, 16);
+                            }
+                            if (data.endTime) {
+                                document.getElementById('announcementEndTime').value = new Date(data.endTime).toISOString().slice(0, 16);
+                            }
+                        } else {
+                            document.getElementById('announcementSettings').style.display = 'none';
+                        }
+                        
+                        // 更新公告状态显示
+                        updateAnnouncementStatus(data);
+                    } else {
+                        // 没有公告数据
+                        updateAnnouncementStatus(null);
+                    }
+                })
+                .catch(error => {
+                    console.error('加载公告设置失败:', error);
+                    updateAnnouncementStatus(null);
+                });
+        }
+        
+        // 更新公告状态显示
+        function updateAnnouncementStatus(data) {
+            const statusContent = document.getElementById('announcementStatusContent');
+            
+            if (!data || !data.enabled) {
+                statusContent.innerHTML = `
+                    <p style="color: #aaa; margin: 0;">📴 当前没有活跃的公告</p>
+                `;
+                return;
+            }
+            
+            const now = Date.now();
+            const startTime = data.startTime || 0;
+            const endTime = data.endTime || now + 86400000;
+            
+            let statusText = '';
+            let statusColor = '';
+            let showCancelButton = false;
+            
+            if (now < startTime) {
+                // 还未开始
+                statusText = '⏳ 公告已设置，等待生效';
+                statusColor = '#ff9800';
+                showCancelButton = true;
+            } else if (now >= startTime && now <= endTime) {
+                // 正在进行
+                statusText = '🔔 公告正在显示中';
+                statusColor = '#4CAF50';
+                showCancelButton = true;
+            } else {
+                // 已过期
+                statusText = '⌛ 公告已过期';
+                statusColor = '#757575';
+            }
+            
+            // 获取创建者信息
+            let creatorInfo = '未知';
+            if (data.createdBy) {
+                db.ref(`users/${data.createdBy}`).once('value')
+                    .then(snapshot => {
+                        if (snapshot.exists()) {
+                            const userData = snapshot.val();
+                            creatorInfo = userData.name || userData.email?.split('@')[0] || '管理员';
+                        }
+                        renderAnnouncementStatus();
+                    })
+                    .catch(() => {
+                        renderAnnouncementStatus();
+                    });
+            } else {
+                renderAnnouncementStatus();
+            }
+            
+            function renderAnnouncementStatus() {
+                const startTimeStr = new Date(startTime).toLocaleString('zh-CN');
+                const endTimeStr = new Date(endTime).toLocaleString('zh-CN');
+                
+                statusContent.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <p style="color: ${statusColor}; margin: 0 0 10px 0; font-weight: bold;">${statusText}</p>
+                        <div style="color: #ccc; font-size: 12px; line-height: 1.5;">
+                            <p style="margin: 5px 0;"><strong>创建者:</strong> ${creatorInfo}</p>
+                            <p style="margin: 5px 0;"><strong>内容:</strong> ${data.text || '无'}</p>
+                            <p style="margin: 5px 0;"><strong>开始时间:</strong> ${startTimeStr}</p>
+                            <p style="margin: 5px 0;"><strong>结束时间:</strong> ${endTimeStr}</p>
+                        </div>
+                    </div>
+                    ${showCancelButton ? `
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="cancelCurrentAnnouncement()" style="
+                                flex: 1;
+                                background: #f44336;
+                                color: white;
+                                border: none;
+                                padding: 10px 15px;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                font-size: 13px;">
+                                🗑️ 立即取消公告
+                            </button>
+                            <button onclick="extendAnnouncement()" style="
+                                flex: 1;
+                                background: #ff9800;
+                                color: white;
+                                border: none;
+                                padding: 10px 15px;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                font-size: 13px;">
+                                ⏰ 延长1小时
+                            </button>
+                        </div>
+                    ` : ''}
+                `;
+            }
+        }
+        
+        // 取消当前公告
+        function cancelCurrentAnnouncement() {
+            if (!confirm('确定要立即取消当前公告吗？这个操作无法撤销。')) {
+                return;
+            }
+            
+            console.log('正在取消公告...');
+            
+            // 直接设置为禁用状态
+            db.ref('announcement').update({
+                enabled: false,
+                canceledAt: firebase.database.ServerValue.TIMESTAMP,
+                canceledBy: currentUser.uid
+            })
+            .then(() => {
+                alert('公告已成功取消！');
+                console.log('公告取消成功');
+                
+                // 更新表单状态
+                document.getElementById('announcementEnabled').checked = false;
+                document.getElementById('announcementSettings').style.display = 'none';
+                
+                // 刷新状态显示
+                loadAnnouncementSettings();
+                
+                // 立即隐藏所有用户的公告
+                hideAnnouncement();
+            })
+            .catch(error => {
+                console.error('取消公告失败:', error);
+                alert('取消公告失败: ' + error.message);
+            });
+        }
+        
+        // 延长公告1小时
+        function extendAnnouncement() {
+            if (!confirm('确定要将公告延长1小时吗？')) {
+                return;
+            }
+            
+            db.ref('announcement').once('value')
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        const currentEndTime = data.endTime || Date.now();
+                        const newEndTime = currentEndTime + (60 * 60 * 1000); // 延长1小时
+                        
+                        return db.ref('announcement').update({
+                            endTime: newEndTime,
+                            extendedAt: firebase.database.ServerValue.TIMESTAMP,
+                            extendedBy: currentUser.uid
+                        });
+                    }
+                })
+                .then(() => {
+                    alert('公告已延长1小时！');
+                    
+                    // 更新表单中的结束时间
+                    db.ref('announcement').once('value').then(snapshot => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            if (data.endTime) {
+                                document.getElementById('announcementEndTime').value = new Date(data.endTime).toISOString().slice(0, 16);
+                            }
+                        }
+                    });
+                    
+                    // 刷新状态显示
+                    loadAnnouncementSettings();
+                })
+                .catch(error => {
+                    console.error('延长公告失败:', error);
+                    alert('延长公告失败: ' + error.message);
+                });
+        }
+        
+        // 检查并显示公告
+        function checkAndShowAnnouncement() {
+            db.ref('announcement').on('value', snapshot => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    
+                    if (data.enabled && data.text) {
+                        const now = Date.now();
+                        const startTime = data.startTime || 0;
+                        const endTime = data.endTime || now + 86400000; // 默认24小时后过期
+                        
+                        // 检查是否在有效时间范围内
+                        if (now >= startTime && now <= endTime) {
+                            showAnnouncement(data);
+                        } else {
+                            hideAnnouncement();
+                        }
+                    } else {
+                        hideAnnouncement();
+                    }
+                } else {
+                    hideAnnouncement();
+                }
+            });
+        }
+        
+        // 显示公告
+        function showAnnouncement(data) {
+            const banner = document.getElementById('announcementBanner');
+            const textElement = document.getElementById('announcementScrollText');
+            
+            // 获取创建者信息并设置公告内容
+            if (data.createdBy) {
+                db.ref(`users/${data.createdBy}`).once('value')
+                    .then(snapshot => {
+                        let creatorName = '管理员';
+                        if (snapshot.exists()) {
+                            const userData = snapshot.val();
+                            creatorName = userData.name || userData.email?.split('@')[0] || '管理员';
+                        }
+                        
+                        // 设置公告内容，包含创建者信息
+                        const fullText = `【${creatorName} 发布】${data.text}`;
+                        textElement.textContent = fullText;
+                        
+                        // 应用其他样式
+                        applyAnnouncementStyles(banner, textElement, data);
+                    })
+                    .catch(error => {
+                        console.error('获取创建者信息失败:', error);
+                        // 如果获取失败，直接显示公告内容
+                        textElement.textContent = `【管理员 发布】${data.text}`;
+                        applyAnnouncementStyles(banner, textElement, data);
+                    });
+            } else {
+                // 没有创建者信息的情况
+                textElement.textContent = `【管理员 发布】${data.text}`;
+                applyAnnouncementStyles(banner, textElement, data);
+            }
+        }
+        
+        // 应用公告样式的辅助函数
+        function applyAnnouncementStyles(banner, textElement, data) {
+            // 设置样式
+            banner.style.fontSize = data.fontSize || '16px';
+            banner.style.color = data.textColor || '#ffffff';
+            textElement.style.animationDuration = data.speed || '15s';
+            
+            // 设置背景
+            const bg = data.background || {};
+            if (bg.type === 'solid' && bg.color) {
+                banner.style.background = bg.color;
+                banner.style.backgroundSize = 'initial';
+                banner.style.animation = 'none';
+            } else if (bg.type === 'custom' && bg.startColor && bg.endColor) {
+                banner.style.background = `linear-gradient(45deg, ${bg.startColor}, ${bg.endColor})`;
+                banner.style.backgroundSize = 'initial';
+                banner.style.animation = 'none';
+            } else {
+                // 默认渐变
+                banner.style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffd93d)';
+                banner.style.backgroundSize = '300% 300%';
+                banner.style.animation = 'gradientShift 3s ease infinite';
+            }
+            
+            // 显示公告
+            banner.style.display = 'block';
+            document.body.classList.add('announcement-active');
+            
+            // 重启滚动动画
+            textElement.style.animation = 'none';
+            setTimeout(() => {
+                textElement.style.animation = `scroll ${data.speed || '15s'} linear infinite`;
+            }, 10);
+        }
+        
+
+        
+        // 隐藏公告
+        function hideAnnouncement() {
+            const banner = document.getElementById('announcementBanner');
+            banner.style.display = 'none';
+            document.body.classList.remove('announcement-active');
+        }
     </script>
 </body>
 </html>
