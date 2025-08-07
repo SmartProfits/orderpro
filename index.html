@@ -230,9 +230,15 @@
         
         /* 网格视图样式 */
         #productList.grid-view {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: grid !important;
+            grid-template-columns: repeat(2, 1fr) !important;
             gap: 15px;
+        }
+
+        /* 强制网格布局 - 测试用 */
+        .test-grid {
+            border: 2px solid red !important;
+            background: rgba(255, 0, 0, 0.1) !important;
         }
         
         #productList.grid-view > div {
@@ -332,7 +338,7 @@
         
         @media (max-width: 768px) {
             #productList.grid-view {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(2, 1fr) !important;
                 gap: 12px; /* 减小间距以增加卡片空间 */
                 padding: 0 5px; /* 减小外边距 */
             }
@@ -365,7 +371,7 @@
         
         @media (max-width: 480px) {
             #productList.grid-view {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(2, 1fr) !important;
                 gap: 8px; /* 在小屏幕上进一步减小间距 */
                 padding: 0; /* 移除外边距 */
             }
@@ -1105,7 +1111,7 @@
         /* 店铺选择卡片样式 */
         .shop-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(2, 1fr) !important;
             gap: 10px;
             margin: 20px 0;
         }
@@ -1259,7 +1265,7 @@
         /* 分类选择样式 */
         .category-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(3, 1fr) !important;
             gap: 15px;
             margin: 20px 0;
         }
@@ -3804,6 +3810,7 @@
                 // 确保预览窗口显示
                 if (allowAutoShow) {
                     previewWindow.style.display = 'block';
+                    previewWindow.style.opacity = '1'; // 确保透明度为1
                     if (previewIcon) previewIcon.style.display = 'none';
                 } else if (previewIcon) {
                     previewIcon.style.display = 'flex';
@@ -3968,7 +3975,7 @@
                 }
             }
 
-            result += '\n_App Version 1.6_';
+            result += '\n_App Version 1.8_';
             return result;
         }
 
@@ -4135,27 +4142,43 @@
         function handleScroll() {
             const previewWindow = document.getElementById('preview-window');
             
-            if (!isScrolling && Object.keys(selectedItems).length > 0) {
-                // 开始滚动时隐藏order list
-                previewWindow.style.opacity = '0';
-                previewWindow.style.transition = 'opacity 0.2s ease';
-                isScrolling = true;
+            if (!previewWindow) {
+                console.log('handleScroll: previewWindow not found');
+                return;
             }
             
-            // 清除之前的定时器
-            clearTimeout(scrollTimeout);
+            const computedStyle = window.getComputedStyle(previewWindow);
+            const isVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
+            const hasSelectedItems = Object.keys(selectedItems).length > 0;
             
-            // 设置新的定时器，滚动停止后300ms显示order list
-            scrollTimeout = setTimeout(() => {
-                if (Object.keys(selectedItems).length > 0) {
-                    previewWindow.style.opacity = '1';
-                    isScrolling = false;
+            console.log('handleScroll:', { isVisible, hasSelectedItems, display: previewWindow.style.display });
+            
+            // 只有当previewWindow可见且有选中商品时才处理
+            if (isVisible && hasSelectedItems) {
+                if (!isScrolling) {
+                    console.log('开始滚动，隐藏order list');
+                    // 开始滚动时隐藏order list
+                    previewWindow.style.opacity = '0';
+                    previewWindow.style.transition = 'opacity 0.2s ease';
+                    isScrolling = true;
                 }
-            }, 300);
+                
+                // 清除之前的定时器
+                clearTimeout(scrollTimeout);
+                
+                // 设置新的定时器，滚动停止后300ms显示order list
+                scrollTimeout = setTimeout(() => {
+                    const currentComputedStyle = window.getComputedStyle(previewWindow);
+                    const currentIsVisible = currentComputedStyle.display !== 'none' && currentComputedStyle.visibility !== 'hidden';
+                    
+                    if (currentIsVisible && Object.keys(selectedItems).length > 0) {
+                        console.log('滚动停止，显示order list');
+                        previewWindow.style.opacity = '1';
+                        isScrolling = false;
+                    }
+                }, 300);
+            }
         }
-        
-        // 监听页面滚动
-        window.addEventListener('scroll', handleScroll, { passive: true });
 
         // 添加选择效果的JavaScript
         function selectShop(element, value) {
@@ -4279,6 +4302,7 @@
             const previewWindow = document.getElementById('preview-window');
             if (Object.keys(selectedItems).length > 0 && allowAutoShow) {
                 previewWindow.style.display = 'block';
+                previewWindow.style.opacity = '1'; // 确保透明度为1
             }
         }
 
@@ -4289,6 +4313,7 @@
             
             if (previewWindow.style.display === 'none') {
                 previewWindow.style.display = 'block';
+                previewWindow.style.opacity = '1'; // 确保透明度为1
                 previewIcon.style.display = 'none';
                 allowAutoShow = true;  // 用户主动显示时，允许自动显示
                 
@@ -5189,6 +5214,35 @@
                     updatePreview();
                 });
             }
+            
+            // 添加滚动监听
+            console.log("添加滚动监听器");
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            
+            // 测试滚动监听是否工作
+            setTimeout(() => {
+                console.log("测试滚动监听器是否工作");
+                window.scrollBy(0, 1);
+                setTimeout(() => window.scrollBy(0, -1), 100);
+            }, 1000);
+            
+            // 测试网格布局
+            setTimeout(() => {
+                const productList = document.getElementById('productList');
+                if (productList) {
+                    console.log("productList 当前类:", productList.className);
+                    console.log("productList 计算样式:", window.getComputedStyle(productList).display);
+                    console.log("productList 网格列数:", window.getComputedStyle(productList).gridTemplateColumns);
+                    
+                    // 添加测试样式
+                    productList.classList.add('test-grid');
+                    
+                    // 5秒后移除测试样式
+                    setTimeout(() => {
+                        productList.classList.remove('test-grid');
+                    }, 5000);
+                }
+            }, 2000);
             
             // 初始化商店选择事件
             document.querySelectorAll('input[name="store"]').forEach(radio => {
