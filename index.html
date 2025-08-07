@@ -240,6 +240,70 @@
             border: 2px solid red !important;
             background: rgba(255, 0, 0, 0.1) !important;
         }
+
+        /* Preview Window 过渡动画 */
+        #preview-window {
+            transition: opacity 0.3s ease;
+        }
+
+        /* 禁用长按功能 */
+        * {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version */
+            -webkit-tap-highlight-color: transparent; /* 移除触摸高亮 */
+        }
+
+        /* 允许输入框选择文本 */
+        input, textarea {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        /* 禁用图片长按菜单 */
+        img {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: none; /* 禁用图片的点击事件 */
+        }
+
+        /* 禁用右键菜单 */
+        * {
+            -webkit-context-menu: none;
+            -moz-context-menu: none;
+            -ms-context-menu: none;
+            context-menu: none;
+        }
+
+        /* 禁用图片长按菜单 - 更严格的设置 */
+        img, .shop-image, .product-image {
+            -webkit-touch-callout: none !important;
+            -webkit-user-select: none !important;
+            -khtml-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+            pointer-events: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
+        /* 允许按钮和交互元素正常工作 */
+        button, input, .shop-card, .category-card, .bottom-nav-item {
+            pointer-events: auto !important;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
         
         #productList.grid-view > div {
             /* 基本卡片容器样式 */
@@ -4135,9 +4199,11 @@
             }
         }
 
-        // 滚动控制order list显示/隐藏
+        // 滚动和触摸控制preview window显示/隐藏
         let scrollTimeout;
         let isScrolling = false;
+        let touchStartY = 0;
+        let touchStartTime = 0;
         
         function handleScroll() {
             const previewWindow = document.getElementById('preview-window');
@@ -4156,8 +4222,8 @@
             // 只有当previewWindow可见且有选中商品时才处理
             if (isVisible && hasSelectedItems) {
                 if (!isScrolling) {
-                    console.log('开始滚动，隐藏order list');
-                    // 开始滚动时隐藏order list
+                    console.log('开始滚动，隐藏preview window');
+                    // 开始滚动时隐藏preview window
                     previewWindow.style.opacity = '0';
                     previewWindow.style.transition = 'opacity 0.2s ease';
                     isScrolling = true;
@@ -4166,17 +4232,54 @@
                 // 清除之前的定时器
                 clearTimeout(scrollTimeout);
                 
-                // 设置新的定时器，滚动停止后300ms显示order list
+                // 设置新的定时器，滚动停止后500ms显示preview window
                 scrollTimeout = setTimeout(() => {
                     const currentComputedStyle = window.getComputedStyle(previewWindow);
                     const currentIsVisible = currentComputedStyle.display !== 'none' && currentComputedStyle.visibility !== 'hidden';
                     
                     if (currentIsVisible && Object.keys(selectedItems).length > 0) {
-                        console.log('滚动停止，显示order list');
+                        console.log('滚动停止，显示preview window');
                         previewWindow.style.opacity = '1';
                         isScrolling = false;
                     }
-                }, 300);
+                }, 500);
+            }
+        }
+        
+        // 触摸事件处理
+        function handleTouchStart(e) {
+            touchStartY = e.touches[0].clientY;
+            touchStartTime = Date.now();
+        }
+        
+        function handleTouchMove(e) {
+            const previewWindow = document.getElementById('preview-window');
+            
+            if (!previewWindow) return;
+            
+            const computedStyle = window.getComputedStyle(previewWindow);
+            const isVisible = computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden';
+            const hasSelectedItems = Object.keys(selectedItems).length > 0;
+            
+            if (isVisible && hasSelectedItems) {
+                const currentY = e.touches[0].clientY;
+                const deltaY = Math.abs(currentY - touchStartY);
+                const deltaTime = Date.now() - touchStartTime;
+                
+                // 如果触摸移动超过10px且时间少于100ms，认为是快速滑动
+                if (deltaY > 10 && deltaTime < 100) {
+                    console.log('触摸滑动，隐藏preview window');
+                    previewWindow.style.opacity = '0';
+                    previewWindow.style.transition = 'opacity 0.2s ease';
+                    
+                    // 1秒后重新显示
+                    setTimeout(() => {
+                        if (Object.keys(selectedItems).length > 0) {
+                            console.log('触摸滑动停止，显示preview window');
+                            previewWindow.style.opacity = '1';
+                        }
+                    }, 1000);
+                }
             }
         }
 
@@ -5215,9 +5318,13 @@
                 });
             }
             
-            // 添加滚动监听
-            console.log("添加滚动监听器");
+            // 添加滚动和触摸监听
+            console.log("添加滚动和触摸监听器");
             window.addEventListener('scroll', handleScroll, { passive: true });
+            
+            // 添加触摸事件监听
+            document.addEventListener('touchstart', handleTouchStart, { passive: true });
+            document.addEventListener('touchmove', handleTouchMove, { passive: true });
             
             // 测试滚动监听是否工作
             setTimeout(() => {
@@ -5243,6 +5350,56 @@
                     }, 5000);
                 }
             }, 2000);
+            
+            // 测试preview window
+            setTimeout(() => {
+                const previewWindow = document.getElementById('preview-window');
+                if (previewWindow) {
+                    console.log("preview-window 初始状态:", {
+                        display: previewWindow.style.display,
+                        opacity: previewWindow.style.opacity,
+                        computedDisplay: window.getComputedStyle(previewWindow).display
+                    });
+                }
+            }, 3000);
+            
+            // 禁用右键菜单
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 禁用长按选择文本
+            document.addEventListener('selectstart', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 禁用拖拽
+            document.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 禁用复制功能
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 禁用剪切功能
+            document.addEventListener('cut', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 禁用粘贴功能（除了输入框）
+            document.addEventListener('paste', function(e) {
+                if (!e.target.matches('input, textarea')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
             
             // 初始化商店选择事件
             document.querySelectorAll('input[name="store"]').forEach(radio => {
