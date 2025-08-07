@@ -135,6 +135,52 @@
             background: rgba(0, 0, 0, 0.05);
         }
 
+        /* 订单计数徽章样式 */
+        .order-count-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            box-sizing: border-box;
+        }
+
+        /* 全屏确认窗口样式 */
+        #fullscreenConfirm {
+            background: #1a2035;
+        }
+
+        body:not(.dark-mode) #fullscreenConfirm {
+            background: #f5f5f5;
+        }
+
+        body:not(.dark-mode) #fullscreenConfirm .fullscreen-header h2,
+        body:not(.dark-mode) #fullscreenConfirm .fullscreen-header .material-icons-round {
+            color: #333333 !important;
+        }
+
+        body:not(.dark-mode) #fullscreenConfirm .fullscreen-header {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        body:not(.dark-mode) #fullscreen-content {
+            background: rgba(0, 0, 0, 0.05);
+            color: #333333;
+        }
+
+        body:not(.dark-mode) #fullscreenConfirm .fullscreen-actions {
+            background: #f5f5f5;
+        }
+
         /* 所有滚动容器也应用无滚动条样式 */
         #preview-window, #settings-panel, #user-menu, .modal-content, 
         #admin-panel, #productList, #suggestions {
@@ -1892,7 +1938,6 @@
     vertical-align: middle;
     margin-left: 4px; /* 让它和文字或按钮有点间隔 */
 }
-        }
         
         @keyframes pulseIcon {
             0% {
@@ -2376,6 +2421,95 @@
         </div>
     </div>
 
+    <!-- 全屏确认窗口 -->
+    <div id="fullscreenConfirm" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #1a2035;
+        z-index: 9999;
+        display: none;
+        overflow-y: auto;
+        padding: 20px;
+        box-sizing: border-box;
+    ">
+        <div class="fullscreen-header" style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3a4255;
+        ">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="material-icons-round" style="font-size: 24px; color: #4285F4;">receipt_long</span>
+                <h2 style="margin: 0; color: white;">确认订单</h2>
+            </div>
+            <span class="material-icons-round" style="cursor: pointer; font-size: 24px; color: white;" onclick="closeFullscreenConfirm()">close</span>
+        </div>
+        
+        <div id="fullscreen-content" style="
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: white;
+            line-height: 1.6;
+            min-height: 60vh;
+        "></div>
+        
+        <div class="fullscreen-actions" style="
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            position: sticky;
+            bottom: 20px;
+            padding: 20px;
+            background: #1a2035;
+        ">
+            <button onclick="confirmAndSendWhatsApp()" style="
+                flex: 1;
+                max-width: 200px;
+                padding: 15px 25px;
+                background: #25D366;
+                color: white;
+                border: none;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            ">
+                <span class="material-icons">check</span>
+                确定发送
+            </button>
+            <button onclick="closeFullscreenConfirm()" style="
+                flex: 1;
+                max-width: 200px;
+                padding: 15px 25px;
+                background: #ff4444;
+                color: white;
+                border: none;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            ">
+                <span class="material-icons">refresh</span>
+                重选
+            </button>
+        </div>
+    </div>
+
     <!-- 修改预览图标的样式 -->
 
 
@@ -2430,7 +2564,7 @@
             <div style="display: flex; gap: 10px;">
                 <button id="dark-mode-btn" 
                         onclick="changeTheme('dark')" 
-                        style="flex: 1; padding: 8px; border-radiuszz: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;">
+                        style="flex: 1; padding: 8px; border-radius: 5px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 5px;">
                     <span class="material-icons-round" style="font-size: 16px;">dark_mode</span>
                     Dark Mode
                 </button>
@@ -2555,8 +2689,8 @@
             </div>
     </div>
 
-    <h3>Category</h3>
-    <div class="category-container">
+    <h3 id="categoryTitle" style="display: none;">Category</h3>
+    <div class="category-container" id="categoryContainer" style="display: none;">
         <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
             <input type="radio" name="category" value="BanHeang" id="banheang">
             <label for="banheang">
@@ -2622,13 +2756,13 @@
         </div>
     </div>
 
-    <div style="position: relative; margin-bottom: 15px; margin-top: 15px;">
+    <div id="searchContainer" style="position: relative; margin-bottom: 15px; margin-top: 15px; display: none;">
         <span class="material-icons" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.5); pointer-events: none; z-index: 10;">search</span>
         <input type="text" id="productSearch" placeholder="Search..." oninput="searchProduct()" autocomplete="off" style="padding-left: 35px; width: calc(100% - 35px); position: relative;" />
     </div>
 
     <!-- 添加布局切换按钮 -->
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 10px; gap: 10px;">
+    <div id="viewToggleContainer" style="display: none; justify-content: flex-end; margin-bottom: 10px; gap: 10px;">
         <button id="listViewBtn" onclick="toggleView('list')" class="view-toggle-btn active">
             <span class="material-icons">view_list</span>
         </button>
@@ -2637,9 +2771,9 @@
         </button>
     </div>
 
-    <div id="suggestions"></div>
-    <h3>Select items (default quantity is 1）</h3>
-    <div id="productList"></div>
+    <div id="suggestions" style="display: none;"></div>
+    <h3 id="selectItemsTitle" style="display: none;">Select items (default quantity is 1）</h3>
+    <div id="productList" style="display: none;"></div>
 
     <div id="imageModal" class="image-modal" style="display: none;">
         <span class="close-modal" onclick="closeImageModal()">&times;</span>
@@ -3235,8 +3369,6 @@
 		{ id: 174, name: "BH Tau Shar Pheah Original" },
 		{ id: 175, name: "BH Tau Shar Pheah Matcha" },
 		{ id: 176, name: "BH Tau Shar Pheah Paprika Seaweed" },
-		{ id: 178, name: "BH Tau Shar Pheah White Coffee" },
-		{ id: 179, name: "BH Tau Shar Pheah Cempedak" },
                 { id: 105, name: "BH Heong Pheah" },
                 { id: 106, name: "BH Beh Teh Saw" },
                 { id: 107, name: "BH Phong Pheah" },
@@ -3688,6 +3820,9 @@
             
             // 强制更新预览内容
             updatePreview();
+            
+            // 更新订单计数徽章
+            updateOrderCount();
         }
 
         function saveQuantity(id) {
@@ -3695,6 +3830,7 @@
             if (selectedItems[id]) {
                 selectedItems[id] = quantity;
                 updatePreview();
+                updateOrderCount();
             }
         }
 
@@ -3832,20 +3968,54 @@
                 }
             }
 
-            result += '\n_App Version 1.7_';
+            result += '\n_App Version 1.6_';
             return result;
         }
 
         function copyAndSendWhatsApp() {
+            // 显示全屏确认窗口
+            const fullscreenConfirm = document.getElementById('fullscreenConfirm');
+            const fullscreenContent = document.getElementById('fullscreen-content');
+            
+            // 获取订单内容并显示
+            const text = generateText(false); // 获取带HTML格式的文本
+            fullscreenContent.innerHTML = text.replace(/\n/g, '<br>');
+            
+            // 显示全屏窗口
+            fullscreenConfirm.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // 禁止背景滚动
+            
+            // 自动向下滑动到内容区域
+            setTimeout(() => {
+                fullscreenConfirm.scrollTo({
+                    top: 200,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        }
+        
+        function confirmAndSendWhatsApp() {
             // 使用 generateText(true) 来获取纯文本版本
             let text = generateText(true);
             navigator.clipboard.writeText(text).then(() => {
                 alert('Text copied, now redirecting to WhatsApp');
                 let whatsappURL = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                
+                // 关闭全屏窗口
+                closeFullscreenConfirm();
+                
+                // 跳转到WhatsApp
                 window.location.href = whatsappURL;
             }).catch(err => {
                 console.error('无法复制', err);
+                alert('复制失败，请手动复制订单内容');
             });
+        }
+        
+        function closeFullscreenConfirm() {
+            const fullscreenConfirm = document.getElementById('fullscreenConfirm');
+            fullscreenConfirm.style.display = 'none';
+            document.body.style.overflow = 'auto'; // 恢复背景滚动
         }
 
         function searchProduct() {
@@ -3923,6 +4093,70 @@
             // 检查用户是否已登录，Firebase的onAuthStateChanged会自动处理认证状态
         }
 
+        // 显示分类选择区域和相关功能
+        function showCategories() {
+            document.getElementById('categoryTitle').style.display = 'block';
+            document.getElementById('categoryContainer').style.display = 'grid';
+            document.getElementById('searchContainer').style.display = 'block';
+            document.getElementById('viewToggleContainer').style.display = 'flex';
+            document.getElementById('suggestions').style.display = 'block';
+            document.getElementById('selectItemsTitle').style.display = 'block';
+            document.getElementById('productList').style.display = 'block';
+        }
+        
+        // 隐藏分类选择区域和相关功能
+        function hideCategories() {
+            document.getElementById('categoryTitle').style.display = 'none';
+            document.getElementById('categoryContainer').style.display = 'none';
+            document.getElementById('searchContainer').style.display = 'none';
+            document.getElementById('viewToggleContainer').style.display = 'none';
+            document.getElementById('suggestions').style.display = 'none';
+            document.getElementById('selectItemsTitle').style.display = 'none';
+            document.getElementById('productList').style.display = 'none';
+        }
+
+        // 更新订单计数徽章
+        function updateOrderCount() {
+            const orderCountBadge = document.getElementById('orderCountBadge');
+            const itemCount = Object.keys(selectedItems).length;
+            
+            if (itemCount > 0) {
+                orderCountBadge.textContent = itemCount;
+                orderCountBadge.style.display = 'flex';
+            } else {
+                orderCountBadge.style.display = 'none';
+            }
+        }
+
+        // 滚动控制order list显示/隐藏
+        let scrollTimeout;
+        let isScrolling = false;
+        
+        function handleScroll() {
+            const previewWindow = document.getElementById('preview-window');
+            
+            if (!isScrolling && Object.keys(selectedItems).length > 0) {
+                // 开始滚动时隐藏order list
+                previewWindow.style.opacity = '0';
+                previewWindow.style.transition = 'opacity 0.2s ease';
+                isScrolling = true;
+            }
+            
+            // 清除之前的定时器
+            clearTimeout(scrollTimeout);
+            
+            // 设置新的定时器，滚动停止后300ms显示order list
+            scrollTimeout = setTimeout(() => {
+                if (Object.keys(selectedItems).length > 0) {
+                    previewWindow.style.opacity = '1';
+                    isScrolling = false;
+                }
+            }, 300);
+        }
+        
+        // 监听页面滚动
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
         // 添加选择效果的JavaScript
         function selectShop(element, value) {
             vibrate(); // 添加震动反馈
@@ -3947,6 +4181,9 @@
                 reselectBtn.onclick = reselectShop;
                 shopContainer.appendChild(reselectBtn);
             }
+            
+            // 显示分类选择区域
+            showCategories();
             
             toggleItems();
             updatePreview();
@@ -3973,8 +4210,10 @@
                 reselectBtn.remove();
             }
             
-            // 清空选中的商品和更新预览
-            Object.keys(selectedItems).forEach(key => delete selectedItems[key]);
+            // 隐藏分类选择区域
+            hideCategories();
+            
+            // 不清空选中商品，只是重新显示所有店铺供选择
             toggleItems();
             updatePreview();
         }
@@ -4821,7 +5060,10 @@
         
         <!-- 订单预览按钮 -->
         <div class="bottom-nav-item" id="previewNavItem" onclick="togglePreview()">
-            <span class="material-icons">description</span>
+            <div style="position: relative;">
+                <span class="material-icons">description</span>
+                <span id="orderCountBadge" class="order-count-badge" style="display: none;">0</span>
+            </div>
             <span class="label">Order</span>
         </div>
         
