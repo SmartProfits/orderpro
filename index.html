@@ -309,11 +309,12 @@
             /* 基本卡片容器样式 */
             background: rgba(255, 255, 255, 0.1); /* 恢复半透明背景 */
             padding: 15px;
+            padding-bottom: 50px; /* 为右下角按钮留出空间 */
             border-radius: 10px; /* 恢复原始圆角 */
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 恢复原始阴影 */
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             min-height: 180px;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -355,13 +356,10 @@
             text-align: center;
             font-weight: bold;
             cursor: pointer;
-            /* 确保高度一致，溢出文本设置省略号 */
-            height: 2.4em;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
+            /* 完全显示商品名称，不限制行数 */
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
         }
         
         #productList.grid-view .stock-info {
@@ -386,9 +384,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            width: 100%;
-            margin-top: 10px;
+            gap: 5px;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 10;
         }
         
         #productList.grid-view .quantity-btn {
@@ -410,6 +410,7 @@
             #productList.grid-view > div {
                 /* 确保在两列时卡片大小一致 */
                 min-height: 200px;
+                padding-bottom: 50px; /* 为右下角按钮留出空间 */
                 height: 100%;
                 width: 100%; /* 确保卡片占满列宽 */
                 max-width: 100%; /* 防止溢出 */
@@ -418,13 +419,10 @@
             
             #productList.grid-view .product-name {
                 font-size: 0.95rem; /* 稍微缩小字体 */
-                line-height: 1.2; /* 减小行高 */
-                height: 2.4em; /* 2行高度限制 */
-                overflow: hidden;
-                text-overflow: ellipsis;
-                display: -webkit-box;
-                -webkit-box-orient: vertical;
-                -webkit-line-clamp: 2; /* 限制为两行 */
+                line-height: 1.3; /* 行高 */
+                word-wrap: break-word;
+                word-break: break-word;
+                white-space: normal;
                 margin-bottom: 4px;
             }
             
@@ -442,6 +440,7 @@
             
             #productList.grid-view > div {
                 padding: 10px; /* 减小内边距以增加内容区域 */
+                padding-bottom: 50px; /* 为右下角按钮留出空间 */
                 min-height: 180px;
                 width: 100%; /* 确保卡片占满列宽 */
             }
@@ -453,7 +452,9 @@
             
             #productList.grid-view .product-name {
                 font-size: 0.9rem; /* 进一步缩小字体 */
-                -webkit-line-clamp: 2; /* 仍保持两行 */
+                word-wrap: break-word;
+                word-break: break-word;
+                white-space: normal;
                 margin: 3px 0;
             }
             
@@ -1995,19 +1996,25 @@
             background: #ff5252;
         }
         
-        /* 商品列表中的新品标记 */
-        #productList .new-badge {
-            position: static;
-            display: inline-block;
-            color: #ff0000;
-            font-size: 16px;
-            vertical-align: middle;
-            margin-left: 5px;
-             width: 50px;
-    height: 20px;
-    vertical-align: middle;
-    margin-left: 4px; /* 让它和文字或按钮有点间隔 */
-}
+        /* 新品商品红色呼吸边框效果 */
+        #productList.grid-view > div.is-new-product,
+        #productList:not(.grid-view) > div.is-new-product {
+            position: relative;
+            border: 2px solid #ff0000 !important;
+            animation: pulse-red-border 1.5s ease-in-out infinite;
+        }
+        
+        /* 红色边框呼吸动画 */
+        @keyframes pulse-red-border {
+            0%, 100% {
+                border-color: #ff0000;
+                box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7);
+            }
+            50% {
+                border-color: #ff4444;
+                box-shadow: 0 0 15px 5px rgba(255, 0, 0, 0.5);
+            }
+        }
         
         @keyframes pulseIcon {
             0% {
@@ -2225,7 +2232,7 @@
             
             <!-- 商品管理选项卡 -->
             <div id="products-tab" class="admin-tab-content" style="display: none;">
-                <h3>商品新品标记</h3>
+                <h3>商品管理</h3>
                 <div class="product-management">
                     <select id="categorySelect" onchange="loadProductsForAdmin()">
                         <option value="">-- 选择商品分类 --</option>
@@ -3350,10 +3357,14 @@
 
         // 修改 updateStockDisplay 函数
         function updateStockDisplay() {
-            // 获取新品标记数据
-            db.ref('newProducts').once('value')
-                .then(snapshot => {
-                    const newProductsData = snapshot.val() || {};
+            // 获取新品标记数据和box数据
+            Promise.all([
+                db.ref('newProducts').once('value'),
+                db.ref('productBoxes').once('value')
+            ])
+                .then(([newProductsSnapshot, productBoxesSnapshot]) => {
+                    const newProductsData = newProductsSnapshot.val() || {};
+                    const productBoxesData = productBoxesSnapshot.val() || {};
                     
                     // 更新所有商品的显示
                     for (const [productId, product] of Object.entries(window.allProducts || {})) {
@@ -3362,9 +3373,15 @@
                         const newUntil = isNew ? new Date(isNew.until) : null;
                         const isStillNew = isNew && newUntil && newUntil > new Date();
                         
-                        // 新品标记代码
-                        const newBadge = isStillNew ? 
-                            `<img src="pic/new.png" class="new-badge" alt="New Badge">` : '';
+                        // 新品标记：为商品容器添加/移除class
+                        const productDiv = document.querySelector(`[data-product-id="${product.id}"]`);
+                        if (productDiv) {
+                            if (isStillNew) {
+                                productDiv.classList.add('is-new-product');
+                            } else {
+                                productDiv.classList.remove('is-new-product');
+                            }
+                        }
                 
                         // 获取库存信息
                         let stock = stockMap[product.name] || 0;
@@ -3385,13 +3402,17 @@
                         const stockClass = stock === 0 ? 'zero-stock' : '';
                         const stockText = stock === 0 ? '(No Stock)' : `(Stock: ${stock})`;
                         
+                        // 获取unit数量
+                        const boxCount = productBoxesData[product.id] || 0;
+                        const boxText = boxCount > 0 ? ` <span style="display: inline-block; padding: 3px 10px; background: #000000; color: #ffffff; font-weight: bold; font-size: 13px; border-radius: 8px; margin-left: 6px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4); letter-spacing: 0.5px;">Unit: ${boxCount}</span>` : '';
+                        
                         // 区分网格视图和列表视图的更新方式
                         if (currentView === 'grid') {
                             // 网格视图：更新独立的stock-info元素
                             const stockElement = document.getElementById(`stock${product.id}`);
                             if (stockElement) {
                                 stockElement.className = `stock-info ${stockClass}`;
-                                stockElement.innerHTML = `${stockText} ${newBadge}`;
+                                stockElement.innerHTML = `${stockText}${boxText}`;
                             }
                             
                             // 确保产品名称正确显示
@@ -3410,13 +3431,13 @@
                                     <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 3px;">image</span>View
                                 </button>` : '';
                             
-                            // 更新标签内容，将新品标记放在库存文本旁边
-                            label.innerHTML = `${product.name} <span class="${stockClass}">${stockText} ${newBadge}</span> ${viewImageButton}`;
+                            // 更新标签内容
+                            label.innerHTML = `${product.name} <span class="${stockClass}">${stockText}${boxText}</span> ${viewImageButton}`;
                         }
                     }
                 })
                 .catch(error => {
-                    console.error('加载新品数据失败:', error);
+                    console.error('加载商品数据失败:', error);
                 });
         }
 
@@ -3669,6 +3690,7 @@
 
             sortedProducts.forEach(product => {
                 const div = document.createElement('div');
+                div.setAttribute('data-product-id', product.id);
                 const isChecked = selectedItems[product.id] ? 'checked' : '';
                 const defaultQuantity = product.defaultQuantity || 1;
                 const currentQuantity = selectedItems[product.id] || defaultQuantity;
@@ -3732,6 +3754,8 @@
             
             // 加载商品后更新库存和新品标记信息
             loadQuantitiesFromFirebase();
+            // 更新unit信息
+            updateProductBoxDisplay();
         }
 
         // 备用函数，在获取新品数据失败时使用
@@ -3741,6 +3765,7 @@
 
             products.forEach(product => {
                 const div = document.createElement('div');
+                div.setAttribute('data-product-id', product.id);
                 const isChecked = selectedItems[product.id] ? 'checked' : '';
                 const defaultQuantity = product.defaultQuantity || 1;
                 const currentQuantity = selectedItems[product.id] || defaultQuantity;
@@ -3807,6 +3832,8 @@
             
             // 加载商品后更新库存信息
             loadQuantitiesFromFirebase();
+            // 更新unit信息
+            updateProductBoxDisplay();
         }
 
         // 添加显示图片的函数
@@ -4049,7 +4076,7 @@
                 }
             }
 
-            result += '\n_App Version 1.8_';
+            result += '\n_App Version 1.9_';
             return result;
         }
 
@@ -4884,23 +4911,38 @@
                 return;
             }
             
-            // 获取新品标记数据
-            db.ref('newProducts').once('value')
-                .then(snapshot => {
-                    const newProductsData = snapshot.val() || {};
+            // 获取新品标记数据和box数据
+            Promise.all([
+                db.ref('newProducts').once('value'),
+                db.ref('productBoxes').once('value')
+            ])
+                .then(([newProductsSnapshot, productBoxesSnapshot]) => {
+                    const newProductsData = newProductsSnapshot.val() || {};
+                    const productBoxesData = productBoxesSnapshot.val() || {};
                     let html = '';
                     
                     products.forEach(product => {
                         const isNew = newProductsData[product.id];
                         const newUntil = isNew ? new Date(isNew.until) : null;
                         const isStillNew = isNew && newUntil && newUntil > new Date();
+                        const boxCount = productBoxesData[product.id] || 0;
                         
                         html += `
                             <div class="product-item ${isStillNew ? 'new-product' : ''}">
                                 <div class="product-name">${product.name}</div>
                                 ${isStillNew ? `<span class="material-icons-round new-badge">keyboard_double_arrow_up</span>` : ''}
                                 <div>ID: ${product.id}</div>
-                                <div>
+                                <div style="margin-top: 10px;">
+                                    <label style="display: block; margin-bottom: 5px; font-size: 14px; font-weight: 500;">Unit数量:</label>
+                                    <input type="number" 
+                                           id="boxCount${product.id}" 
+                                           value="${boxCount}" 
+                                           min="0" 
+                                           style="width: 100%; padding: 5px; background: #2a2d3e; color: #fff; border: 1px solid #3a4255; border-radius: 4px;"
+                                           onchange="saveProductBoxCount(${product.id})"
+                                           placeholder="输入unit数量">
+                                </div>
+                                <div style="margin-top: 10px;">
                                     ${isStillNew 
                                         ? `<button class="toggle-new remove" onclick="toggleNewProduct(${product.id}, false)">移除新品标记</button>
                                            <div style="font-size: 12px; margin-top: 5px;">到期时间: ${newUntil.toLocaleDateString()}</div>`
@@ -4914,9 +4956,32 @@
                     document.getElementById('productManagementList').innerHTML = html;
                 })
                 .catch(error => {
-                    console.error('加载新品数据失败:', error);
+                    console.error('加载商品数据失败:', error);
                     document.getElementById('productManagementList').innerHTML = '<p>加载失败，请重试</p>';
                 });
+        }
+        
+        // 保存商品的unit数量
+        function saveProductBoxCount(productId) {
+            const boxCountInput = document.getElementById(`boxCount${productId}`);
+            const boxCount = parseInt(boxCountInput.value) || 0;
+            
+            db.ref(`productBoxes/${productId}`).set(boxCount)
+                .then(() => {
+                    console.log(`商品 ${productId} 的unit数量已保存: ${boxCount}`);
+                    // 更新商品显示中的unit信息
+                    updateProductBoxDisplay();
+                })
+                .catch(error => {
+                    console.error('保存unit数量失败:', error);
+                    alert('保存失败，请重试');
+                });
+        }
+        
+        // 更新商品显示中的unit信息
+        function updateProductBoxDisplay() {
+            // 直接调用updateStockDisplay来更新所有信息（包括unit）
+            updateStockDisplay();
         }
         
         // 切换商品的新品标记状态
