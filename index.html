@@ -927,6 +927,35 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative; /* 为Unit标签定位提供参考 */
+        }
+        
+        /* Unit标签样式 - 右上角（列表视图和网格视图通用） */
+        #productList .product-unit-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            display: inline-block;
+            padding: 3px 10px;
+            background: #000000;
+            color: #ffffff;
+            font-weight: bold;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        /* 列表视图Unit标签字体大小 */
+        #productList:not(.grid-view) .product-unit-badge {
+            font-size: 13px;
+        }
+        
+        /* 网格视图Unit标签字体大小（更小） */
+        #productList.grid-view .product-unit-badge {
+            font-size: 11px;
+            padding: 2px 8px;
         }
 
         /* 修改按钮样式 */
@@ -3404,15 +3433,25 @@
                         
                         // 获取unit数量
                         const boxCount = productBoxesData[product.id] || 0;
-                        const boxText = boxCount > 0 ? ` <span style="display: inline-block; padding: 3px 10px; background: #000000; color: #ffffff; font-weight: bold; font-size: 13px; border-radius: 8px; margin-left: 6px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4); letter-spacing: 0.5px;">Unit: ${boxCount}</span>` : '';
                         
                         // 区分网格视图和列表视图的更新方式
                         if (currentView === 'grid') {
-                            // 网格视图：更新独立的stock-info元素
+                            // 网格视图：更新独立的stock-info元素（不包含Unit）
                             const stockElement = document.getElementById(`stock${product.id}`);
                             if (stockElement) {
                                 stockElement.className = `stock-info ${stockClass}`;
-                                stockElement.innerHTML = `${stockText}${boxText}`;
+                                stockElement.innerHTML = `${stockText}`;
+                            }
+                            
+                            // 更新Unit标签（显示在右上角）
+                            const unitBadge = document.getElementById(`unitBadge${product.id}`);
+                            if (unitBadge) {
+                                if (boxCount > 0) {
+                                    unitBadge.innerHTML = `Unit: ${boxCount}`;
+                                    unitBadge.style.display = 'block';
+                                } else {
+                                    unitBadge.style.display = 'none';
+                                }
                             }
                             
                             // 确保产品名称正确显示
@@ -3421,7 +3460,7 @@
                                 nameElement.innerHTML = product.name;
                             }
                         } else {
-                            // 列表视图：更新label内容
+                            // 列表视图：更新label内容（不包含Unit）
                             const label = document.querySelector(`label[for="item${product.id}"]`);
                             if (!label) continue;
                             
@@ -3431,8 +3470,19 @@
                                     <span class="material-icons-outlined" style="font-size: 16px; vertical-align: middle; margin-right: 3px;">image</span>View
                                 </button>` : '';
                             
-                            // 更新标签内容
-                            label.innerHTML = `${product.name} <span class="${stockClass}">${stockText}${boxText}</span> ${viewImageButton}`;
+                            // 更新标签内容（不包含Unit，Unit显示在右上角）
+                            label.innerHTML = `${product.name} <span class="${stockClass}">${stockText}</span> ${viewImageButton}`;
+                            
+                            // 更新Unit标签（显示在右上角）
+                            const unitBadge = document.getElementById(`unitBadge${product.id}`);
+                            if (unitBadge) {
+                                if (boxCount > 0) {
+                                    unitBadge.innerHTML = `Unit: ${boxCount}`;
+                                    unitBadge.style.display = 'block';
+                                } else {
+                                    unitBadge.style.display = 'none';
+                                }
+                            }
                         }
                     }
                 })
@@ -3705,6 +3755,7 @@
                     // 在网格视图中，使用独立的元素显示产品名称和库存信息
                     div.innerHTML = `
                         <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
+                        <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
                         ${imageHTML}
                         <span class="product-name" for="item${product.id}" onclick="document.getElementById('item${product.id}').click()">${product.name}</span>
                         <span class="stock-info" id="stock${product.id}"></span>
@@ -3731,6 +3782,7 @@
                     
                     div.innerHTML = `
                         <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
+                        <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
                         <label for="item${product.id}">
                             ${product.name}
                             ${viewImageButton}
@@ -3780,6 +3832,7 @@
                     // 在网格视图中，使用独立的元素显示产品名称和库存信息
                     div.innerHTML = `
                         <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
+                        <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
                         ${imageHTML}
                         <span class="product-name" for="item${product.id}" onclick="document.getElementById('item${product.id}').click()">${product.name}</span>
                         <span class="stock-info" id="stock${product.id}"></span>
@@ -3813,6 +3866,7 @@
                                 ${viewImageButton}
                             </label>
                         </div>
+                        <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
                         <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)">
                             <span class="material-icons-round" style="font-size: 18px;">add</span>
                         </button>
