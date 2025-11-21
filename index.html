@@ -147,7 +147,7 @@
             background: var(--surface-color);
             border-radius: var(--radius-lg);
             overflow: hidden;
-            aspect-ratio: 16/9;
+            aspect-ratio: ;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-color);
             transition: all 0.3s ease;
@@ -1683,59 +1683,101 @@
             content.innerHTML = text.replace(/\n/g, '<br>');
         }
 
-        function generateText(forWhatsApp) {
-            let result = '';
-            let selectedStore = document.querySelector('input[name="store"]:checked');
-            let hasAddOn = document.getElementById('addOnCheckbox').checked;
-            let totalItems = 0;
-            let userName = currentUser ? (currentUser.email ? currentUser.email.split('@')[0] : "Guest") : "Guest";
-            try {
-                 const nameEl = document.querySelector('#dashboardUserName');
-                 if(nameEl && nameEl.textContent !== 'Not logged in') userName = nameEl.textContent;
-            } catch(e){}
+function generateText(forWhatsApp) {
+    let result = '';
+    let selectedStore = document.querySelector('input[name="store"]:checked');
+    let hasAddOn = document.getElementById('addOnCheckbox').checked;
+    let totalItems = 0;
+    
+    // 获取用户名
+    let userName = currentUser ? (currentUser.email ? currentUser.email.split('@')[0] : "Guest") : "Guest";
+    try {
+         const nameEl = document.querySelector('#dashboardUserName');
+         if(nameEl && nameEl.textContent !== 'Not logged in') userName = nameEl.textContent;
+    } catch(e){}
 
-            if (selectedStore) {
-                result += 'Store: ' + selectedStore.value + (hasAddOn ? ' 💥Add On💥' : '') + '\n';
-                result += 'Order By: (' + userName + ')\n\n';
+    // --- 新增：日期和时间逻辑 ---
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const dateStr = `${day}/${month}/${year}`;
+
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // 0点显示为12点
+    const timeStr = `${String(hours).padStart(2, '0')}:${minutes}${ampm}`;
+    // ---------------------------
+
+    // 构建头部信息
+    if (selectedStore) {
+        // 去除value中可能自带的星号，防止重复
+        let storeName = selectedStore.value.replace(/\*/g, '');
+        
+        result += `🏪 *${storeName}* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
+        result += `👤 Order By: ${userName}\n`;
+        result += `📅 Date: ${dateStr}\n`;
+        result += `🕠 Time: ${timeStr}\n\n`;
+    }
+
+    // 处理商品分类和计数
+    const categorizedItems = {};
+    Object.keys(categories).forEach(c => categorizedItems[c] = []);
+
+    for (const [id, quantity] of Object.entries(selectedItems)) {
+        for (const [cat, products] of Object.entries(categories)) {
+            const p = products.find(i => i.id == id);
+            if (p) {
+                categorizedItems[cat].push({ ...p, quantity });
+                // 巧克力按品种算1个，其他按数量算（保留你之前的逻辑）
+                if(p.name.includes("Chocolate")) totalItems += 1; 
+                else totalItems += parseInt(quantity);
+                break;
             }
-
-            const categorizedItems = {};
-            Object.keys(categories).forEach(c => categorizedItems[c] = []);
-
-            for (const [id, quantity] of Object.entries(selectedItems)) {
-                for (const [cat, products] of Object.entries(categories)) {
-                    const p = products.find(i => i.id == id);
-                    if (p) {
-                        categorizedItems[cat].push({ ...p, quantity });
-                        if(p.name.includes("Chocolate")) totalItems += 1; else totalItems += parseInt(quantity);
-                        break;
-                    }
-                }
-            }
-
-            result += `📦 Total Items: ${totalItems}\n`;
-
-            for (const [cat, items] of Object.entries(categorizedItems)) {
-                if (items.length > 0) {
-                    result += `\n🔹 ${cat} 🔹\n`;
-                    items.forEach(item => {
-                        if (forWhatsApp) {
-                            result += `${item.name} - ${item.quantity}\n`;
-                        } else {
-                            const stock = stockMap[item.name] || 0;
-                            const nameHtml = stock === 0 ? `<span style="color:var(--danger-color)">${item.name}</span>` : item.name;
-                            result += `${nameHtml} - <b>${item.quantity}</b>\n`;
-                        }
-                    });
-                }
-            }
-            
-            // Add App Version at the end
-            result += '\n_App Version 2.0_';
-            
-            return result;
         }
+    }
 
+    result += `📦 Total Items: *${totalItems}*\n`;
+
+    // 定义分类对应的 Emoji (优化点)
+    const categoryIcons = {
+        'BanHeang': '🍪', 'HoeHup': '🥮', 'Chocolate': '🍫', 
+        'Sotong': '🦑', 'Coffee': '☕', 'Amplang': '🌕', 
+        'Other': '🎁', 'Wrapping': '🧸', 'Office': '📦'
+    };
+
+    // 构建商品列表
+    for (const [cat, items] of Object.entries(categorizedItems)) {
+        if (items.length > 0) {
+            // 获取对应图标，如果没有则不显示
+            const icon = categoryIcons[cat] || '';
+            
+            result += `\n🔹🔸🔹 ${cat} ${icon} 🔹🔸🔹\n`;
+            
+            items.forEach(item => {
+                const unit = item.unit || 'ctn'; // 默认单位 ctn
+                
+                if (forWhatsApp) {
+                    // WhatsApp 纯文本格式
+                    // 建议：可以在数量上加粗 (例如 *1 ctn*) 方便查看，这里暂时按照你的要求不加
+                    result += `${item.name} - ${item.quantity} ${unit}\n`;
+                } else {
+                    // 网页预览格式 (HTML)
+                    const stock = stockMap[item.name] || 0;
+                    // 如果无库存，红色显示名字
+                    const nameHtml = stock === 0 ? `<span style="color:var(--danger-color)">${item.name}</span>` : item.name;
+                    result += `${nameHtml} - <b>${item.quantity} ${unit}</b>\n`;
+                }
+            });
+        }
+    }
+    
+    result += '\n_App Version 2.0_';
+    
+    return result;
+}
         function loadQuantitiesFromFirebase() {
             ['office', 'kepayan'].forEach(loc => {
                 stockDb.ref(`inventory/${loc}`).on('value', snap => {
