@@ -147,7 +147,7 @@
             background: var(--surface-color);
             border-radius: var(--radius-lg);
             overflow: hidden;
-            aspect-ratio: ;
+            aspect-ratio: 3/2;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border-color);
             transition: all 0.3s ease;
@@ -280,7 +280,7 @@
         }
 
         #productList label span { font-size: 0.8rem; color: var(--accent-color); margin-top: 2px; }
-        #productList label span.zero-stock { color: var(--danger-color) !important; }
+        #productList .zero-stock { color: var(--danger-color) !important; }
 
         /* View Image Button */
         .view-image-btn {
@@ -592,13 +592,139 @@
             100% { transform: translate3d(-100%, 0, 0); } /* End at left of text width */
         }
 
+        /* =========================================
+           SPLASH SCREEN STYLES (NEW)
+           ========================================= */
+        #splashScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* 适配暗黑/明亮模式的动态背景 */
+            background: var(--bg-color); 
+            z-index: 20000; /* 确保在最顶层 */
+            display: none; /* 默认隐藏，JS控制显示 */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            /* 使用transform进行硬件加速，避免卡顿 */
+            transition: opacity 0.5s ease-out;
+        }
+
+        /* 渐变背景覆盖层 - 更加酷炫 */
+        #splashScreen::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, rgba(66, 133, 244, 0.15) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+        }
+
+        .splash-content {
+            text-align: center;
+            padding: 20px;
+            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .splash-logo-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            background: linear-gradient(135deg, #4285F4, #00CED1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+
+        .splash-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1.2;
+            background: linear-gradient(90deg, #ffffff, #a0c4ff, #ffffff);
+            background-size: 200% auto;
+            color: #000; /* Fallback */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+        }
+        
+        /* 适配亮色模式的文字颜色 */
+        body:not(.dark-mode) .splash-title {
+            background: linear-gradient(90deg, #1f2937, #4285F4, #1f2937);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .splash-subtitle {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-top: 5px;
+            opacity: 0.9;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .splash-loader {
+            width: 60px;
+            height: 4px;
+            background: rgba(128,128,128,0.2);
+            margin: 30px auto 0;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .splash-loader::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 40%;
+            background: var(--primary-color);
+            border-radius: 4px;
+            animation: loadBar 1.5s infinite ease-in-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        @keyframes loadBar {
+            0% { left: -40%; }
+            100% { left: 100%; }
+        }
+
         /* Responsive Tweaks */
         @media (max-width: 380px) {
             .category-container { grid-template-columns: repeat(3, 1fr); }
+            .splash-title { font-size: 1.8rem; }
         }
     </style>
 </head>
 <body class="dark-mode"> <!-- Default to Dark Mode -->
+
+    <!-- SPLASH SCREEN (新添加的开场动画层) -->
+    <div id="splashScreen">
+        <div class="splash-content">
+            <span class="material-icons-round splash-logo-icon">rocket_launch</span>
+            <h1 class="splash-title">SmartProfits</h1>
+            <div class="splash-subtitle">Stock Request</div>
+            <div class="splash-loader"></div>
+        </div>
+    </div>
 
     <!-- 公告横幅 (修复文字显示和动画) -->
     <div id="announcementBanner" style="
@@ -669,125 +795,146 @@
     </div>
 
     <!-- 主要内容区域 -->
-    <h1 style="padding-top: 20px;">Airport Stock Request</h1>
+    <div id="mainAppContent" style="opacity: 0; transition: opacity 0.5s;">
+        <h1 style="padding-top: 20px;">SmartProfits Stock Request</h1>
 
-    <!-- 店铺选择 -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
-        <h3><span class="material-icons-round" style="color: var(--primary-color)">store</span> Select Outlet</h3>
-    </div>
+        <!-- 店铺选择 -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
+            <h3><span class="material-icons-round" style="color: var(--primary-color)">store</span> Select Outlet</h3>
+        </div>
 
-    <div class="shop-container">
-        <div class="shop-card" onclick="selectShop(this, '*JKL*')">
-            <input type="radio" name="store" value="*JKL*" id="jkl" style="display:none">
-            <img src="shop/jkl.png" alt="JKL" onerror="this.src='https://placehold.co/400x200?text=JKL'">
-            <div class="shop-name">JKL</div>
+        <div class="shop-container">
+            <div class="shop-card" onclick="selectShop(this, '*JKL*')">
+                <input type="radio" name="store" value="*JKL*" id="jkl" style="display:none">
+                <img src="shop/jkl.png" alt="JKL" onerror="this.src='https://placehold.co/400x200?text=JKL'">
+                <div class="shop-name">JKL</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*TOM*')">
+                <input type="radio" name="store" value="*TOM*" id="tom" style="display:none">
+                <img src="shop/tom.png" alt="TOM" onerror="this.src='https://placehold.co/400x200?text=TOM'">
+                <div class="shop-name">TOM</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Dalam*')">
+                <input type="radio" name="store" value="*Ole-Ole Dalam*" id="dalam" style="display:none">
+                <img src="shop/dalam.png" alt="Dalam" onerror="this.src='https://placehold.co/400x200?text=Dalam'">
+                <div class="shop-name">Ole-Ole Dalam</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Luar*')">
+                <input type="radio" name="store" value="*Ole-Ole Luar*" id="new" style="display:none">
+                <img src="shop/luar.png" alt="Luar" onerror="this.src='https://placehold.co/400x200?text=Luar'">
+                <div class="shop-name">Ole-Ole Luar</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Wrapping(AA)*')">
+                <input type="radio" name="store" value="*Wrapping(AA)*" id="aa" style="display:none">
+                <img src="shop/Aa.png" alt="AA" onerror="this.src='https://placehold.co/400x200?text=AA'">
+                <div class="shop-name">Wrapping(AA)</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Wrapping(MAS)*')">
+                <input type="radio" name="store" value="*Wrapping(MAS)*" id="mas" style="display:none">
+                <img src="shop/Mas.png" alt="MAS" onerror="this.src='https://placehold.co/400x200?text=MAS'">
+                <div class="shop-name">Wrapping(MAS)</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Tawau*')">
+                <input type="radio" name="store" value="*Ole-Ole Tawau*" id="twu" style="display:none">
+                <img src="shop/tawau.png" alt="Tawau" onerror="this.src='https://placehold.co/400x200?text=Tawau'">
+                <div class="shop-name">Ole-Ole Tawau</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Wisma*')">
+                <input type="radio" name="store" value="*Wisma*" id="wisma" style="display:none">
+                <img src="shop/wisma.png" alt="Wisma" onerror="this.src='https://placehold.co/400x200?text=Wisma'">
+                <div class="shop-name">Wisma</div>
+            </div>
         </div>
-        <div class="shop-card" onclick="selectShop(this, '*TOM*')">
-            <input type="radio" name="store" value="*TOM*" id="tom" style="display:none">
-            <img src="shop/tom.png" alt="TOM" onerror="this.src='https://placehold.co/400x200?text=TOM'">
-            <div class="shop-name">TOM</div>
-        </div>
-        <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Dalam*')">
-            <input type="radio" name="store" value="*Ole-Ole Dalam*" id="dalam" style="display:none">
-            <img src="shop/dalam.png" alt="Dalam" onerror="this.src='https://placehold.co/400x200?text=Dalam'">
-            <div class="shop-name">Ole-Ole Dalam</div>
-        </div>
-        <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Luar*')">
-            <input type="radio" name="store" value="*Ole-Ole Luar*" id="new" style="display:none">
-            <img src="shop/luar.png" alt="Luar" onerror="this.src='https://placehold.co/400x200?text=Luar'">
-            <div class="shop-name">Ole-Ole Luar</div>
-        </div>
-        <div class="shop-card" onclick="selectShop(this, '*Wrapping(AA)*')">
-            <input type="radio" name="store" value="*Wrapping(AA)*" id="aa" style="display:none">
-            <img src="shop/Aa.png" alt="AA" onerror="this.src='https://placehold.co/400x200?text=AA'">
-            <div class="shop-name">Wrapping(AA)</div>
-        </div>
-        <div class="shop-card" onclick="selectShop(this, '*Wrapping(MAS)*')">
-            <input type="radio" name="store" value="*Wrapping(MAS)*" id="mas" style="display:none">
-            <img src="shop/Mas.png" alt="MAS" onerror="this.src='https://placehold.co/400x200?text=MAS'">
-            <div class="shop-name">Wrapping(MAS)</div>
-        </div>
-        <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Tawau*')">
-            <input type="radio" name="store" value="*Ole-Ole Tawau*" id="twu" style="display:none">
-            <img src="shop/tawau.png" alt="Tawau" onerror="this.src='https://placehold.co/400x200?text=Tawau'">
-            <div class="shop-name">Ole-Ole Tawau</div>
-        </div>
-        <div class="shop-card" onclick="selectShop(this, '*Wisma*')">
-            <input type="radio" name="store" value="*Wisma*" id="wisma" style="display:none">
-            <img src="shop/wisma.png" alt="Wisma" onerror="this.src='https://placehold.co/400x200?text=Wisma'">
-            <div class="shop-name">Wisma</div>
-        </div>
-    </div>
 
-    <h3 id="categoryTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">category</span> Category</h3>
-    <div class="category-container" id="categoryContainer" style="display: none;">
-        <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
-            <input type="radio" name="category" value="BanHeang" id="banheang" style="display:none">
-            <span class="category-icon">🍪</span>
-            <label>BanHeang</label>
+        <h3 id="categoryTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">category</span> Category</h3>
+        <div class="category-container" id="categoryContainer" style="display: none;">
+            <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
+                <input type="radio" name="category" value="BanHeang" id="banheang" style="display:none">
+                <span class="category-icon">🍪</span>
+                <label>BanHeang</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'HoeHup')">
+                <input type="radio" name="category" value="HoeHup" id="HoeHup" style="display:none">
+                <span class="category-icon">🥮</span>
+                <label>HoeHup</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Chocolate')">
+                <input type="radio" name="category" value="Chocolate" id="chocolate" style="display:none">
+                <span class="category-icon">🍫</span>
+                <label>Chocolate</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Sotong')">
+                <input type="radio" name="category" value="Sotong" id="sotong" style="display:none">
+                <span class="category-icon">🦑</span>
+                <label>Sotong</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Coffee')">
+                <input type="radio" name="category" value="Coffee" id="coffee" style="display:none">
+                <span class="category-icon">☕</span>
+                <label>Coffee</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Amplang')">
+                <input type="radio" name="category" value="Amplang" id="amplang" style="display:none">
+                <span class="category-icon">🌕</span>
+                <label>Amplang</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Other')">
+                <input type="radio" name="category" value="Other" id="other" style="display:none">
+                <span class="category-icon">🎁</span>
+                <label>Other</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Wrapping')">
+                <input type="radio" name="category" value="Wrapping" id="wrapping" style="display:none">
+                <span class="category-icon">🧸</span>
+                <label>Wrapping</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Office')">
+                <input type="radio" name="category" value="Office" id="Office" style="display:none">
+                <span class="category-icon">📦</span>
+                <label>Office</label>
+            </div>
         </div>
-        <div class="category-card" onclick="selectCategory(this, 'HoeHup')">
-            <input type="radio" name="category" value="HoeHup" id="HoeHup" style="display:none">
-            <span class="category-icon">🥮</span>
-            <label>HoeHup</label>
-        </div>
-        <div class="category-card" onclick="selectCategory(this, 'Chocolate')">
-            <input type="radio" name="category" value="Chocolate" id="chocolate" style="display:none">
-            <span class="category-icon">🍫</span>
-            <label>Chocolate</label>
-        </div>
-        <div class="category-card" onclick="selectCategory(this, 'Sotong')">
-            <input type="radio" name="category" value="Sotong" id="sotong" style="display:none">
-            <span class="category-icon">🦑</span>
-            <label>Sotong</label>
-        </div>
-        <div class="category-card" onclick="selectCategory(this, 'Coffee')">
-            <input type="radio" name="category" value="Coffee" id="coffee" style="display:none">
-            <span class="category-icon">☕</span>
-            <label>Coffee</label>
-        </div>
-        <div class="category-card" onclick="selectCategory(this, 'Amplang')">
-            <input type="radio" name="category" value="Amplang" id="amplang" style="display:none">
-            <span class="category-icon">🌕</span>
-            <label>Amplang</label>
-        </div>
-        <div class="category-card" onclick="selectCategory(this, 'Other')">
-            <input type="radio" name="category" value="Other" id="other" style="display:none">
-            <span class="category-icon">🎁</span>
-            <label>Other</label>
-        </div>
-        <div class="category-card" onclick="selectCategory(this, 'Wrapping')">
-            <input type="radio" name="category" value="Wrapping" id="wrapping" style="display:none">
-            <span class="category-icon">🧸</span>
-            <label>Wrapping</label>
-        </div>
-        <div class="category-card" onclick="selectCategory(this, 'Office')">
-            <input type="radio" name="category" value="Office" id="Office" style="display:none">
-            <span class="category-icon">📦</span>
-            <label>Office</label>
-        </div>
-    </div>
 
-    <!-- Search and View Toggle -->
-    <div class="tools-bar" id="searchContainer" style="display: none;">
-        <div style="position: relative; flex: 1;">
-            <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">search</span>
-            <input type="text" id="productSearch" placeholder="Search product..." oninput="searchProduct()" autocomplete="off">
+        <!-- Search and View Toggle -->
+        <div class="tools-bar" id="searchContainer" style="display: none;">
+            <div style="position: relative; flex: 1;">
+                <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">search</span>
+                <input type="text" id="productSearch" placeholder="Search product..." oninput="searchProduct()" autocomplete="off">
+            </div>
+            <div class="view-toggle-group" id="viewToggleContainer">
+                <button id="listViewBtn" onclick="toggleView('list')" class="view-toggle-btn active">
+                    <span class="material-icons">view_list</span>
+                </button>
+                <button id="gridViewBtn" onclick="toggleView('grid')" class="view-toggle-btn">
+                    <span class="material-icons">grid_view</span>
+                </button>
+            </div>
         </div>
-        <div class="view-toggle-group" id="viewToggleContainer">
-            <button id="listViewBtn" onclick="toggleView('list')" class="view-toggle-btn active">
-                <span class="material-icons">view_list</span>
-            </button>
-            <button id="gridViewBtn" onclick="toggleView('grid')" class="view-toggle-btn">
-                <span class="material-icons">grid_view</span>
-            </button>
-        </div>
-    </div>
 
-    <div id="suggestions" style="background: var(--surface-color); border-radius: 12px; margin-bottom: 10px; overflow: hidden; display: none;"></div>
-    
-    <h3 id="selectItemsTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">list_alt</span> Select Items</h3>
-    <div id="productList" style="display: none;"></div>
+        <div id="suggestions" style="background: var(--surface-color); border-radius: 12px; margin-bottom: 10px; overflow: hidden; display: none;"></div>
+        
+        <h3 id="selectItemsTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">list_alt</span> Select Items</h3>
+        <div id="productList" style="display: none;"></div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="bottom-nav-item" id="menuNavItem" onclick="toggleDashboard()">
+                <span class="material-icons">menu</span>
+                <span>Menu</span>
+            </div>
+            <div class="bottom-nav-item" id="previewNavItem" onclick="togglePreview()">
+                <div style="position: relative;">
+                    <span class="material-icons">shopping_cart</span>
+                    <span id="orderCountBadge" class="order-count-badge" style="display: none;">0</span>
+                </div>
+                <span>Order</span>
+            </div>
+            <div class="bottom-nav-item" id="settingsNavItem" onclick="toggleSettings()">
+                <span class="material-icons">settings</span>
+                <span>Setting</span>
+            </div>
+        </div>
+    </div> <!-- End Main Content -->
 
     <!-- Image Modal -->
     <div id="imageModal" class="image-modal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; justify-content:center; align-items:center;">
@@ -829,25 +976,6 @@
         <div style="display: flex; gap: 12px;">
             <button onclick="confirmAndSendWhatsApp()" style="flex: 1; background: var(--success-color); color: white; padding: 15px; border-radius: var(--radius-md);">Confirm</button>
             <button onclick="closeFullscreenConfirm()" style="flex: 1; background: var(--surface-color); border: 1px solid var(--danger-color); color: var(--danger-color); padding: 15px; border-radius: var(--radius-md);">Cancel</button>
-        </div>
-    </div>
-
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <div class="bottom-nav-item" id="menuNavItem" onclick="toggleDashboard()">
-            <span class="material-icons">menu</span>
-            <span>Menu</span>
-        </div>
-        <div class="bottom-nav-item" id="previewNavItem" onclick="togglePreview()">
-            <div style="position: relative;">
-                <span class="material-icons">shopping_cart</span>
-                <span id="orderCountBadge" class="order-count-badge" style="display: none;">0</span>
-            </div>
-            <span>Order</span>
-        </div>
-        <div class="bottom-nav-item" id="settingsNavItem" onclick="toggleSettings()">
-            <span class="material-icons">settings</span>
-            <span>Setting</span>
         </div>
     </div>
 
@@ -1066,6 +1194,7 @@
         let userRole = "User";
         let selectedItems = {};
         let currentView = localStorage.getItem('view-mode') || 'list';
+        let splashShown = false; // Track splash state
         window.allProducts = {};
 
         // Product Categories Data (RESTORED WITH IMAGES)
@@ -1178,6 +1307,28 @@
                 { id: 910, name: "Kerepek Pisang Manis", unit: 'ctn' },{ id: 911, name: "Kerepek Pisang Masin", unit: 'ctn' }
             ]
         };
+
+        // ==========================================
+        // SPLASH SCREEN LOGIC
+        // ==========================================
+        function playOpeningAnimation(callback) {
+            const splash = document.getElementById('splashScreen');
+            const mainContent = document.getElementById('mainAppContent');
+            
+            splash.style.display = 'flex';
+            mainContent.style.opacity = '0';
+            
+            // 持续时间：2.5秒，既不卡顿又能展示动画
+            setTimeout(() => {
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    splash.style.opacity = '1'; // Reset for next time if needed
+                    mainContent.style.opacity = '1';
+                    if (callback) callback();
+                }, 500); // Fade out duration
+            }, 2500);
+        }
 
         // ==========================================
         // LOGIC RESTORATION
@@ -1774,7 +1925,7 @@ function generateText(forWhatsApp) {
         }
     }
     
-    result += '\n_App Version 2.0_';
+    result += '\n_App Version 2.1_';
     
     return result;
 }
@@ -1965,10 +2116,20 @@ function generateText(forWhatsApp) {
             localStorage.setItem('dark-mode', theme === 'dark' ? 'enabled' : 'disabled');
         }
 
+        // Modified Auth Listener for Splash Screen
         auth.onAuthStateChanged(user => {
             if (user) {
-                currentUser = user;
+                // User is logged in
                 document.getElementById('authContainer').style.display = 'none';
+                
+                if (!splashShown) {
+                    // Play animation if first load
+                    playOpeningAnimation(() => {
+                        splashShown = true;
+                    });
+                }
+
+                currentUser = user;
                 db.ref(`users/${user.uid}`).once('value').then(snap => {
                     const val = snap.val();
                     if(val) {
@@ -1979,6 +2140,7 @@ function generateText(forWhatsApp) {
                             document.getElementById('dashboardAdminButton').style.display = 'flex';
                         }
                         if(val.status === 'pending') {
+                            // Re-show auth container if pending
                             document.getElementById('authContainer').style.display = 'flex';
                             document.getElementById('pendingForm').style.display = 'block';
                             document.getElementById('loginForm').style.display = 'none';
@@ -1987,9 +2149,12 @@ function generateText(forWhatsApp) {
                 });
                 loadQuantitiesFromFirebase();
             } else {
+                // User Not Logged In
                 document.getElementById('authContainer').style.display = 'flex';
                 document.getElementById('loginForm').style.display = 'block';
                 document.getElementById('pendingForm').style.display = 'none';
+                document.getElementById('mainAppContent').style.opacity = '0'; // Hide main content
+                splashShown = false; // Reset
             }
         });
 
@@ -2017,6 +2182,7 @@ function generateText(forWhatsApp) {
                 .then(() => {
                     btn.innerText = originalText;
                     btn.disabled = false;
+                    // Auth state change handles the rest including animation
                 })
                 .catch(error => {
                     btn.innerText = originalText;
