@@ -1867,8 +1867,8 @@ function generateText(forWhatsApp) {
         // 去除value中可能自带的星号，防止重复
         let storeName = selectedStore.value.replace(/\*/g, '');
         
-        result += `🏪 *${storeName}* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
-        result += `👤 ${userName}\n`;
+        result += `🏪 *(${storeName})* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
+        result += `👤 *(${userName})*\n`;
         result += `📅 ${dateStr}\n`;
         result += `🕠 ${timeStr}\n\n`;
     }
