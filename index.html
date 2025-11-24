@@ -1868,9 +1868,9 @@ function generateText(forWhatsApp) {
         let storeName = selectedStore.value.replace(/\*/g, '');
         
         result += `🏪 *${storeName}* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
-        result += `👤 Order By: ${userName}\n`;
-        result += `📅 Date: ${dateStr}\n`;
-        result += `🕠 Time: ${timeStr}\n\n`;
+        result += `👤 ${userName}\n`;
+        result += `📅 ${dateStr}\n`;
+        result += `🕠 ${timeStr}\n\n`;
     }
 
     // 处理商品分类和计数
@@ -1894,9 +1894,9 @@ function generateText(forWhatsApp) {
 
     // 定义分类对应的 Emoji (优化点)
     const categoryIcons = {
-        'BanHeang': '🍪', 'HoeHup': '🥮', 'Chocolate': '🍫', 
-        'Sotong': '🦑', 'Coffee': '☕', 'Amplang': '🌕', 
-        'Other': '🎁', 'Wrapping': '🧸', 'Office': '📦'
+        'BanHeang': '', 'HoeHup': '', 'Chocolate': '', 
+        'Sotong': '', 'Coffee': '', 'Amplang': '', 
+        'Other': '', 'Wrapping': '', 'Office': ''
     };
 
     // 构建商品列表
