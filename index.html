@@ -1,19 +1,57 @@
 <!DOCTYPE html>
 <html lang="zh">
+    
 <head>
+</head>
+<body style="height:100vh; margin:0;">
+  <audio id="bgMusic" src="https://raw.githubusercontent.com/SmartProfits/orderplus/main/pic/Taylor%20Swift%20-%20Last%20Christmas%20(Audio).mp3" loop muted></audio>
+
+   <script>
+    const audio = document.getElementById('bgMusic');
+
+    audio.play().catch(() => {});
+
+    function fadeInAudio(duration = 3000) {
+      audio.muted = false;
+      audio.volume = 0; // 从静音开始
+      audio.play();
+
+      const interval = 50; // 每 50ms 增加一次音量
+      const step = interval / duration;
+
+      const fade = setInterval(() => {
+        if (audio.volume < 1) {
+          audio.volume = Math.min(audio.volume + step, 1);
+        } else {
+          clearInterval(fade); // 音量到最大停止渐变
+        }
+      }, interval);
+    }
+
+    function enableMusic() {
+      fadeInAudio(5000); // 3秒渐入
+      document.removeEventListener('click', enableMusic);
+    }
+
+    document.addEventListener('click', enableMusic);
+  </script>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Airport Stock Request</title>
+    <title>Christmas Stock Request - 3D Edition</title>
     
     <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
-    <!-- PWA相关标记 -->
-    <meta name="theme-color" content="#1a2035">
+    <!-- Three.js (Added for 3D Tree) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- PWA Tags -->
+    <meta name="theme-color" content="#0F1712">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./icons/s2.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -26,24 +64,24 @@
 
     <style>
         :root {
-            /* Color Palette */
-            --primary-color: #4285F4;
-            --primary-gradient: linear-gradient(135deg, #4285F4, #3a74d6);
-            --accent-color: #00CED1;
+            /* Christmas Color Palette */
+            --primary-color: #D32F2F; 
+            --primary-gradient: linear-gradient(135deg, #D32F2F, #B71C1C);
+            --accent-color: #FFC107; 
             --danger-color: #ff4444;
-            --success-color: #25D366;
+            --success-color: #2E7D32; 
             
             /* Light Mode Variables */
-            --bg-color: #f2f4f8;
+            --bg-color: #f0f4f8;
             --surface-color: #ffffff;
-            --surface-color-transparent: rgba(255, 255, 255, 0.85);
+            --surface-color-transparent: rgba(255, 255, 255, 0.9);
             --text-primary: #1f2937;
             --text-secondary: #6b7280;
             --border-color: rgba(0, 0, 0, 0.08);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-sm: 0 2px 8px rgba(211, 47, 47, 0.1);
+            --shadow-md: 0 4px 12px rgba(211, 47, 47, 0.15);
             --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-bg: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(255, 255, 255, 0.5);
             
             /* Layout */
@@ -56,17 +94,18 @@
         }
 
         body.dark-mode {
-            /* Dark Mode Variables */
-            --bg-color: #121212;
-            --surface-color: #1e1e1e;
-            --surface-color-transparent: rgba(30, 30, 30, 0.85);
-            --text-primary: #e5e7eb;
-            --text-secondary: #9ca3af;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
-            --glass-bg: rgba(30, 30, 30, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.05);
+            /* Dark Christmas Night Theme */
+            --bg-color: #0b1e15; 
+            --surface-color: #142920;
+            --surface-color-transparent: rgba(20, 41, 32, 0.9);
+            --text-primary: #e8f5e9;
+            --text-secondary: #a5d6a7;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --glass-bg: rgba(20, 41, 32, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-color: #FFD54F; 
         }
 
         /* Global Reset & Typography */
@@ -84,8 +123,9 @@
             background-color: var(--bg-color);
             color: var(--text-primary);
             scrollbar-width: none;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.5s ease, color 0.3s ease;
             overflow-x: hidden;
+            position: relative; 
         }
 
         body {
@@ -95,12 +135,11 @@
 
         ::-webkit-scrollbar { display: none; }
 
-        /* Typography Helpers */
         h1, h2, h3, h4 { margin: 0; font-weight: 700; }
-        h1 { font-size: 1.75rem; margin-bottom: 1rem; text-align: center; letter-spacing: -0.5px; }
+        h1 { font-size: 1.75rem; margin-bottom: 1rem; text-align: center; letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); color: var(--primary-color); }
         h3 { font-size: 1.1rem; margin-bottom: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
 
-        /* UI Elements: Buttons */
+        /* UI Elements */
         button {
             font-family: inherit;
             border: none;
@@ -111,100 +150,97 @@
             justify-content: center;
             font-weight: 600;
         }
-        
         button:active { transform: scale(0.96); }
 
-        /* UI Elements: Inputs */
-        input[type="text"], 
-        input[type="number"], 
-        input[type="password"], 
-        input[type="email"],
-        input[type="datetime-local"],
-        select, 
-        textarea {
+        input[type="text"], input[type="number"], input[type="password"], input[type="email"], input[type="datetime-local"], select, textarea {
             background: var(--surface-color);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
             border-radius: var(--radius-md);
             padding: 12px;
-            font-size: 16px; /* Prevent iOS zoom */
+            font-size: 16px;
             transition: border-color 0.2s;
             width: 100%;
         }
-        
         input:focus, select:focus, textarea:focus { border-color: var(--primary-color); }
 
-        /* Shop Grid System (Forced 2 columns) */
-        .shop-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr) !important; /* 强制一行两个 */
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .shop-card {
+        /* --- 3D CANVAS CONTAINER & OPTIMIZED BUTTON --- */
+        #canvas-wrapper {
             position: relative;
-            background: var(--surface-color);
-            border-radius: var(--radius-lg);
+            width: 100%;
+            height: 55vh; /* Adjustable height */
+            min-height: 400px;
+            border-radius: var(--radius-xl);
             overflow: hidden;
-            aspect-ratio: 3/2;
-            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-            cursor: pointer;
         }
-
-        .shop-card.selected {
-            border: 2px solid var(--success-color);
-            box-shadow: 0 0 0 4px rgba(37, 211, 102, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .shop-card img {
+        #canvas-container {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
+            display: block;
         }
-
-        .shop-card:hover img { transform: scale(1.05); }
-
-        .shop-card .shop-name {
+        .canvas-overlay-msg {
             position: absolute;
-            bottom: 8px;
-            left: 8px;
-            right: 8px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            color: white;
-            padding: 6px 10px;
-            border-radius: var(--radius-md);
-            font-size: 0.85rem;
-            font-weight: 600;
+            bottom: 20px;
+            width: 100%;
             text-align: center;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
-
-        /* Single Selected Shop Mode */
-        .shop-container.single-selected {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            color: rgba(255, 255, 255, 0.9);
+            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            z-index: 10;
+            font-weight: bold;
+            letter-spacing: 1px;
+            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+            padding-bottom: 10px;
+            transition: all 0.3s ease;
         }
         
-        .shop-container.single-selected .shop-card:not(.selected) { display: none; }
-        .shop-container.single-selected .shop-card.selected { width: 100%; max-width: 450px; aspect-ratio: 3/2; }
-
-        .reselect-btn {
-            margin-top: 12px;
-            background: rgba(255, 255, 255, 0.15);
+        /* UPDATED: 3D Reset Button (Optimized Location & Style) */
+        #reset-3d-btn {
+            position: absolute;
+            top: 2px;
+            left: 3px; /* Moved to Left (Standard Back position) */
+            right: auto;
+            background: rgba(0, 0, 0, 0.65); /* Darker glass for better contrast */
             backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 50px;
+            z-index: 50;
+            display: none; /* Hidden by default */
+            font-size: 0.6rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            align-items: center;
+            gap: 8px;
+            animation: fadeInBtn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #reset-3d-btn:hover {
+            background: rgba(211, 47, 47, 0.9); /* Red on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(211, 47, 47, 0.4);
+        }
+        
+        @keyframes fadeInBtn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- END 3D CSS --- */
+
+        .reselect-text-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            text-decoration: underline;
+            font-size: 0.85rem;
+            padding: 0;
+            margin-left: 8px;
+            cursor: pointer;
         }
 
         /* Category Grid */
@@ -232,20 +268,18 @@
         }
 
         .category-card.selected {
-            background: var(--primary-color);
+            background: var(--success-color);
             color: white;
             border-color: transparent;
             box-shadow: var(--shadow-md);
         }
         
         .category-card.selected .category-icon { transform: scale(1.1); }
-
         .category-icon { font-size: 1.8rem; margin-bottom: 5px; transition: transform 0.2s; }
         .category-card label { font-size: 0.8rem; font-weight: 600; cursor: pointer; display: block; }
 
-        /* Product List - List View (Optimized) */
+        /* Product List */
         #productList { display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px; }
-        
         #productList > div {
             background: var(--surface-color);
             border-radius: var(--radius-md);
@@ -258,33 +292,15 @@
             position: relative;
             transition: transform 0.1s;
         }
-
         #productList > div:active { transform: scale(0.99); background-color: rgba(0,0,0,0.02); }
 
-        /* Checkbox styling */
-        #productList input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-right: 12px;
-            accent-color: var(--primary-color);
-        }
-
-        /* Product Name Label */
-        #productList label {
-            flex: 1;
-            font-weight: 500;
-            font-size: 0.95rem;
-            display: flex;
-            flex-direction: column;
-            cursor: pointer;
-        }
-
+        #productList input[type="checkbox"] { width: 20px; height: 20px; margin-right: 12px; accent-color: var(--success-color); }
+        #productList label { flex: 1; font-weight: 500; font-size: 0.95rem; display: flex; flex-direction: column; cursor: pointer; }
         #productList label span { font-size: 0.8rem; color: var(--accent-color); margin-top: 2px; }
-        #productList .zero-stock { color: var(--danger-color) !important; }
+        #productList .zero-stock { color: var(--danger-color) !important; font-weight: bold; }
 
-        /* View Image Button */
         .view-image-btn {
-            background: rgba(66, 133, 244, 0.1);
+            background: rgba(211, 47, 47, 0.1);
             color: var(--primary-color);
             padding: 2px 8px;
             border-radius: 4px;
@@ -293,10 +309,9 @@
             vertical-align: middle;
             display: inline-flex !important;
             cursor: pointer;
-            border: 1px solid rgba(66, 133, 244, 0.2);
+            border: 1px solid rgba(211, 47, 47, 0.2);
         }
 
-        /* Quantity Controls */
         .quantity-controls-wrapper {
             display: flex;
             align-items: center;
@@ -304,594 +319,236 @@
             border-radius: 20px;
             padding: 2px;
         }
-
         .quantity-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--surface-color);
-            color: var(--text-primary);
-            box-shadow: var(--shadow-sm);
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 32px; height: 32px; border-radius: 50%;
+            background: var(--surface-color); color: var(--primary-color);
+            box-shadow: var(--shadow-sm); padding: 0;
+            display: flex; align-items: center; justify-content: center;
         }
-        
-        .quantity-btn:active { background: var(--border-color); }
+        #productList input[type="number"] { width: 40px; text-align: center; border: none; background: transparent; padding: 0; font-weight: 600; color: var(--text-primary); -moz-appearance: textfield; }
 
-        #productList input[type="number"] {
-            width: 40px;
-            text-align: center;
-            border: none;
-            background: transparent;
-            padding: 0;
-            font-weight: 600;
-            color: var(--text-primary);
-            -moz-appearance: textfield;
-        }
-
-        /* Grid View Overrides - Forced 2 Columns */
-        #productList.grid-view {
-            display: grid !important;
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 12px !important;
-        }
-
-        #productList.grid-view > div {
-            flex-direction: column;
-            align-items: center;
-            padding: 16px 12px;
-            text-align: center;
-            height: auto;
-            min-height: 160px;
-        }
-
+        #productList.grid-view { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+        #productList.grid-view > div { flex-direction: column; align-items: center; padding: 16px 12px; text-align: center; height: auto; min-height: 160px; }
         #productList.grid-view .product-image {
-            width: 80px;
-            height: 80px;
-            border-radius: var(--radius-md);
-            margin-bottom: 10px;
-            background: var(--bg-color);
-            object-fit: cover;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            width: 80px; height: 80px; border-radius: var(--radius-md); margin-bottom: 10px;
+            background: var(--bg-color); object-fit: cover; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid var(--border-color);
         }
-        
-        #productList.grid-view .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
+        #productList.grid-view .product-image img { width: 100%; height: 100%; object-fit: cover; }
         #productList.grid-view .quantity-controls-wrapper { margin-top: auto; width: 100%; justify-content: space-between; padding: 4px; }
         #productList.grid-view input[type="checkbox"] { position: absolute; top: 10px; left: 10px; margin: 0; }
-        #productList.grid-view .product-name { font-size: 0.9rem; margin-bottom: 4px; line-height: 1.3; }
 
-        /* Unit Badge */
-        .product-unit-badge {
-            position: absolute;
-            top: -8px;
-            right: -5px;
-            background: #333;
-            color: #fff;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            z-index: 2;
-            box-shadow: var(--shadow-sm);
-        }
-        
-        /* New Product Badge Animation */
-        .new-product-glow {
-            animation: pulse-red 1.5s infinite;
-            border: 2px solid var(--danger-color) !important;
-        }
-        
-        @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(255, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); }
-        }
+        .product-unit-badge { position: absolute; top: -8px; right: -5px; background: var(--accent-color); color: #000; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; z-index: 2; box-shadow: var(--shadow-sm); font-weight: bold; }
+        .new-product-glow { animation: pulse-red 1.5s infinite; border: 2px solid var(--danger-color) !important; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(255, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); } }
 
-        /* Bottom Navigation (Glassmorphism) */
+        /* Bottom Nav */
         .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            position: fixed; bottom: 0; left: 0; right: 0;
             height: calc(var(--nav-height) + var(--safe-area-bottom));
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border-top: 1px solid var(--glass-border);
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-start;
-            padding-top: 10px;
-            z-index: 1000;
-            padding-bottom: var(--safe-area-bottom);
+            display: flex; justify-content: space-around; align-items: flex-start;
+            padding-top: 10px; z-index: 1000; padding-bottom: var(--safe-area-bottom);
         }
-
-        .bottom-nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            position: relative;
-            transition: color 0.3s;
-            cursor: pointer;
-        }
-
-        .bottom-nav-item.active { color: var(--primary-color); }
+        .bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); font-size: 0.75rem; position: relative; cursor: pointer; }
+        .bottom-nav-item.active { color: var(--primary-color); text-shadow: 0 0 8px rgba(211,47,47,0.4); }
         .bottom-nav-item .material-icons { font-size: 24px; margin-bottom: 4px; }
+        .order-count-badge { position: absolute; top: -5px; right: calc(50% - 20px); background: var(--accent-color); color: #000; font-size: 10px; font-weight: bold; min-width: 16px; height: 16px; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--glass-bg); }
 
-        .order-count-badge {
-            position: absolute;
-            top: -5px;
-            right: calc(50% - 20px);
-            background: var(--danger-color);
-            color: white;
-            font-size: 10px;
-            font-weight: bold;
-            min-width: 16px;
-            height: 16px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 4px;
-            border: 2px solid var(--glass-bg);
-        }
-
-        /* Search & Toggle Bar */
-        .tools-bar {
-            display: flex;
-            gap: 10px;
-            margin: 16px 0;
-            align-items: center;
-        }
-        
+        /* Tools Bar */
+        .tools-bar { display: flex; gap: 10px; margin: 16px 0; align-items: center; }
         #searchContainer { flex: 1; margin: 0; position: relative; }
         #searchContainer input { padding-left: 40px; border-radius: 50px; background: var(--surface-color-transparent); }
         #searchContainer .material-icons { left: 12px; color: var(--text-secondary); }
-        
-        .view-toggle-group {
-            display: flex;
-            background: var(--surface-color);
-            border-radius: var(--radius-md);
-            padding: 2px;
-            border: 1px solid var(--border-color);
-        }
-        
-        .view-toggle-btn {
-            padding: 8px;
-            border-radius: 6px;
-            color: var(--text-secondary);
-            background: transparent;
-            border: none;
-        }
-        
-        .view-toggle-btn.active { background: var(--primary-color); color: white; shadow: var(--shadow-sm); }
+        .view-toggle-group { display: flex; background: var(--surface-color); border-radius: var(--radius-md); padding: 2px; border: 1px solid var(--border-color); }
+        .view-toggle-btn { padding: 8px; border-radius: 6px; color: var(--text-secondary); background: transparent; border: none; }
+        .view-toggle-btn.active { background: var(--success-color); color: white; }
 
-        /* Bottom Sheet Preview Window (Redesigned) */
+        /* Preview Window */
         #preview-window {
-            position: fixed;
-            bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 10px);
-            left: 10px;
-            right: 10px;
-            background: var(--surface-color-transparent);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--glass-border);
-            padding: 20px;
-            z-index: 900;
-            display: none;
-            transform-origin: bottom center;
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 60vh;
-            overflow-y: auto;
+            position: fixed; bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 10px); left: 10px; right: 10px;
+            background: var(--surface-color-transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--glass-border);
+            padding: 20px; z-index: 900; display: none; transform-origin: bottom center; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 60vh; overflow-y: auto;
         }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        .whatsapp-button { background: #25D366; color: white; width: 100%; padding: 14px; border-radius: var(--radius-md); font-weight: 600; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); margin-top: 10px; }
 
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        .whatsapp-button {
-            background: #25D366;
-            color: white;
-            width: 100%;
-            padding: 14px;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
-            margin-top: 10px;
-        }
-
-        /* Login/Auth Modal */
-        .auth-container {
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-        }
-        
-        .auth-box {
-            background: var(--surface-color);
-            color: var(--text-primary);
-            border-radius: var(--radius-xl);
-            padding: 32px 24px;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border-color);
-        }
-
+        /* Auth */
+        .auth-container { background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
+        .auth-box { background: var(--surface-color); color: var(--text-primary); border-radius: var(--radius-xl); padding: 32px 24px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); }
         .auth-box h2 { color: var(--primary-color); margin-bottom: 24px; }
         .auth-form button { width: 100%; padding: 14px; border-radius: var(--radius-lg); background: var(--primary-color); color: white; font-size: 1rem; margin-top: 10px; }
         .auth-form button:disabled { opacity: 0.7; cursor: not-allowed; }
         .auth-form .switch-form { color: var(--text-secondary); margin-top: 20px; font-size: 0.9rem; }
 
-        /* Admin Panel Styles */
+        /* Admin & Splash (Keeping original styles) */
         #adminPanel .auth-box { max-width: 90%; height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
         .admin-tabs { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; gap: 10px; display: flex; overflow-x: auto; flex-shrink: 0; }
         .tab-button { background: transparent; color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; white-space: nowrap; }
         .tab-button.active { background: var(--primary-color); color: white; }
         .admin-tab-content { height: 100%; overflow-y: auto; padding-bottom: 20px; }
         
-        /* User Card Style */
-        .user-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 15px;
-            margin-bottom: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .user-name { font-weight: bold; }
-        .user-status span { display: inline-flex; align-items: center; gap: 4px; font-size: 0.85rem; margin-right: 10px; }
+        .user-card { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 15px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
         .action-button { padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; margin-right: 8px; color: white; }
         .action-button.approve { background: var(--success-color); }
         .action-button.delete { background: var(--danger-color); }
         .action-button.promote { background: var(--primary-color); }
         .action-button.demote { background: #ff9800; }
+        .product-item { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px; margin-bottom: 10px; }
 
-        /* Product Management Item */
-        .product-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 12px;
-            margin-bottom: 10px;
-        }
-        .product-item.new-product { border-color: var(--success-color); }
+        @keyframes scroll { 0% { transform: translate3d(100vw, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+        .snowflake { position: fixed; top: -10px; color: #fff; font-size: 1em; font-family: Arial, sans-serif; text-shadow: 0 0 5px #000; z-index: 999; user-select: none; pointer-events: none; animation-name: snowfall; animation-timing-function: linear; animation-iteration-count: infinite; }
+        @keyframes snowfall { 0% { transform: translateY(0); } 100% { transform: translateY(100vh); } }
 
-        /* Announcement Banner */
-        #announcementBanner {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            backdrop-filter: blur(5px);
-        }
-        
-        /* Scroll Animation Fix */
-        @keyframes scroll {
-            0% { transform: translate3d(100vw, 0, 0); } /* Start from right of screen */
-            100% { transform: translate3d(-100%, 0, 0); } /* End at left of text width */
-        }
+        #splashScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; transition: opacity 0.5s ease-out; }
+        #splashScreen::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at center, rgba(211, 47, 47, 0.2) 0%, rgba(0,0,0,0) 70%); z-index: -1; }
+        .splash-content { text-align: center; padding: 20px; animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .splash-logo-icon { font-size: 4.5rem; margin-bottom: 15px; display: inline-block; background: linear-gradient(135deg, #FFC107, #FF9800); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: floatIcon 3s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5)); }
+        .splash-title { font-size: 2.2rem; font-weight: 800; margin: 0; line-height: 1.2; color: var(--primary-color); text-shadow: 2px 2px 0px #fff; animation: shine 3s linear infinite; }
+        .splash-loader { width: 60px; height: 4px; background: rgba(255,255,255,0.2); margin: 30px auto 0; border-radius: 4px; overflow: hidden; position: relative; }
+        .splash-loader::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 40%; background: var(--accent-color); border-radius: 4px; animation: loadBar 1.5s infinite ease-in-out; }
 
-        /* =========================================
-           SPLASH SCREEN STYLES (NEW)
-           ========================================= */
-        #splashScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* 适配暗黑/明亮模式的动态背景 */
-            background: var(--bg-color); 
-            z-index: 20000; /* 确保在最顶层 */
-            display: none; /* 默认隐藏，JS控制显示 */
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            /* 使用transform进行硬件加速，避免卡顿 */
-            transition: opacity 0.5s ease-out;
-        }
-
-        /* 渐变背景覆盖层 - 更加酷炫 */
-        #splashScreen::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at center, rgba(66, 133, 244, 0.15) 0%, rgba(0,0,0,0) 70%);
-            z-index: -1;
-        }
-
-        .splash-content {
-            text-align: center;
-            padding: 20px;
-            animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        .splash-logo-icon {
-            font-size: 4rem;
-            margin-bottom: 15px;
-            display: inline-block;
-            background: linear-gradient(135deg, #4285F4, #00CED1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: floatIcon 3s ease-in-out infinite;
-        }
-
-        .splash-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin: 0;
-            line-height: 1.2;
-            background: linear-gradient(90deg, #ffffff, #a0c4ff, #ffffff);
-            background-size: 200% auto;
-            color: #000; /* Fallback */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine 3s linear infinite;
-        }
-        
-        /* 适配亮色模式的文字颜色 */
-        body:not(.dark-mode) .splash-title {
-            background: linear-gradient(90deg, #1f2937, #4285F4, #1f2937);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .splash-subtitle {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            margin-top: 5px;
-            opacity: 0.9;
-            font-weight: 500;
-            letter-spacing: 1px;
-        }
-
-        .splash-loader {
-            width: 60px;
-            height: 4px;
-            background: rgba(128,128,128,0.2);
-            margin: 30px auto 0;
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .splash-loader::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 40%;
-            background: var(--primary-color);
-            border-radius: 4px;
-            animation: loadBar 1.5s infinite ease-in-out;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes floatIcon {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        @keyframes shine {
-            to { background-position: 200% center; }
-        }
-
-        @keyframes loadBar {
-            0% { left: -40%; }
-            100% { left: 100%; }
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes floatIcon { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
+        @keyframes loadBar { 0% { left: -40%; } 100% { left: 100%; } }
 
         /* Responsive Tweaks */
-        @media (max-width: 380px) {
-            .category-container { grid-template-columns: repeat(3, 1fr); }
-            .splash-title { font-size: 1.8rem; }
-        }
+        @media (max-width: 380px) { .category-container { grid-template-columns: repeat(3, 1fr); } }
     </style>
 </head>
-<body class="dark-mode"> <!-- Default to Dark Mode -->
+<body class="dark-mode">
 
-    <!-- SPLASH SCREEN (新添加的开场动画层) -->
+    <!-- Snow Container -->
+    <div id="snow-container"></div>
+
+    <!-- SPLASH SCREEN -->
     <div id="splashScreen">
         <div class="splash-content">
-            <span class="material-icons-round splash-logo-icon">rocket_launch</span>
-            <h1 class="splash-title">SmartProfits</h1>
-            <div class="splash-subtitle">Stock Request</div>
+            <span class="material-icons-round splash-logo-icon">forest</span>
+            <h1 class="splash-title">Merry Christmas</h1>
+            <div class="splash-subtitle" style="color:var(--success-color); margin-top:5px; opacity:0.9;">SmartProfits Stock</div>
             <div class="splash-loader"></div>
         </div>
     </div>
 
-    <!-- 公告横幅 (修复文字显示和动画) -->
-    <div id="announcementBanner" style="
-        position: fixed; top: 0; left: 0; right: 0;
-        background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffd93d);
-        background-size: 300% 300%;
-        animation: gradientShift 3s ease infinite;
-        color: white; font-weight: bold; font-size: 14px; padding: 10px 0;
-        z-index: 10000; overflow: hidden; white-space: nowrap; display: none;
-        border-bottom: 1px solid rgba(255,255,255,0.2);">
-        <div id="announcementScrollText" style="
-            display: inline-block; 
-            animation: scroll 15s linear infinite; 
-            line-height: 1.2;
-            white-space: nowrap;"></div>
+    <!-- Announcement Banner -->
+    <div id="announcementBanner" style="position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(45deg, #D32F2F, #2E7D32, #1976D2); background-size: 300% 300%; animation: gradientShift 3s ease infinite; color: white; font-weight: bold; font-size: 14px; padding: 10px 0; z-index: 10000; overflow: hidden; white-space: nowrap; display: none; border-bottom: 1px solid rgba(255,255,255,0.2);">
+        <div id="announcementScrollText" style="display: inline-block; animation: scroll 15s linear infinite; line-height: 1.2; white-space: nowrap;"></div>
     </div>
 
-    <!-- 认证容器 -->
+    <!-- Auth Container -->
     <div id="authContainer" class="auth-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 9999;">
         <div class="auth-box" style="width: 90%; max-width: 400px;">
-            <h2 id="authTitle" style="text-align: center;">Welcome Back</h2>
+            <div style="text-align: center; font-size: 3rem; margin-bottom: 10px;">🎅</div>
+            <h2 id="authTitle" style="text-align: center;">Ho Ho Ho! Welcome</h2>
             
-            <!-- Login Form -->
             <div id="loginForm" class="auth-form">
-                <div style="margin-bottom: 16px;">
-                    <input type="email" id="loginEmail" placeholder="Email Address" required>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <input type="password" id="loginPassword" placeholder="Password" required>
-                </div>
+                <div style="margin-bottom: 16px;"><input type="email" id="loginEmail" placeholder="Email Address" required></div>
+                <div style="margin-bottom: 20px;"><input type="password" id="loginPassword" placeholder="Password" required></div>
                 <button id="loginButton">Login</button>
-                <div class="switch-form" onclick="switchToRegister()" style="text-align: center;">
-                    Create an account
-                </div>
+                <div class="switch-form" onclick="switchToRegister()" style="text-align: center;">Create an account</div>
             </div>
             
-            <!-- Register Form -->
             <div id="registerForm" class="auth-form" style="display: none;">
-                <div style="margin-bottom: 16px;">
-                    <input type="email" id="registerEmail" placeholder="Email Address" required>
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <input type="password" id="registerPassword" placeholder="Create Password" required>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <input type="text" id="registerName" placeholder="Your Name" required>
-                </div>
+                <div style="margin-bottom: 16px;"><input type="email" id="registerEmail" placeholder="Email Address" required></div>
+                <div style="margin-bottom: 16px;"><input type="password" id="registerPassword" placeholder="Create Password" required></div>
+                <div style="margin-bottom: 20px;"><input type="text" id="registerName" placeholder="Your Name" required></div>
                 <button id="registerButton">Register</button>
-                <div class="switch-form" onclick="switchToLogin()" style="text-align: center;">
-                    Already have an account? Login
-                </div>
+                <div class="switch-form" onclick="switchToLogin()" style="text-align: center;">Already have an account? Login</div>
             </div>
             
-            <!-- Pending Form -->
             <div id="pendingForm" class="auth-form" style="display: none; text-align: center;">
                 <div style="font-size: 50px; margin-bottom: 20px;">⏳</div>
                 <h3>Verification Pending</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 0.9rem;">Your account is under review by the administrator.</p>
+                <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 0.9rem;">Your account is under review.</p>
                 <button onclick="backToLogin()" style="background: transparent; color: var(--text-primary); border: 1px solid var(--border-color);">Back to Login</button>
             </div>
         </div>
     </div>
 
-    <!-- 隐藏的用户信息 (保留用于JS逻辑) -->
+    <!-- Hidden User Info -->
     <div id="userInfo" style="display: none;">
         <span id="userName"><span class="username-text">Guest</span></span>
         <span id="userRole">User</span>
     </div>
 
-    <!-- 主要内容区域 -->
+    <!-- Main Content -->
     <div id="mainAppContent" style="opacity: 0; transition: opacity 0.5s;">
-        <h1 style="padding-top: 20px;">SmartProfits Stock Request</h1>
+        <h1 style="padding-top: 20px; font-family: 'Georgia', serif;">🎄 Merry Christmas 🎄</h1>
 
-        <!-- 店铺选择 -->
+        <!-- 3D SHOP SELECTOR -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
-            <h3><span class="material-icons-round" style="color: var(--primary-color)">store</span> Select Outlet</h3>
+            <h3 id="shopSelectHeader"><span class="material-icons-round" style="color: var(--primary-color)">store</span> Select Outlet</h3>
         </div>
 
-        <div class="shop-container">
-            <div class="shop-card" onclick="selectShop(this, '*JKL*')">
-                <input type="radio" name="store" value="*JKL*" id="jkl" style="display:none">
-                <img src="shop/jkl.png" alt="JKL" onerror="this.src='https://placehold.co/400x200?text=JKL'">
-                <div class="shop-name">JKL</div>
-            </div>
-            <div class="shop-card" onclick="selectShop(this, '*TOM*')">
-                <input type="radio" name="store" value="*TOM*" id="tom" style="display:none">
-                <img src="shop/tom.png" alt="TOM" onerror="this.src='https://placehold.co/400x200?text=TOM'">
-                <div class="shop-name">TOM</div>
-            </div>
-            <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Dalam*')">
-                <input type="radio" name="store" value="*Ole-Ole Dalam*" id="dalam" style="display:none">
-                <img src="shop/dalam.png" alt="Dalam" onerror="this.src='https://placehold.co/400x200?text=Dalam'">
-                <div class="shop-name">Ole-Ole Dalam</div>
-            </div>
-            <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Luar*')">
-                <input type="radio" name="store" value="*Ole-Ole Luar*" id="new" style="display:none">
-                <img src="shop/luar.png" alt="Luar" onerror="this.src='https://placehold.co/400x200?text=Luar'">
-                <div class="shop-name">Ole-Ole Luar</div>
-            </div>
-            <div class="shop-card" onclick="selectShop(this, '*Wrapping(AA)*')">
-                <input type="radio" name="store" value="*Wrapping(AA)*" id="aa" style="display:none">
-                <img src="shop/Aa.png" alt="AA" onerror="this.src='https://placehold.co/400x200?text=AA'">
-                <div class="shop-name">Wrapping(AA)</div>
-            </div>
-            <div class="shop-card" onclick="selectShop(this, '*Wrapping(MAS)*')">
-                <input type="radio" name="store" value="*Wrapping(MAS)*" id="mas" style="display:none">
-                <img src="shop/Mas.png" alt="MAS" onerror="this.src='https://placehold.co/400x200?text=MAS'">
-                <div class="shop-name">Wrapping(MAS)</div>
-            </div>
-            <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Tawau*')">
-                <input type="radio" name="store" value="*Ole-Ole Tawau*" id="twu" style="display:none">
-                <img src="shop/tawau.png" alt="Tawau" onerror="this.src='https://placehold.co/400x200?text=Tawau'">
-                <div class="shop-name">Ole-Ole Tawau</div>
-            </div>
-            <div class="shop-card" onclick="selectShop(this, '*Wisma*')">
-                <input type="radio" name="store" value="*Wisma*" id="wisma" style="display:none">
-                <img src="shop/wisma.png" alt="Wisma" onerror="this.src='https://placehold.co/400x200?text=Wisma'">
-                <div class="shop-name">Wisma</div>
-            </div>
+        <!-- 3D Canvas Wrapper -->
+        <div id="canvas-wrapper">
+            <!-- OPTIMIZED BUTTON POSITION: Top Left inside canvas -->
+            <button id="reset-3d-btn" onclick="reset3DView()">
+                <span class="material-icons">arrow_back</span> Change Shop
+            </button>
+            <div id="canvas-container"></div>
+            <div class="canvas-overlay-msg" id="canvas-msg">Tap a gift card to select shop</div>
         </div>
 
-        <h3 id="categoryTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">category</span> Category</h3>
+        <!-- Hidden Radio Inputs for Form Logic (Preserved from original) -->
+        <div style="display:none;">
+            <input type="radio" name="store" value="*JKL*" id="jkl">
+            <input type="radio" name="store" value="*TOM*" id="tom">
+            <input type="radio" name="store" value="*Ole-Ole Dalam*" id="dalam">
+            <input type="radio" name="store" value="*Ole-Ole Luar*" id="new">
+            <input type="radio" name="store" value="*Wrapping(AA)*" id="aa">
+            <input type="radio" name="store" value="*Wrapping(MAS)*" id="mas">
+            <input type="radio" name="store" value="*Ole-Ole Tawau*" id="twu">
+            <input type="radio" name="store" value="*Wisma*" id="wisma">
+        </div>
+
+        <h3 id="categoryTitle" style="display: none;">
+            <div style="display:flex; align-items:center;">
+                <span class="material-icons-round" style="color: var(--primary-color); margin-right:6px;">category</span> 
+                Category 
+                <button class="reselect-text-btn" onclick="reset3DView()">(Change Shop)</button>
+            </div>
+        </h3>
         <div class="category-container" id="categoryContainer" style="display: none;">
             <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
                 <input type="radio" name="category" value="BanHeang" id="banheang" style="display:none">
-                <span class="category-icon">🍪</span>
-                <label>BanHeang</label>
+                <span class="category-icon">🍪</span><label>BanHeang</label>
             </div>
             <div class="category-card" onclick="selectCategory(this, 'HoeHup')">
                 <input type="radio" name="category" value="HoeHup" id="HoeHup" style="display:none">
-                <span class="category-icon">🥮</span>
-                <label>HoeHup</label>
+                <span class="category-icon">🥮</span><label>HoeHup</label>
             </div>
             <div class="category-card" onclick="selectCategory(this, 'Chocolate')">
                 <input type="radio" name="category" value="Chocolate" id="chocolate" style="display:none">
-                <span class="category-icon">🍫</span>
-                <label>Chocolate</label>
+                <span class="category-icon">🍫</span><label>Chocolate</label>
             </div>
             <div class="category-card" onclick="selectCategory(this, 'Sotong')">
                 <input type="radio" name="category" value="Sotong" id="sotong" style="display:none">
-                <span class="category-icon">🦑</span>
-                <label>Sotong</label>
+                <span class="category-icon">🦑</span><label>Sotong</label>
             </div>
             <div class="category-card" onclick="selectCategory(this, 'Coffee')">
                 <input type="radio" name="category" value="Coffee" id="coffee" style="display:none">
-                <span class="category-icon">☕</span>
-                <label>Coffee</label>
+                <span class="category-icon">☕</span><label>Coffee</label>
             </div>
             <div class="category-card" onclick="selectCategory(this, 'Amplang')">
                 <input type="radio" name="category" value="Amplang" id="amplang" style="display:none">
-                <span class="category-icon">🌕</span>
-                <label>Amplang</label>
+                <span class="category-icon">🌕</span><label>Amplang</label>
             </div>
             <div class="category-card" onclick="selectCategory(this, 'Other')">
                 <input type="radio" name="category" value="Other" id="other" style="display:none">
-                <span class="category-icon">🎁</span>
-                <label>Other</label>
+                <span class="category-icon">🎁</span><label>Other</label>
             </div>
             <div class="category-card" onclick="selectCategory(this, 'Wrapping')">
                 <input type="radio" name="category" value="Wrapping" id="wrapping" style="display:none">
-                <span class="category-icon">🧸</span>
-                <label>Wrapping</label>
+                <span class="category-icon">🧸</span><label>Wrapping</label>
             </div>
             <div class="category-card" onclick="selectCategory(this, 'Office')">
                 <input type="radio" name="category" value="Office" id="Office" style="display:none">
-                <span class="category-icon">📦</span>
-                <label>Office</label>
+                <span class="category-icon">📦</span><label>Office</label>
             </div>
         </div>
 
@@ -902,12 +559,8 @@
                 <input type="text" id="productSearch" placeholder="Search product..." oninput="searchProduct()" autocomplete="off">
             </div>
             <div class="view-toggle-group" id="viewToggleContainer">
-                <button id="listViewBtn" onclick="toggleView('list')" class="view-toggle-btn active">
-                    <span class="material-icons">view_list</span>
-                </button>
-                <button id="gridViewBtn" onclick="toggleView('grid')" class="view-toggle-btn">
-                    <span class="material-icons">grid_view</span>
-                </button>
+                <button id="listViewBtn" onclick="toggleView('list')" class="view-toggle-btn active"><span class="material-icons">view_list</span></button>
+                <button id="gridViewBtn" onclick="toggleView('grid')" class="view-toggle-btn"><span class="material-icons">grid_view</span></button>
             </div>
         </div>
 
@@ -919,8 +572,7 @@
         <!-- Bottom Navigation -->
         <div class="bottom-nav">
             <div class="bottom-nav-item" id="menuNavItem" onclick="toggleDashboard()">
-                <span class="material-icons">menu</span>
-                <span>Menu</span>
+                <span class="material-icons">menu</span><span>Menu</span>
             </div>
             <div class="bottom-nav-item" id="previewNavItem" onclick="togglePreview()">
                 <div style="position: relative;">
@@ -930,8 +582,7 @@
                 <span>Order</span>
             </div>
             <div class="bottom-nav-item" id="settingsNavItem" onclick="toggleSettings()">
-                <span class="material-icons">settings</span>
-                <span>Setting</span>
+                <span class="material-icons">settings</span><span>Setting</span>
             </div>
         </div>
     </div> <!-- End Main Content -->
@@ -953,30 +604,15 @@
             </div>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <label style="display: flex; align-items: center; gap: 6px; font-size: 0.9rem;">
-                    <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()" style="width: 16px; height: 16px;">
-                    Add On
+                    <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()" style="width: 16px; height: 16px;"> Add On
                 </label>
                 <span class="material-icons-round" onclick="togglePreview()" style="cursor: pointer; color: var(--text-secondary);">close</span>
             </div>
         </div>
         <div id="preview-content" style="font-size: 0.9rem; line-height: 1.6; max-height: 40vh; overflow-y: auto;"></div>
         <button class="whatsapp-button" onclick="copyAndSendWhatsApp()">
-            <span class="material-icons-round" style="margin-right: 8px;">whatsapp</span>
-            Send to WhatsApp
+            <span class="material-icons-round" style="margin-right: 8px;">whatsapp</span> Send to WhatsApp 🎄
         </button>
-    </div>
-
-    <!-- Fullscreen Confirm -->
-    <div id="fullscreenConfirm" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: none; padding: 20px; overflow-y: auto;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="color: var(--text-primary);">Confirm Order</h2>
-            <span class="material-icons-round" onclick="closeFullscreenConfirm()" style="font-size: 28px; cursor: pointer;">close</span>
-        </div>
-        <div id="fullscreen-content" style="background: var(--surface-color); padding: 20px; border-radius: var(--radius-md); margin-bottom: 20px; line-height: 1.6;"></div>
-        <div style="display: flex; gap: 12px;">
-            <button onclick="confirmAndSendWhatsApp()" style="flex: 1; background: var(--success-color); color: white; padding: 15px; border-radius: var(--radius-md);">Confirm</button>
-            <button onclick="closeFullscreenConfirm()" style="flex: 1; background: var(--surface-color); border: 1px solid var(--danger-color); color: var(--danger-color); padding: 15px; border-radius: var(--radius-md);">Cancel</button>
-        </div>
     </div>
 
     <!-- Settings Panel -->
@@ -985,7 +621,7 @@
         <div style="margin-bottom: 15px;">
             <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Appearance</label>
             <div style="display: flex; gap: 8px;">
-                <button onclick="changeTheme('dark')" style="flex: 1; padding: 8px; background: #333; color: white; border-radius: 6px;">Dark</button>
+                <button onclick="changeTheme('dark')" style="flex: 1; padding: 8px; background: #0b1e15; color: white; border-radius: 6px;">Dark</button>
                 <button onclick="changeTheme('light')" style="flex: 1; padding: 8px; background: #f0f0f0; color: #333; border-radius: 6px;">Light</button>
             </div>
         </div>
@@ -1016,7 +652,7 @@
     </div>
     <div id="dashboard-overlay" onclick="toggleDashboard()" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1499; display: none;"></div>
 
-    <!-- Admin Panel -->
+    <!-- Admin Panel (Preserved) -->
     <div id="adminPanel" class="auth-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 2000;">
         <div class="auth-box" style="width: 95%; height: 90vh; max-width: 800px; display: flex; flex-direction: column; overflow: hidden;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -1029,21 +665,14 @@
                 <button class="tab-button" onclick="showAdminTab('announcement')">Announce</button>
             </div>
             <div style="flex: 1; overflow-y: auto; padding-top: 15px; padding-bottom: 20px;">
-                <!-- User Management -->
                 <div id="users-tab" class="admin-tab-content">
-                    <h3>Pending Users</h3>
-                    <div id="pendingUsersList" class="users-list">Loading...</div>
-                    <h3 style="margin-top: 20px;">All Users</h3>
-                    <div id="allUsersList" class="users-list">Loading...</div>
+                    <h3>Pending Users</h3><div id="pendingUsersList" class="users-list">Loading...</div>
+                    <h3 style="margin-top: 20px;">All Users</h3><div id="allUsersList" class="users-list">Loading...</div>
                 </div>
-                
-                <!-- Product Management -->
                 <div id="products-tab" class="admin-tab-content" style="display: none;">
                     <select id="categorySelect" onchange="loadProductsForAdmin()" style="margin-bottom: 15px;"></select>
                     <div id="productManagementList" class="product-management-list"></div>
                 </div>
-                
-                <!-- Announcement Management -->
                 <div id="announcement-tab" class="admin-tab-content" style="display: none;">
                     <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
                         <input type="checkbox" id="announcementEnabled" onchange="toggleAnnouncement()"> Enable Announcement
@@ -1054,41 +683,8 @@
                             <label style="font-size:0.8rem">Start Time:<input type="datetime-local" id="announcementStartTime"></label>
                             <label style="font-size:0.8rem">End Time:<input type="datetime-local" id="announcementEndTime"></label>
                         </div>
-                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                            <select id="announcementFontSize"><option value="16px">Normal</option><option value="20px">Large</option></select>
-                            <input type="color" id="announcementTextColor" value="#ffffff" style="height: 45px;">
-                        </div>
-                        <select id="announcementBgType" onchange="toggleBgSettings()" style="margin-bottom: 10px;">
-                            <option value="gradient">Gradient</option>
-                            <option value="solid">Solid</option>
-                            <option value="custom">Custom Gradient</option>
-                        </select>
-                        <div id="solidColorSettings" style="display: none; margin-bottom: 10px;">
-                            <input type="color" id="announcementBgColor" value="#4285f4" style="height: 45px;">
-                        </div>
-                         <div id="customGradientSettings" style="display: none; margin-bottom: 10px;">
-                             <input type="color" id="announcementGradientStart" value="#ff6b6b">
-                             <input type="color" id="announcementGradientEnd" value="#4ecdc4">
-                        </div>
-                         <select id="announcementSpeed" style="margin-bottom: 10px;">
-                            <option value="15s">Normal Speed</option>
-                            <option value="10s">Fast</option>
-                        </select>
                         <div style="display: flex; gap: 10px;">
-                            <button onclick="previewAnnouncement()" style="flex: 1; padding: 12px; background: var(--primary-color); color: white;">Preview</button>
                             <button onclick="saveAnnouncementSettings()" style="flex: 1; padding: 12px; background: var(--success-color); color: white;">Save</button>
-                        </div>
-                        
-                        <!-- Preview Area -->
-                         <div style="margin-top: 15px;">
-                            <label>Preview:</label>
-                            <div id="announcementPreview" style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); padding: 10px; border-radius: 8px; overflow: hidden; white-space: nowrap; color: white; margin-top: 5px;">
-                                <div>Announcement Text</div>
-                            </div>
-                         </div>
-
-                        <div id="currentAnnouncementStatus" style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;">
-                            <div id="announcementStatusContent">Checking...</div>
                         </div>
                     </div>
                 </div>
@@ -1096,9 +692,345 @@
         </div>
     </div>
 
+    <!-- 3D LOGIC & MAIN APP SCRIPT -->
     <script>
         // ==========================================
-        // CONFIGURATION & INITIALIZATION
+        // 3D CHRISTMAS SHOP SELECTOR (Three.js)
+        // ==========================================
+        
+        let scene, camera, renderer, treeGroup;
+        let shopsGroup; // Holds the shop meshes
+        let is3DPaused = false;
+        let selectedMesh = null;
+        let animationId;
+
+        // Shop Data mapped to values
+        const shopData = [
+            { name: "JKL", value: "*JKL*", img: "shop/jkl.png", color: "#FF4444" },
+            { name: "TOM", value: "*TOM*", img: "shop/tom.png", color: "#44FF44" },
+            { name: "Ole-Ole Dalam", value: "*Ole-Ole Dalam*", img: "shop/dalam.png", color: "#4444FF" },
+            { name: "Ole-Ole Luar", value: "*Ole-Ole Luar*", img: "shop/luar.png", color: "#FFFF44" },
+            { name: "Wrapping (AA)", value: "*Wrapping(AA)*", img: "shop/Aa.png", color: "#44FFFF" },
+            { name: "Wrapping (MAS)", value: "*Wrapping(MAS)*", img: "shop/Mas.png", color: "#FF44FF" },
+            { name: "Ole-Ole Tawau", value: "*Ole-Ole Tawau*", img: "shop/tawau.png", color: "#FFA500" },
+            { name: "Wisma", value: "*Wisma*", img: "shop/wisma.png", color: "#800080" }
+        ];
+
+        function init3DScene() {
+            const container = document.getElementById('canvas-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // 1. Scene Setup
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x050505, 0.02);
+
+            camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+            camera.position.set(0, 5, 14);
+            camera.lookAt(0, 3, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            // 2. Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffdfba, 1.2);
+            dirLight.position.set(10, 15, 10);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 1024;
+            dirLight.shadow.mapSize.height = 1024;
+            scene.add(dirLight);
+
+            // 3. Tree Group
+            treeGroup = new THREE.Group();
+            scene.add(treeGroup);
+
+            // Trunk
+            const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.8, 2.5, 8);
+            const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x4d2926, roughness: 0.9 });
+            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+            trunk.position.y = 1.25;
+            trunk.castShadow = true;
+            trunk.receiveShadow = true;
+            treeGroup.add(trunk);
+
+            // Leaves
+            const treeMaterial = new THREE.MeshStandardMaterial({ color: 0x1a472a, roughness: 0.7, flatShading: true });
+            function createTreeLayer(radiusBottom, radiusTop, height, yPos) {
+                const geometry = new THREE.ConeGeometry(radiusBottom, height, 8);
+                const mesh = new THREE.Mesh(geometry, treeMaterial);
+                mesh.position.y = yPos;
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                treeGroup.add(mesh);
+                return mesh;
+            }
+            createTreeLayer(3.5, 0, 3.5, 3.5);
+            createTreeLayer(2.8, 0, 3.0, 5.5);
+            createTreeLayer(2.0, 0, 2.5, 7.2);
+
+            // Star
+            const starGeometry = new THREE.IcosahedronGeometry(0.5, 0);
+            const starMaterial = new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xffd700, emissiveIntensity: 1 });
+            const star = new THREE.Mesh(starGeometry, starMaterial);
+            star.position.y = 8.6;
+            treeGroup.add(star);
+            const starLight = new THREE.PointLight(0xffd700, 1.5, 8);
+            starLight.position.set(0, 8.6, 0);
+            treeGroup.add(starLight);
+
+            // Ornaments (Simplified)
+            const ornamentGeo = new THREE.SphereGeometry(0.18, 8, 8);
+            const colors = [0xff0000, 0xffd700, 0x00bfff, 0xff69b4];
+            for (let i = 0; i < 30; i++) {
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const mat = new THREE.MeshStandardMaterial({ color: color, emissive: color, emissiveIntensity: 0.4 });
+                const mesh = new THREE.Mesh(ornamentGeo, mat);
+                const angle = Math.random() * Math.PI * 2;
+                const y = 3 + Math.random() * 4;
+                const r = 3 * (1 - (y-3)/5) + 0.2;
+                mesh.position.set(Math.cos(angle)*r, y, Math.sin(angle)*r);
+                treeGroup.add(mesh);
+            }
+
+            // --- ADD SHOPS ---
+            shopsGroup = new THREE.Group();
+            treeGroup.add(shopsGroup); // Shops rotate with tree
+
+            const shopRadius = 6.0; // Distance from center
+            const shopY = 4.5;
+            
+            shopData.forEach((shop, index) => {
+                const angle = (index / shopData.length) * Math.PI * 2;
+                const x = Math.cos(angle) * shopRadius;
+                const z = Math.sin(angle) * shopRadius;
+
+                // Create Texture (Try image, fallback to canvas)
+                const texture = createShopTexture(shop);
+                
+                // Card Geometry
+                const cardGeo = new THREE.BoxGeometry(2.5, 1.8, 0.1);
+                const cardMat = new THREE.MeshBasicMaterial({ map: texture });
+                const card = new THREE.Mesh(cardGeo, cardMat);
+                
+                card.position.set(x, shopY, z);
+                // Make card face outwards from center
+                card.lookAt(0, shopY, 0);
+                // Correct rotation to face outward (rotate 180 deg around Y)
+                card.rotateY(Math.PI);
+                
+                // Add Metadata for Raycaster
+                card.userData = { isShop: true, value: shop.value, name: shop.name };
+                
+                shopsGroup.add(card);
+            });
+
+            // Snow
+            const snowGeo = new THREE.BufferGeometry();
+            const snowCount = 600;
+            const pos = [];
+            for(let i=0; i<snowCount; i++) {
+                pos.push((Math.random()-0.5)*30, Math.random()*20, (Math.random()-0.5)*30);
+            }
+            snowGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+            const snowMat = new THREE.PointsMaterial({ size: 0.15, color: 0xffffff, transparent: true });
+            const snowSystem = new THREE.Points(snowGeo, snowMat);
+            scene.add(snowSystem);
+
+            // Interaction
+            const raycaster = new THREE.Raycaster();
+            const pointer = new THREE.Vector2();
+
+            function onPointerDown(event) {
+                if (is3DPaused) return;
+
+                // Calculate pointer position in normalized device coordinates
+                const rect = renderer.domElement.getBoundingClientRect();
+                pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+                raycaster.setFromCamera(pointer, camera);
+                const intersects = raycaster.intersectObjects(shopsGroup.children);
+
+                if (intersects.length > 0) {
+                    const hit = intersects[0].object;
+                    if (hit.userData.isShop) {
+                        selectShopFrom3D(hit);
+                    }
+                }
+            }
+
+            renderer.domElement.addEventListener('pointerdown', onPointerDown);
+
+            // Animation Loop
+            const clock = new THREE.Clock();
+            function animate() {
+                animationId = requestAnimationFrame(animate);
+                
+                const delta = clock.getDelta();
+
+                if (!is3DPaused) {
+                    treeGroup.rotation.y += 0.003;
+                }
+
+                // Snow
+                const positions = snowSystem.geometry.attributes.position.array;
+                for(let i=1; i<snowCount*3; i+=3) {
+                    positions[i] -= 0.05;
+                    if(positions[i] < 0) positions[i] = 20;
+                }
+                snowSystem.geometry.attributes.position.needsUpdate = true;
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            // Handle Resize
+            window.addEventListener('resize', () => {
+                const w = container.clientWidth;
+                const h = container.clientHeight;
+                camera.aspect = w / h;
+                camera.updateProjectionMatrix();
+                renderer.setSize(w, h);
+            });
+        }
+
+        // Texture Generator for Shops
+        function createShopTexture(shop) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 360;
+            const ctx = canvas.getContext('2d');
+
+            // Background (Card style)
+            const gradient = ctx.createLinearGradient(0, 0, 512, 360);
+            gradient.addColorStop(0, '#fff');
+            gradient.addColorStop(1, '#eee');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 512, 360);
+            
+            // Border
+            ctx.lineWidth = 20;
+            ctx.strokeStyle = '#D32F2F'; // Christmas Red
+            ctx.strokeRect(0, 0, 512, 360);
+            
+            // Text
+            ctx.fillStyle = '#1f2937';
+            ctx.font = 'bold 60px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Handle long names
+            const words = shop.name.split(' ');
+            if (words.length > 2) {
+                ctx.fillText(words.slice(0,2).join(' '), 256, 140);
+                ctx.fillText(words.slice(2).join(' '), 256, 220);
+            } else {
+                ctx.fillText(shop.name, 256, 180);
+            }
+            
+            // Add a small icon graphic (Circle)
+            ctx.beginPath();
+            ctx.arc(256, 60, 20, 0, Math.PI*2);
+            ctx.fillStyle = '#D32F2F';
+            ctx.fill();
+
+            const tex = new THREE.CanvasTexture(canvas);
+            
+            // Attempt to load real image, if successful, replace texture
+            const img = new Image();
+            img.src = shop.img;
+            img.onload = () => {
+                const imgCanvas = document.createElement('canvas');
+                imgCanvas.width = 512;
+                imgCanvas.height = 360;
+                const iCtx = imgCanvas.getContext('2d');
+                // Draw rounded rect clip
+                iCtx.fillStyle = '#fff';
+                iCtx.fillRect(0,0,512,360);
+                iCtx.drawImage(img, 0, 0, 512, 360);
+                
+                // Add Name overlay
+                iCtx.fillStyle = 'rgba(211, 47, 47, 0.9)';
+                iCtx.fillRect(0, 290, 512, 70);
+                iCtx.fillStyle = '#fff';
+                iCtx.font = 'bold 40px Arial';
+                iCtx.textAlign = 'center';
+                iCtx.fillText(shop.name, 256, 335);
+                
+                tex.image = imgCanvas;
+                tex.needsUpdate = true;
+            };
+
+            return tex;
+        }
+
+        function selectShopFrom3D(mesh) {
+            playEffect('select');
+            
+            if (selectedMesh) {
+                // Reset previous mesh scale
+                selectedMesh.scale.set(1, 1, 1);
+            }
+            
+            selectedMesh = mesh;
+            is3DPaused = true;
+            
+            // Visual Effect: Scale up mesh
+            mesh.scale.set(1.3, 1.3, 1.3);
+            
+            // Trigger App Logic
+            const radio = document.querySelector(`input[value="${mesh.userData.value}"]`);
+            if(radio) {
+                radio.checked = true;
+                
+                document.getElementById('categoryTitle').style.display = 'block';
+                document.getElementById('categoryContainer').style.display = 'grid';
+                document.getElementById('searchContainer').style.display = 'flex';
+                
+                // Show Reset Button (with new animation)
+                document.getElementById('reset-3d-btn').style.display = 'flex'; 
+                
+                document.getElementById('canvas-msg').innerText = "Selected: " + mesh.userData.name;
+
+                // Smooth scroll
+                setTimeout(() => { 
+                    document.getElementById('categoryTitle').scrollIntoView({ behavior: 'smooth', block: 'start' }); 
+                }, 100);
+                
+                toggleItems();
+                updatePreview();
+            }
+        }
+
+        function reset3DView() {
+            playEffect('click');
+            is3DPaused = false;
+            if(selectedMesh) selectedMesh.scale.set(1, 1, 1);
+            selectedMesh = null;
+            document.getElementById('reset-3d-btn').style.display = 'none';
+            document.getElementById('canvas-msg').innerText = "Tap a gift card to select shop";
+            
+            // Hide categories logic
+            document.getElementById('categoryTitle').style.display = 'none';
+            document.getElementById('categoryContainer').style.display = 'none';
+            document.getElementById('searchContainer').style.display = 'none';
+            document.getElementById('productList').style.display = 'none';
+            document.getElementById('selectItemsTitle').style.display = 'none';
+            
+            // Uncheck radios
+            const checked = document.querySelector('input[name="store"]:checked');
+            if(checked) checked.checked = false;
+        }
+
+        // ==========================================
+        // APP CONFIG & LOGIC (Preserved)
         // ==========================================
         
         const authFirebaseConfig = {
@@ -1111,7 +1043,6 @@
             appId: "1:1062589065402:web:499c586bdfb399a461ba83",
             measurementId: "G-4W7C1FKW1M"
         };
-        
         const stockFirebaseConfig = {
             apiKey: "AIzaSyDAK5KVv9oln2qS5EfNzox1snM19wa83-o",
             authDomain: "smart-profits-stock.firebaseapp.com",
@@ -1123,85 +1054,49 @@
             measurementId: "G-R0K4Q7JTGE"
         };
 
-        // Initialize Firebase
         const authApp = firebase.initializeApp(authFirebaseConfig);
         const db = authApp.database();
         const auth = authApp.auth();
         const stockApp = firebase.initializeApp(stockFirebaseConfig, "stock");
         const stockDb = stockApp.database();
 
-        // Advanced Sound Effect System using Web Audio API
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
         function playEffect(type) {
             try {
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-                
+                if (audioCtx.state === 'suspended') audioCtx.resume();
                 const gainNode = audioCtx.createGain();
                 gainNode.connect(audioCtx.destination);
-
-                if (type === 'add') {
-                    // High pitch short beep (Increase)
-                    playTone(880, 0.1, 'sine');
-                } else if (type === 'remove') {
-                    // Low pitch short beep (Decrease)
-                    playTone(440, 0.1, 'sine');
-                } else if (type === 'select') {
-                    // Soft pop (Selection)
-                    playTone(600, 0.05, 'triangle');
-                } else if (type === 'success') {
-                    // Success chime (WhatsApp)
-                    playTone(523.25, 0.1, 'sine'); // C5
-                    setTimeout(() => playTone(659.25, 0.2, 'sine'), 100); // E5
-                } else {
-                    // Default click
-                    playTone(800, 0.03, 'sine');
-                }
-                
-                // Trigger vibration as backup
-                if (localStorage.getItem('vibration-enabled') !== 'disabled' && window.navigator.vibrate) {
-                    window.navigator.vibrate(10);
-                }
-            } catch(e) {
-                console.error("Audio play failed", e);
-            }
+                if (type === 'add') playTone(880, 0.1, 'sine');
+                else if (type === 'remove') playTone(440, 0.1, 'sine');
+                else if (type === 'select') { playTone(600, 0.05, 'triangle'); setTimeout(() => playTone(800, 0.05, 'triangle'), 100); }
+                else if (type === 'success') { playTone(523.25, 0.1, 'sine'); setTimeout(() => playTone(659.25, 0.1, 'sine'), 150); setTimeout(() => playTone(783.99, 0.2, 'sine'), 300); }
+                else playTone(800, 0.03, 'sine');
+                if (localStorage.getItem('vibration-enabled') !== 'disabled' && window.navigator.vibrate) window.navigator.vibrate(10);
+            } catch(e) {}
         }
-
         function playTone(freq, duration, type) {
             try {
                 const oscillator = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
-                
-                oscillator.type = type;
-                oscillator.frequency.value = freq;
-                
-                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + duration);
+                oscillator.type = type; oscillator.frequency.value = freq;
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
+                oscillator.start(); oscillator.stop(audioCtx.currentTime + duration);
             } catch(e) {}
         }
 
-        // Global State
         let stockMap = {};
         let currentUser = null;
         let userRole = "User";
         let selectedItems = {};
         let currentView = localStorage.getItem('view-mode') || 'list';
-        let splashShown = false; // Track splash state
+        let splashShown = false;
         window.allProducts = {};
 
-        // Product Categories Data (RESTORED WITH IMAGES)
+        // Product Categories Data
         const categories = {
             BanHeang: [
-                { id: 101, name: "BH Tambun Original", imageUrl: "https://example.com/path/to/image.jpg" },
-                { id: 102, name: "BH Tambun Pandan" }, { id: 103, name: "BH Tambun White Lotus" },
+                { id: 101, name: "BH Tambun Original" }, { id: 102, name: "BH Tambun Pandan" }, { id: 103, name: "BH Tambun White Lotus" },
                 { id: 104, name: "BH Tau Sar Pheah" }, { id: 166, name: "BH Tau Sar Pheah Spicy Shrimp" },
                 { id: 170, name: "BH Tau Shar Pheah Durian" }, { id: 171, name: "BH Tau Shar Pheah Salted Egg" },
                 { id: 172, name: "BH Tau Shar Pheah Almond" }, { id: 173, name: "BH Tau Shar Pheah Cheese" },
@@ -1302,98 +1197,74 @@
                 { id: 903, name: "Dried mango", unit: 'ctn' }, { id: 904, name: "Coconut milk candy", unit: 'ctn' },
                 { id: 905, name: "Durian milk candy", unit: 'ctn' }, { id: 906, name: "Bird Nest Candy", unit: 'ctn' },
                 { id: 907, name: "Traditional Coconut Candy", unit: 'ctn' }, { id: 908, name: "Kuih Cincin Mini (office)", unit: 'ctn' },
-                
-                { id: 909, name: "Kuih Cincin Besar (office)", unit: 'ctn' },
-                { id: 910, name: "Kerepek Pisang Manis", unit: 'ctn' },{ id: 911, name: "Kerepek Pisang Masin", unit: 'ctn' }
+                { id: 909, name: "Kuih Cincin Besar (office)", unit: 'ctn' }, { id: 910, name: "Kerepek Pisang Manis", unit: 'ctn' },{ id: 911, name: "Kerepek Pisang Masin", unit: 'ctn' }
             ]
         };
 
-        // ==========================================
-        // SPLASH SCREEN LOGIC
-        // ==========================================
         function playOpeningAnimation(callback) {
             const splash = document.getElementById('splashScreen');
             const mainContent = document.getElementById('mainAppContent');
-            
-            splash.style.display = 'flex';
-            mainContent.style.opacity = '0';
-            
-            // 持续时间：2.5秒，既不卡顿又能展示动画
+            splash.style.display = 'flex'; mainContent.style.opacity = '0';
             setTimeout(() => {
                 splash.style.opacity = '0';
-                setTimeout(() => {
-                    splash.style.display = 'none';
-                    splash.style.opacity = '1'; // Reset for next time if needed
-                    mainContent.style.opacity = '1';
-                    if (callback) callback();
-                }, 500); // Fade out duration
+                setTimeout(() => { splash.style.display = 'none'; splash.style.opacity = '1'; mainContent.style.opacity = '1'; if (callback) callback(); }, 500);
             }, 2500);
         }
 
-        // ==========================================
-        // LOGIC RESTORATION
-        // ==========================================
+        function createSnowflakes() {
+            const container = document.getElementById('snow-container');
+            for (let i = 0; i < 20; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake'; snowflake.textContent = '❄';
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDuration = Math.random() * 3 + 5 + 's';
+                snowflake.style.opacity = Math.random() * 0.5 + 0.3;
+                snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+                snowflake.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(snowflake);
+            }
+        }
 
         function initAllProducts() {
             window.allProducts = {};
             Object.entries(categories).forEach(([category, products]) => {
-                products.forEach(product => {
-                    window.allProducts[product.id] = product;
-                });
+                products.forEach(product => { window.allProducts[product.id] = product; });
             });
         }
 
-        // Render Products with Image Support
         function loadProducts(products) {
             const productList = document.getElementById('productList');
             productList.innerHTML = '';
-
-            // Get new product info from cache or similar if needed, here we just load
-            // We need to fetch the 'new products' status to add badges
-            Promise.all([
-                db.ref('newProducts').once('value'),
-                db.ref('productBoxes').once('value')
-            ]).then(([newProductsSnapshot, productBoxesSnapshot]) => {
+            Promise.all([ db.ref('newProducts').once('value'), db.ref('productBoxes').once('value') ]).then(([newProductsSnapshot, productBoxesSnapshot]) => {
                 const newProductsData = newProductsSnapshot.val() || {};
-                
-                // Sort Logic
                 const sortedProducts = [...products].sort((a, b) => {
-                    const stockA = stockMap[a.name] || 0;
-                    const stockB = stockMap[b.name] || 0;
-                    if ((stockA > 0) === (stockB > 0)) return 0;
-                    return stockA > 0 ? -1 : 1;
+                    const stockA = stockMap[a.name] || 0; const stockB = stockMap[b.name] || 0;
+                    if ((stockA > 0) === (stockB > 0)) return 0; return stockA > 0 ? -1 : 1;
                 });
-
                 sortedProducts.forEach(product => {
                     const div = document.createElement('div');
                     div.setAttribute('data-product-id', product.id);
-                    
-                    // Check for New Status
                     const isNew = newProductsData[product.id];
-                    const newUntil = isNew ? new Date(isNew.until) : null;
-                    const isStillNew = isNew && newUntil && newUntil > new Date();
+                    const isStillNew = isNew && new Date(isNew.until) > new Date();
                     if (isStillNew) div.classList.add('new-product-glow');
-
                     const isChecked = selectedItems[product.id] ? 'checked' : '';
                     const defaultQuantity = product.defaultQuantity || 1;
                     const currentQuantity = selectedItems[product.id] || defaultQuantity;
                     
                     if (currentView === 'grid') {
-                        // Grid View with Image Support
                         const hasImage = product.imageUrl ? true : false;
                         const imageHTML = hasImage ? 
                             `<div class="product-image" onclick="showImage('${product.imageUrl}', '${product.name}'); event.stopPropagation();">
                                 <img src="${product.imageUrl}" alt="${product.name}" onerror="this.style.display='none';this.parentNode.innerHTML='<span class=\'material-icons-round\' style=\'font-size:32px;color:var(--text-secondary)\'>inventory_2</span>'">
                              </div>` : 
                             `<div class="product-image"><span class="material-icons-round" style="font-size: 32px; color: var(--text-secondary);">inventory_2</span></div>`;
-                        
                         div.innerHTML = `
                             <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
                             <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
                             ${isStillNew ? '<span style="position:absolute; top:5px; left:5px; background:red; color:white; font-size:10px; padding:2px 4px; border-radius:4px; z-index:5">NEW</span>' : ''}
                             ${imageHTML}
                             <span class="product-name" onclick="document.getElementById('item${product.id}').click()">${product.name}</span>
-                            <span class="stock-info" id="stock${product.id}" style="font-size:0.8rem; color: var(--accent-color); margin-bottom:6px;">Checking...</span>
+                            <span class="stock-info" id="stock${product.id}" style="font-size:0.8rem; color: var(--text-secondary); margin-bottom:6px;">Checking...</span>
                             <div class="quantity-controls-wrapper">
                                 <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)"><span class="material-icons-round">add</span></button>
                                 <input type="number" id="quantity${product.id}" min="1" value="${currentQuantity}" readonly>
@@ -1401,23 +1272,14 @@
                             </div>
                         `;
                     } else {
-                        // List View with Image Button
-                        const viewImageButton = product.imageUrl ? 
-                            `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}'); event.stopPropagation();">
-                                <span class="material-icons-outlined" style="font-size: 14px; margin-right: 2px;">image</span> View
-                            </button>` : '';
-                        
+                        const viewImageButton = product.imageUrl ? `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}'); event.stopPropagation();"><span class="material-icons-outlined" style="font-size: 14px; margin-right: 2px;">image</span> View</button>` : '';
                         const newBadge = isStillNew ? '<span style="background:red; color:white; font-size:10px; padding:1px 4px; border-radius:4px; margin-left:5px;">NEW</span>' : '';
-
                         div.innerHTML = `
                             <div style="display:flex; align-items:center; flex:1;">
                                 <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
                                 <label for="item${product.id}">
-                                    <div style="display:flex; align-items:center;">
-                                        ${product.name} ${newBadge}
-                                        ${viewImageButton}
-                                    </div>
-                                    <span id="stock${product.id}" style="font-size:0.8rem; color: var(--accent-color);">Checking...</span>
+                                    <div style="display:flex; align-items:center;">${product.name} ${newBadge} ${viewImageButton}</div>
+                                    <span id="stock${product.id}" style="font-size:0.8rem; color: var(--text-secondary);">Checking...</span>
                                 </label>
                             </div>
                             <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
@@ -1430,88 +1292,30 @@
                     }
                     productList.appendChild(div);
                 });
-                
-                // Trigger stock update to fill in numbers
                 loadQuantitiesFromFirebase();
                 updateProductBoxDisplay();
             });
         }
 
-        // ==========================
-        // ADMIN PANEL LOGIC RESTORED
-        // ==========================
-
-        function openAdminPanel() {
-            playEffect('click');
-            document.getElementById('adminPanel').style.display = 'flex';
-            loadUsersList();
-            initAdminPanel();
-            showAdminTab('users');
-        }
-
+        // --- Admin Functions ---
+        function openAdminPanel() { playEffect('click'); document.getElementById('adminPanel').style.display = 'flex'; loadUsersList(); initAdminPanel(); showAdminTab('users'); }
         function showAdminTab(tabName) {
-            playEffect('click');
-            document.querySelectorAll('.admin-tab-content').forEach(tab => tab.style.display = 'none');
-            document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
-            document.getElementById(tabName + '-tab').style.display = 'block';
-            document.querySelector(`.tab-button[onclick="showAdminTab('${tabName}')"]`).classList.add('active');
-            
-            if (tabName === 'products') {
-                const sel = document.getElementById('categorySelect');
-                if (sel.value) loadProductsForAdmin();
-            }
-            if (tabName === 'announcement') {
-                loadAnnouncementSettings();
-            }
+            playEffect('click'); document.querySelectorAll('.admin-tab-content').forEach(tab => tab.style.display = 'none'); document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
+            document.getElementById(tabName + '-tab').style.display = 'block'; document.querySelector(`.tab-button[onclick="showAdminTab('${tabName}')"]`).classList.add('active');
+            if (tabName === 'products') { const sel = document.getElementById('categorySelect'); if (sel.value) loadProductsForAdmin(); }
+            if (tabName === 'announcement') loadAnnouncementSettings();
         }
-
-        function initAdminPanel() {
-            const sel = document.getElementById('categorySelect');
-            sel.innerHTML = '<option value="">-- Select Category --</option>';
-            Object.keys(categories).forEach(c => {
-                const o = document.createElement('option');
-                o.value = c;
-                o.text = c;
-                sel.add(o);
-            });
-        }
-
-        // --- User Management ---
+        function initAdminPanel() { const sel = document.getElementById('categorySelect'); sel.innerHTML = '<option value="">-- Select Category --</option>'; Object.keys(categories).forEach(c => { const o = document.createElement('option'); o.value = c; o.text = c; sel.add(o); }); }
+        
         function loadUsersList() {
-            document.getElementById('pendingUsersList').innerHTML = 'Loading...';
-            document.getElementById('allUsersList').innerHTML = 'Loading...';
-
             db.ref('users').once('value').then(snapshot => {
-                const pendingDiv = document.getElementById('pendingUsersList');
-                const allDiv = document.getElementById('allUsersList');
-                pendingDiv.innerHTML = '';
-                allDiv.innerHTML = '';
-
-                if (!snapshot.exists()) {
-                    pendingDiv.innerHTML = '<p>No pending users.</p>';
-                    allDiv.innerHTML = '<p>No users found.</p>';
-                    return;
-                }
-
+                const pendingDiv = document.getElementById('pendingUsersList'); const allDiv = document.getElementById('allUsersList');
+                pendingDiv.innerHTML = ''; allDiv.innerHTML = '';
+                if (!snapshot.exists()) { pendingDiv.innerHTML = '<p>No pending users.</p>'; allDiv.innerHTML = '<p>No users found.</p>'; return; }
                 snapshot.forEach(child => {
-                    const uid = child.key;
-                    const user = child.val();
-                    
-                    // Render Pending
-                    if (user.status === 'pending') {
-                        pendingDiv.innerHTML += `
-                            <div class="user-card">
-                                <div class="user-name">${user.name} (${user.email})</div>
-                                <div style="margin-top:5px;">
-                                    <button class="action-button approve" onclick="approveUser('${uid}')">Approve</button>
-                                </div>
-                            </div>
-                        `;
-                    }
-
-                    // Render All Users (Permissions Logic)
-                    if (userRole === 'Admin' && user.role === 'SAdmin') return; // Admin can't see SAdmin
-
+                    const uid = child.key; const user = child.val();
+                    if (user.status === 'pending') { pendingDiv.innerHTML += `<div class="user-card"><div class="user-name">${user.name} (${user.email})</div><div style="margin-top:5px;"><button class="action-button approve" onclick="approveUser('${uid}')">Approve</button></div></div>`; }
+                    if (userRole === 'Admin' && user.role === 'SAdmin') return;
                     let actions = '';
                     if (userRole === 'SAdmin' && uid !== currentUser.uid) {
                         if (user.role === 'User') actions += `<button class="action-button promote" onclick="changeUserRole('${uid}','User','Admin')">Make Admin</button>`;
@@ -1519,782 +1323,153 @@
                         actions += `<button class="action-button delete" onclick="deleteUser('${uid}')">Delete</button>`;
                     }
                     if (user.status === 'pending') actions = `<button class="action-button approve" onclick="approveUser('${uid}')">Activate</button>` + actions;
-
-                    const statusColor = user.status === 'active' ? 'var(--success-color)' : 'orange';
-                    allDiv.innerHTML += `
-                        <div class="user-card">
-                            <div class="user-name">${user.name}</div>
-                            <div class="user-status">
-                                <span style="color:${statusColor}">● ${user.status}</span>
-                                <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">${user.role}</span>
-                            </div>
-                            <div style="margin-top:8px;">${actions}</div>
-                        </div>
-                    `;
+                    allDiv.innerHTML += `<div class="user-card"><div class="user-name">${user.name}</div><div class="user-status"><span style="color:${user.status === 'active' ? 'var(--success-color)' : 'orange'}">● ${user.status}</span><span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">${user.role}</span></div><div style="margin-top:8px;">${actions}</div></div>`;
                 });
-
                 if (pendingDiv.innerHTML === '') pendingDiv.innerHTML = '<p style="color:var(--text-secondary)">No pending users.</p>';
             });
         }
+        function approveUser(uid) { playEffect('success'); db.ref(`users/${uid}`).update({ status: 'active' }).then(() => { alert('Approved'); loadUsersList(); }); }
+        function changeUserRole(uid, oldRole, newRole) { if(confirm(`Change role?`)) { playEffect('click'); db.ref(`users/${uid}`).update({ role: newRole }).then(() => { alert('Role updated'); loadUsersList(); }); } }
+        function deleteUser(uid) { if(confirm('Delete user?')) { playEffect('click'); db.ref(`users/${uid}`).remove().then(() => { alert('Deleted'); loadUsersList(); }); } }
 
-        function approveUser(uid) {
-            playEffect('success');
-            db.ref(`users/${uid}`).update({ status: 'active' }).then(() => { alert('Approved'); loadUsersList(); });
-        }
-
-        function changeUserRole(uid, oldRole, newRole) {
-            if(confirm(`Change role from ${oldRole} to ${newRole}?`)) {
-                playEffect('click');
-                db.ref(`users/${uid}`).update({ role: newRole }).then(() => { alert('Role updated'); loadUsersList(); });
-            }
-        }
-
-        function deleteUser(uid) {
-            if(confirm('Delete this user permanently?')) {
-                playEffect('click');
-                db.ref(`users/${uid}`).remove().then(() => { alert('Deleted'); loadUsersList(); });
-            }
-        }
-
-        // --- Product Management ---
         function loadProductsForAdmin() {
-            const cat = document.getElementById('categorySelect').value;
-            const div = document.getElementById('productManagementList');
-            if (!cat) return;
-            
-            const products = categories[cat];
-            div.innerHTML = 'Loading...';
-
-            Promise.all([
-                db.ref('newProducts').once('value'),
-                db.ref('productBoxes').once('value')
-            ]).then(([newSnap, boxSnap]) => {
-                const newData = newSnap.val() || {};
-                const boxData = boxSnap.val() || {};
-                div.innerHTML = '';
-
+            const cat = document.getElementById('categorySelect').value; const div = document.getElementById('productManagementList');
+            if (!cat) return; const products = categories[cat]; div.innerHTML = 'Loading...';
+            Promise.all([ db.ref('newProducts').once('value'), db.ref('productBoxes').once('value') ]).then(([newSnap, boxSnap]) => {
+                const newData = newSnap.val() || {}; const boxData = boxSnap.val() || {}; div.innerHTML = '';
                 products.forEach(p => {
-                    const isNew = newData[p.id];
-                    const newUntil = isNew ? new Date(isNew.until) : null;
-                    const isStillNew = isNew && newUntil > new Date();
-                    const boxCount = boxData[p.id] || 0;
-
-                    div.innerHTML += `
-                        <div class="product-item ${isStillNew ? 'new-product' : ''}">
-                            <div style="font-weight:bold; margin-bottom:5px;">${p.name} ${isStillNew ? '🔥' : ''}</div>
-                            <label style="font-size:0.85rem; display:block;">Unit Count: 
-                                <input type="number" value="${boxCount}" onchange="saveProductBoxCount(${p.id}, this.value)" style="width:60px; padding:4px;">
-                            </label>
-                            <div style="margin-top:8px;">
-                                ${isStillNew ? 
-                                    `<button class="action-button delete" onclick="toggleNewProduct(${p.id}, false)">Remove New Tag</button>` :
-                                    `<button class="action-button promote" onclick="toggleNewProduct(${p.id}, true)">Mark as New</button>`
-                                }
-                            </div>
-                        </div>
-                    `;
+                    const isNew = newData[p.id]; const newUntil = isNew ? new Date(isNew.until) : null; const isStillNew = isNew && newUntil > new Date(); const boxCount = boxData[p.id] || 0;
+                    div.innerHTML += `<div class="product-item ${isStillNew ? 'new-product' : ''}"><div style="font-weight:bold; margin-bottom:5px;">${p.name} ${isStillNew ? '🔥' : ''}</div><label style="font-size:0.85rem; display:block;">Unit Count: <input type="number" value="${boxCount}" onchange="saveProductBoxCount(${p.id}, this.value)" style="width:60px; padding:4px;"></label><div style="margin-top:8px;">${isStillNew ? `<button class="action-button delete" onclick="toggleNewProduct(${p.id}, false)">Remove New Tag</button>` : `<button class="action-button promote" onclick="toggleNewProduct(${p.id}, true)">Mark as New</button>`}</div></div>`;
                 });
             });
         }
+        function saveProductBoxCount(pid, val) { db.ref(`productBoxes/${pid}`).set(parseInt(val)); }
+        function toggleNewProduct(pid, state) { if(state) { const until = new Date(); until.setDate(until.getDate() + 7); db.ref(`newProducts/${pid}`).set({ markedAt: Date.now(), until: until.getTime() }).then(() => loadProductsForAdmin()); } else { db.ref(`newProducts/${pid}`).remove().then(() => loadProductsForAdmin()); } }
 
-        function saveProductBoxCount(pid, val) {
-            db.ref(`productBoxes/${pid}`).set(parseInt(val)).then(() => console.log('Box count saved'));
-        }
+        function toggleAnnouncement() { document.getElementById('announcementSettings').style.display = document.getElementById('announcementEnabled').checked ? 'block' : 'none'; }
+        function loadAnnouncementSettings() { db.ref('announcement').once('value').then(snap => { const data = snap.val(); if (data && data.enabled) { document.getElementById('announcementEnabled').checked = true; document.getElementById('announcementSettings').style.display = 'block'; document.getElementById('announcementText').value = data.text || ''; document.getElementById('announcementStartTime').value = data.startTime ? new Date(data.startTime).toISOString().slice(0,16) : ''; document.getElementById('announcementEndTime').value = data.endTime ? new Date(data.endTime).toISOString().slice(0,16) : ''; } else { document.getElementById('announcementEnabled').checked = false; document.getElementById('announcementSettings').style.display = 'none'; } }); }
+        function saveAnnouncementSettings() { playEffect('success'); const enabled = document.getElementById('announcementEnabled').checked; if (!enabled) { db.ref('announcement').set({ enabled: false }).then(() => alert('Announcement disabled')); return; } const data = { enabled: true, text: document.getElementById('announcementText').value, startTime: new Date(document.getElementById('announcementStartTime').value).getTime(), endTime: new Date(document.getElementById('announcementEndTime').value).getTime() }; db.ref('announcement').set(data).then(() => { alert('Saved'); loadAnnouncementSettings(); }); }
 
-        function toggleNewProduct(pid, state) {
-            if(state) {
-                const until = new Date();
-                until.setDate(until.getDate() + 7);
-                db.ref(`newProducts/${pid}`).set({ markedAt: Date.now(), until: until.getTime() }).then(() => loadProductsForAdmin());
-            } else {
-                db.ref(`newProducts/${pid}`).remove().then(() => loadProductsForAdmin());
-            }
-        }
-
-        // --- Announcement Management ---
-        function toggleAnnouncement() {
-            const enabled = document.getElementById('announcementEnabled').checked;
-            document.getElementById('announcementSettings').style.display = enabled ? 'block' : 'none';
-        }
+        // --- Standard Logic ---
+        function showImage(url, name) { playEffect('click'); document.getElementById('modalImage').src = url; document.getElementById('imageModal').style.display = 'flex'; }
+        function closeImageModal() { playEffect('click'); document.getElementById('imageModal').style.display = 'none'; }
+        document.getElementById('imageModal').onclick = function(e) { if(e.target === this) closeImageModal(); }
         
-        function toggleBgSettings() {
-            const type = document.getElementById('announcementBgType').value;
-            document.getElementById('solidColorSettings').style.display = type === 'solid' ? 'block' : 'none';
-            document.getElementById('customGradientSettings').style.display = type === 'custom' ? 'block' : 'none';
-        }
-
-        function loadAnnouncementSettings() {
-            db.ref('announcement').once('value').then(snap => {
-                const data = snap.val();
-                const statusDiv = document.getElementById('announcementStatusContent');
-                
-                if (data && data.enabled) {
-                    document.getElementById('announcementEnabled').checked = true;
-                    document.getElementById('announcementSettings').style.display = 'block';
-                    document.getElementById('announcementText').value = data.text || '';
-                    document.getElementById('announcementStartTime').value = data.startTime ? new Date(data.startTime).toISOString().slice(0,16) : '';
-                    document.getElementById('announcementEndTime').value = data.endTime ? new Date(data.endTime).toISOString().slice(0,16) : '';
-                    
-                    // Status Display
-                    const now = Date.now();
-                    let status = 'Expired';
-                    let color = 'grey';
-                    if (now < data.startTime) { status = 'Pending'; color = 'orange'; }
-                    else if (now <= data.endTime) { status = 'Active'; color = 'green'; }
-                    
-                    statusDiv.innerHTML = `<b style="color:${color}">${status}</b><br>Text: ${data.text}<br><button onclick="cancelCurrentAnnouncement()" class="action-button delete" style="margin-top:5px;">Cancel</button>`;
-                } else {
-                    document.getElementById('announcementEnabled').checked = false;
-                    document.getElementById('announcementSettings').style.display = 'none';
-                    statusDiv.innerHTML = 'No active announcement.';
-                }
-            });
-        }
-
-        function saveAnnouncementSettings() {
-            playEffect('success');
-            const enabled = document.getElementById('announcementEnabled').checked;
-            if (!enabled) {
-                db.ref('announcement').set({ enabled: false }).then(() => alert('Announcement disabled'));
-                return;
-            }
-            
-            const data = {
-                enabled: true,
-                text: document.getElementById('announcementText').value,
-                startTime: new Date(document.getElementById('announcementStartTime').value).getTime(),
-                endTime: new Date(document.getElementById('announcementEndTime').value).getTime(),
-                fontSize: document.getElementById('announcementFontSize').value,
-                textColor: document.getElementById('announcementTextColor').value,
-                speed: document.getElementById('announcementSpeed').value,
-                background: {
-                    type: document.getElementById('announcementBgType').value,
-                    color: document.getElementById('announcementBgColor').value,
-                    startColor: document.getElementById('announcementGradientStart').value,
-                    endColor: document.getElementById('announcementGradientEnd').value
-                },
-                createdBy: currentUser.uid
-            };
-            
-            db.ref('announcement').set(data).then(() => { alert('Saved'); loadAnnouncementSettings(); });
-        }
-
-        function cancelCurrentAnnouncement() {
-            if(confirm('Cancel?')) db.ref('announcement').update({ enabled: false }).then(() => loadAnnouncementSettings());
-        }
-
-        function previewAnnouncement() {
-            playEffect('click');
-            const text = document.getElementById('announcementText').value;
-            const prev = document.getElementById('announcementPreview');
-            prev.querySelector('div').textContent = text;
-            
-            const bgType = document.getElementById('announcementBgType').value;
-            if(bgType === 'solid') prev.style.background = document.getElementById('announcementBgColor').value;
-            else if(bgType === 'custom') prev.style.background = `linear-gradient(45deg, ${document.getElementById('announcementGradientStart').value}, ${document.getElementById('announcementGradientEnd').value})`;
-            else prev.style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4)';
-            
-            prev.style.color = document.getElementById('announcementTextColor').value;
-        }
-
-        // ==========================================
-        // STANDARD LOGIC
-        // ==========================================
-
-        function showImage(url, name) {
-            playEffect('click');
-            document.getElementById('modalImage').src = url;
-            document.getElementById('imageModal').style.display = 'flex';
-        }
-        
-        function closeImageModal() {
-            playEffect('click');
-            document.getElementById('imageModal').style.display = 'none';
-        }
-        
-        document.getElementById('imageModal').onclick = function(e) {
-            if(e.target === this) closeImageModal();
-        }
-
-        // View Toggle
         function toggleView(viewMode) {
-            playEffect('click');
-            currentView = viewMode;
-            localStorage.setItem('view-mode', viewMode);
-            
+            playEffect('click'); currentView = viewMode; localStorage.setItem('view-mode', viewMode);
             const productList = document.getElementById('productList');
-            const listBtn = document.getElementById('listViewBtn');
-            const gridBtn = document.getElementById('gridViewBtn');
-            
-            if (viewMode === 'list') {
-                productList.classList.remove('grid-view');
-                listBtn.classList.add('active');
-                gridBtn.classList.remove('active');
-            } else {
-                productList.classList.add('grid-view');
-                listBtn.classList.remove('active');
-                gridBtn.classList.add('active');
-            }
-            
+            if (viewMode === 'list') { productList.classList.remove('grid-view'); document.getElementById('listViewBtn').classList.add('active'); document.getElementById('gridViewBtn').classList.remove('active'); } 
+            else { productList.classList.add('grid-view'); document.getElementById('listViewBtn').classList.remove('active'); document.getElementById('gridViewBtn').classList.add('active'); }
             const selectedCategory = document.querySelector('input[name="category"]:checked');
-            if (selectedCategory && categories[selectedCategory.value]) {
-                loadProducts(categories[selectedCategory.value]);
-            }
-            vibrate();
-        }
-
-        // Interaction Helpers
-        function vibrate(duration = 10) {
-             // This is kept for backward compat if vibrate called directly
-             playEffect('click');
+            if (selectedCategory && categories[selectedCategory.value]) loadProducts(categories[selectedCategory.value]);
         }
 
         function toggleVibration(enable) {
             localStorage.setItem('vibration-enabled', enable ? 'enabled' : 'disabled');
-            const onBtn = document.getElementById('vibration-on-btn');
-            const offBtn = document.getElementById('vibration-off-btn');
             playEffect('click');
-            if(enable) {
-                onBtn.style.backgroundColor = 'var(--primary-color)'; onBtn.style.color = 'white';
-                offBtn.style.backgroundColor = 'var(--surface-color)'; offBtn.style.color = 'var(--text-primary)';
-            } else {
-                offBtn.style.backgroundColor = 'var(--primary-color)'; offBtn.style.color = 'white';
-                onBtn.style.backgroundColor = 'var(--surface-color)'; onBtn.style.color = 'var(--text-primary)';
-            }
-        }
-
-        function selectShop(element, value) {
-            playEffect('select');
-            document.querySelectorAll('.shop-card').forEach(card => card.classList.remove('selected'));
-            element.classList.add('selected');
-            element.querySelector('input[type="radio"]').checked = true;
-            document.querySelector('.shop-container').classList.add('single-selected');
-             if (!document.querySelector('.reselect-btn')) {
-                const btn = document.createElement('button');
-                btn.className = 'reselect-btn';
-                btn.innerHTML = '<span class="material-icons-round" style="font-size:16px; margin-right:4px;">arrow_back</span> Change Shop';
-                btn.onclick = reselectShop;
-                document.querySelector('.shop-container').appendChild(btn);
-            }
-            document.getElementById('categoryTitle').style.display = 'block';
-            document.getElementById('categoryContainer').style.display = 'grid';
-            document.getElementById('searchContainer').style.display = 'flex';
-            setTimeout(() => { document.getElementById('categoryTitle').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
-            toggleItems();
-            updatePreview();
-        }
-
-        function reselectShop() {
-            playEffect('click');
-            document.querySelector('.shop-container').classList.remove('single-selected');
-            document.querySelectorAll('.shop-card').forEach(c => c.classList.remove('selected'));
-            const btn = document.querySelector('.reselect-btn');
-            if(btn) btn.remove();
-            document.getElementById('categoryTitle').style.display = 'none';
-            document.getElementById('categoryContainer').style.display = 'none';
-            document.getElementById('searchContainer').style.display = 'none';
-            document.getElementById('productList').style.display = 'none';
-            document.getElementById('selectItemsTitle').style.display = 'none';
+            document.getElementById('vibration-on-btn').style.backgroundColor = enable ? 'var(--primary-color)' : 'var(--surface-color)';
+            document.getElementById('vibration-on-btn').style.color = enable ? 'white' : 'var(--text-primary)';
+            document.getElementById('vibration-off-btn').style.backgroundColor = !enable ? 'var(--primary-color)' : 'var(--surface-color)';
+            document.getElementById('vibration-off-btn').style.color = !enable ? 'white' : 'var(--text-primary)';
         }
 
         function selectCategory(element, value) {
-            playEffect('select');
-            document.querySelectorAll('.category-card').forEach(card => card.classList.remove('selected'));
-            element.classList.add('selected');
-            element.querySelector('input[type="radio"]').checked = true;
-            document.getElementById('selectItemsTitle').style.display = 'flex';
-            document.getElementById('productList').style.display = 'flex';
+            playEffect('select'); document.querySelectorAll('.category-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected'); element.querySelector('input[type="radio"]').checked = true;
+            document.getElementById('selectItemsTitle').style.display = 'flex'; document.getElementById('productList').style.display = 'flex';
             if (categories[value]) loadProducts(categories[value]);
             setTimeout(() => { document.getElementById('selectItemsTitle').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
         }
 
-        function togglePreview() {
-            playEffect('click');
-            const win = document.getElementById('preview-window');
-            const badge = document.getElementById('orderCountBadge');
-            if (win.style.display === 'none') {
-                win.style.display = 'block';
-            } else {
-                win.style.display = 'none';
-            }
-        }
-
+        function togglePreview() { playEffect('click'); const win = document.getElementById('preview-window'); win.style.display = win.style.display === 'none' ? 'block' : 'none'; }
         function updatePreview() {
-            const content = document.getElementById('preview-content');
-            const itemsCount = Object.keys(selectedItems).length;
-            const badge = document.getElementById('orderCountBadge');
-            if (itemsCount > 0) {
-                badge.textContent = itemsCount;
-                badge.style.display = 'flex';
-            } else {
-                badge.style.display = 'none';
-                document.getElementById('preview-window').style.display = 'none';
-            }
-            const text = generateText(false);
-            content.innerHTML = text.replace(/\n/g, '<br>');
+            const content = document.getElementById('preview-content'); const itemsCount = Object.keys(selectedItems).length; const badge = document.getElementById('orderCountBadge');
+            if (itemsCount > 0) { badge.textContent = itemsCount; badge.style.display = 'flex'; } else { badge.style.display = 'none'; document.getElementById('preview-window').style.display = 'none'; }
+            content.innerHTML = generateText(false).replace(/\n/g, '<br>');
         }
 
-function generateText(forWhatsApp) {
-    let result = '';
-    let selectedStore = document.querySelector('input[name="store"]:checked');
-    let hasAddOn = document.getElementById('addOnCheckbox').checked;
-    let totalItems = 0;
-    
-    // 获取用户名
-    let userName = currentUser ? (currentUser.email ? currentUser.email.split('@')[0] : "Guest") : "Guest";
-    try {
-         const nameEl = document.querySelector('#dashboardUserName');
-         if(nameEl && nameEl.textContent !== 'Not logged in') userName = nameEl.textContent;
-    } catch(e){}
-
-    // --- 新增：日期和时间逻辑 ---
-    const now = new Date();
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const year = now.getFullYear();
-    const dateStr = `${day}/${month}/${year}`;
-
-    let hours = now.getHours();
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // 0点显示为12点
-    const timeStr = `${String(hours).padStart(2, '0')}:${minutes}${ampm}`;
-    // ---------------------------
-
-    // 构建头部信息
-    if (selectedStore) {
-        // 去除value中可能自带的星号，防止重复
-        let storeName = selectedStore.value.replace(/\*/g, '');
-        
-        result += `🏪 *(${storeName})* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
-        result += `👤 *(${userName})*\n`;
-        result += `📅 ${dateStr}\n`;
-        result += `🕠 ${timeStr}\n\n`;
-    }
-
-    // 处理商品分类和计数
-    const categorizedItems = {};
-    Object.keys(categories).forEach(c => categorizedItems[c] = []);
-
-    for (const [id, quantity] of Object.entries(selectedItems)) {
-        for (const [cat, products] of Object.entries(categories)) {
-            const p = products.find(i => i.id == id);
-            if (p) {
-                categorizedItems[cat].push({ ...p, quantity });
-                // 巧克力按品种算1个，其他按数量算（保留你之前的逻辑）
-                if(p.name.includes("Chocolate")) totalItems += 1; 
-                else totalItems += parseInt(quantity);
-                break;
-            }
-        }
-    }
-
-    result += `📦 Total Items: *${totalItems}*\n`;
-
-    // 定义分类对应的 Emoji (优化点)
-    const categoryIcons = {
-        'BanHeang': '', 'HoeHup': '', 'Chocolate': '', 
-        'Sotong': '', 'Coffee': '', 'Amplang': '', 
-        'Other': '', 'Wrapping': '', 'Office': ''
-    };
-
-    // 构建商品列表
-    for (const [cat, items] of Object.entries(categorizedItems)) {
-        if (items.length > 0) {
-            // 获取对应图标，如果没有则不显示
-            const icon = categoryIcons[cat] || '';
-            
-            result += `\n🔹🔸🔹 ${cat} ${icon} 🔹🔸🔹\n`;
-            
-            items.forEach(item => {
-                const unit = item.unit || 'ctn'; // 默认单位 ctn
-                
-                if (forWhatsApp) {
-                    // WhatsApp 纯文本格式
-                    // 建议：可以在数量上加粗 (例如 *1 ctn*) 方便查看，这里暂时按照你的要求不加
-                    result += `${item.name} - ${item.quantity} ${unit}\n`;
-                } else {
-                    // 网页预览格式 (HTML)
-                    const stock = stockMap[item.name] || 0;
-                    // 如果无库存，红色显示名字
-                    const nameHtml = stock === 0 ? `<span style="color:var(--danger-color)">${item.name}</span>` : item.name;
-                    result += `${nameHtml} - <b>${item.quantity} ${unit}</b>\n`;
+        function generateText(forWhatsApp) {
+            let result = ''; let selectedStore = document.querySelector('input[name="store"]:checked'); let hasAddOn = document.getElementById('addOnCheckbox').checked; let totalItems = 0;
+            let userName = currentUser ? (currentUser.email ? currentUser.email.split('@')[0] : "Guest") : "Guest";
+            try { const nameEl = document.querySelector('#dashboardUserName'); if(nameEl && nameEl.textContent !== 'Not logged in') userName = nameEl.textContent; } catch(e){}
+            const now = new Date(); const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+            let hours = now.getHours(); const ampm = hours >= 12 ? 'pm' : 'am'; hours = hours % 12; hours = hours ? hours : 12;
+            const timeStr = `${String(hours).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}${ampm}`;
+            if (selectedStore) { let storeName = selectedStore.value.replace(/\*/g, ''); result += `🎄 *${storeName}* ${hasAddOn ? '💥(ADD ON)' : ''}\n🎅 ${userName}\n📅 ${dateStr}\n🕠 ${timeStr}\n\n`; }
+            const categorizedItems = {}; Object.keys(categories).forEach(c => categorizedItems[c] = []);
+            for (const [id, quantity] of Object.entries(selectedItems)) { for (const [cat, products] of Object.entries(categories)) { const p = products.find(i => i.id == id); if (p) { categorizedItems[cat].push({ ...p, quantity }); if(p.name.includes("Chocolate")) totalItems += 1; else totalItems += parseInt(quantity); break; } } }
+            result += `📦 Total Items: *${totalItems}*\n`;
+            for (const [cat, items] of Object.entries(categorizedItems)) {
+                if (items.length > 0) {
+                    result += `\n🎁 ${cat} 🎁\n`;
+                    items.forEach(item => {
+                        const unit = item.unit || 'ctn';
+                        if (forWhatsApp) result += `${item.name} - ${item.quantity} ${unit}\n`;
+                        else result += `${(stockMap[item.name]||0)===0 ? `<span style="color:var(--danger-color)">${item.name}</span>` : item.name} - <b>${item.quantity} ${unit}</b>\n`;
+                    });
                 }
-            });
+            }
+            result += '\n_Merry Christmas! 🎅_';
+            return result;
         }
-    }
-    
-    result += '\n_App Version 2.1_';
-    
-    return result;
-}
+
         function loadQuantitiesFromFirebase() {
             ['office', 'kepayan'].forEach(loc => {
                 stockDb.ref(`inventory/${loc}`).on('value', snap => {
                     const data = snap.val();
-                    if(data) {
-                        Object.values(data).forEach(item => {
-                            // Update Stock
-                            stockMap[item.name] = Math.max(stockMap[item.name] || 0, item.quantity);
-                            
-                            // Update Image if exists (Restored Functionality)
-                            if (item.imageUrl) {
-                                // Find product by name in our local data
-                                Object.values(window.allProducts).forEach(product => {
-                                    if (product.name === item.name) {
-                                        product.imageUrl = item.imageUrl;
-                                        updateProductImageInDOM(product.id, item.imageUrl);
-                                    }
-                                });
-                            }
-                        });
-                        updateStockDisplay();
-                    }
+                    if(data) { Object.values(data).forEach(item => { stockMap[item.name] = Math.max(stockMap[item.name] || 0, item.quantity); if (item.imageUrl) { Object.values(window.allProducts).forEach(product => { if (product.name === item.name) { product.imageUrl = item.imageUrl; updateProductImageInDOM(product.id, item.imageUrl); } }); } }); updateStockDisplay(); }
                 });
             });
         }
-
-        // Helper to update image in DOM without full reload
-        function updateProductImageInDOM(id, url) {
-            // Handle Grid View
-            if (currentView === 'grid') {
-                const productCard = document.querySelector(`div[data-product-id="${id}"]`);
-                if (productCard) {
-                    const imgContainer = productCard.querySelector('.product-image');
-                    if (imgContainer && !imgContainer.querySelector('img')) {
-                         imgContainer.innerHTML = `<img src="${url}" alt="Product" style="width:100%; height:100%; object-fit:cover;" onclick="showImage('${url}', ''); event.stopPropagation();">`;
-                         // Add onclick to parent to handle click if needed
-                         imgContainer.setAttribute('onclick', `showImage('${url}', ''); event.stopPropagation();`);
-                    }
-                }
-            } 
-            // Handle List View
-            else {
-                const label = document.querySelector(`label[for="item${id}"]`);
-                if (label) {
-                    const container = label.querySelector('div'); // The flex container inside label
-                    if (container && !container.querySelector('.view-image-btn')) {
-                         const btn = document.createElement('button');
-                         btn.className = 'view-image-btn';
-                         btn.innerHTML = '<span class="material-icons-outlined" style="font-size: 14px; margin-right: 2px;">image</span> View';
-                         btn.onclick = (e) => { showImage(url, ''); e.stopPropagation(); };
-                         container.appendChild(btn);
-                    }
-                }
-            }
-        }
-
-        function updateProductBoxDisplay() {
-            // Also check box counts
-            db.ref('productBoxes').once('value').then(snap => {
-                const boxData = snap.val() || {};
-                Object.keys(boxData).forEach(pid => {
-                    const badge = document.getElementById(`unitBadge${pid}`);
-                    if(badge) {
-                        if(boxData[pid] > 0) {
-                            badge.style.display = 'block';
-                            badge.textContent = `Unit: ${boxData[pid]}`;
-                        } else {
-                            badge.style.display = 'none';
-                        }
-                    }
-                });
-            });
-        }
-
-        function updateStockDisplay() {
-            for (const [id, product] of Object.entries(window.allProducts)) {
-                let stock = stockMap[product.name] || 0;
-                if ([601, 602, 603, 604, 605, 606, 609, 610, 611, 612, 607, 608].includes(parseInt(id))) {
-                    if(id <= 603) stock = Math.floor(stock/60);
-                    else if(id <= 605) stock = Math.floor(stock/30);
-                    else if([606,609,610,611,612].includes(parseInt(id))) stock = Math.floor(stock/80);
-                    else stock = Math.floor(stock/70);
-                }
-                const stockEl = document.getElementById(`stock${id}`);
-                if (stockEl) {
-                    stockEl.textContent = stock === 0 ? '(No Stock)' : `(Stock: ${stock})`;
-                    if(stock === 0) stockEl.classList.add('zero-stock');
-                    else stockEl.classList.remove('zero-stock');
-                }
-            }
-        }
-
-        function saveItem(id, name) {
-            playEffect('select'); // Selection sound
-            const checkbox = document.getElementById('item' + id);
-            const qtyInput = document.getElementById('quantity' + id);
-            if (checkbox.checked) {
-                selectedItems[id] = qtyInput.value;
-            } else {
-                delete selectedItems[id];
-            }
-            updatePreview();
-        }
-
-        function changeQuantity(id, change) {
-            const input = document.getElementById('quantity' + id);
-            const checkbox = document.getElementById('item' + id);
-            let val = parseInt(input.value) || 1;
-            
-            // Play sound based on action
-            if (change > 0) {
-                playEffect('add');
-            } else if (val > 1) {
-                playEffect('remove');
-            } else {
-                // At minimum quantity
-                playEffect('remove');
-            }
-
-            val = Math.max(1, val + change);
-            input.value = val;
-            
-            if (selectedItems[id] || checkbox.checked) {
-                checkbox.checked = true;
-                selectedItems[id] = val;
-                updatePreview();
-            }
-        }
-
+        function updateProductImageInDOM(id, url) { if (currentView === 'grid') { const card = document.querySelector(`div[data-product-id="${id}"]`); if (card) { const img = card.querySelector('.product-image'); if (img && !img.querySelector('img')) img.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:cover;" onclick="showImage('${url}','')">`; } } }
+        function updateProductBoxDisplay() { db.ref('productBoxes').once('value').then(snap => { const boxData = snap.val() || {}; Object.keys(boxData).forEach(pid => { const badge = document.getElementById(`unitBadge${pid}`); if(badge) { if(boxData[pid] > 0) { badge.style.display = 'block'; badge.textContent = `Unit: ${boxData[pid]}`; } else { badge.style.display = 'none'; } } }); }); }
+        function updateStockDisplay() { for (const [id, product] of Object.entries(window.allProducts)) { let stock = stockMap[product.name] || 0; if ([601, 602, 603, 604, 605, 606, 609, 610, 611, 612, 607, 608].includes(parseInt(id))) { if(id <= 603) stock = Math.floor(stock/60); else if(id <= 605) stock = Math.floor(stock/30); else if([606,609,610,611,612].includes(parseInt(id))) stock = Math.floor(stock/80); else stock = Math.floor(stock/70); } const stockEl = document.getElementById(`stock${id}`); if (stockEl) { stockEl.textContent = stock === 0 ? '(No Stock)' : `(Stock: ${stock})`; if(stock === 0) stockEl.classList.add('zero-stock'); else stockEl.classList.remove('zero-stock'); } } }
+        function saveItem(id, name) { playEffect('select'); const chk = document.getElementById('item' + id); const qty = document.getElementById('quantity' + id); if (chk.checked) selectedItems[id] = qty.value; else delete selectedItems[id]; updatePreview(); }
+        function changeQuantity(id, change) { const input = document.getElementById('quantity' + id); let val = parseInt(input.value) || 1; if (change > 0) playEffect('add'); else playEffect('remove'); val = Math.max(1, val + change); input.value = val; const chk = document.getElementById('item' + id); if (selectedItems[id] || chk.checked) { chk.checked = true; selectedItems[id] = val; updatePreview(); } }
+        
         function searchProduct() {
-            const term = document.getElementById('productSearch').value.toLowerCase();
-            const sugg = document.getElementById('suggestions');
-            sugg.innerHTML = '';
+            const term = document.getElementById('productSearch').value.toLowerCase(); const sugg = document.getElementById('suggestions'); sugg.innerHTML = '';
             if(term.length === 0) { sugg.style.display = 'none'; return; }
             const matches = Object.values(window.allProducts).filter(p => p.name.toLowerCase().includes(term));
-            matches.slice(0, 5).forEach(p => {
-                const d = document.createElement('div');
-                d.style.padding = '12px';
-                d.style.borderBottom = '1px solid var(--border-color)';
-                d.textContent = p.name;
-                d.onclick = () => { selectProductFromSearch(p); sugg.style.display='none'; };
-                sugg.appendChild(d);
-            });
+            matches.slice(0, 5).forEach(p => { const d = document.createElement('div'); d.style.padding = '12px'; d.style.borderBottom = '1px solid var(--border-color)'; d.textContent = p.name; d.onclick = () => { selectProductFromSearch(p); sugg.style.display='none'; }; sugg.appendChild(d); });
             sugg.style.display = matches.length ? 'block' : 'none';
         }
+        function selectProductFromSearch(product) { playEffect('select'); const list = document.getElementById('productList'); list.innerHTML = ''; const div = document.createElement('div'); div.innerHTML = `<div style="display:flex; align-items:center; justify-content:space-between; width:100%;"><label>${product.name}</label><div class="quantity-controls-wrapper"><button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)"><span class="material-icons-round">add</span></button><input type="number" id="quantity${product.id}" value="1" style="width:40px; text-align:center;"></div><input type="checkbox" id="item${product.id}" checked style="display:none;"></div>`; list.appendChild(div); saveItem(product.id, product.name); }
+        function toggleSettings() { playEffect('click'); const panel = document.getElementById('settings-panel'); panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; }
+        function toggleDashboard() { playEffect('click'); const dash = document.getElementById('side-dashboard'); const over = document.getElementById('dashboard-overlay'); const isHidden = dash.style.display === 'none'; dash.style.display = isHidden ? 'flex' : 'none'; over.style.display = isHidden ? 'block' : 'none'; }
+        function changeTheme(theme) { playEffect('click'); document.body.classList.remove('dark-mode'); if(theme === 'dark') document.body.classList.add('dark-mode'); localStorage.setItem('dark-mode', theme === 'dark' ? 'enabled' : 'disabled'); }
+        function toggleItems(){} // Legacy function placeholder
 
-        function selectProductFromSearch(product) {
-            playEffect('select');
-            const list = document.getElementById('productList');
-            list.innerHTML = '';
-            const div = document.createElement('div');
-            div.innerHTML = `
-                <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
-                    <label>${product.name}</label>
-                    <div class="quantity-controls-wrapper">
-                        <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)"><span class="material-icons-round">add</span></button>
-                        <input type="number" id="quantity${product.id}" value="1" style="width:40px; text-align:center;">
-                    </div>
-                    <input type="checkbox" id="item${product.id}" checked style="display:none;">
-                </div>
-            `;
-            list.appendChild(div);
-            saveItem(product.id, product.name);
-        }
-
-        function toggleSettings() {
-            playEffect('click');
-            const panel = document.getElementById('settings-panel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        }
-        
-        function toggleDashboard() {
-            playEffect('click');
-            const dash = document.getElementById('side-dashboard');
-            const over = document.getElementById('dashboard-overlay');
-            const isHidden = dash.style.display === 'none';
-            dash.style.display = isHidden ? 'flex' : 'none';
-            over.style.display = isHidden ? 'block' : 'none';
-        }
-
-        function changeTheme(theme) {
-            playEffect('click');
-            document.body.classList.remove('dark-mode');
-            if(theme === 'dark') document.body.classList.add('dark-mode');
-            localStorage.setItem('dark-mode', theme === 'dark' ? 'enabled' : 'disabled');
-        }
-
-        // Modified Auth Listener for Splash Screen
         auth.onAuthStateChanged(user => {
             if (user) {
-                // User is logged in
                 document.getElementById('authContainer').style.display = 'none';
-                
-                if (!splashShown) {
-                    // Play animation if first load
-                    playOpeningAnimation(() => {
-                        splashShown = true;
-                    });
-                }
-
+                if (!splashShown) { playOpeningAnimation(() => { splashShown = true; }); }
                 currentUser = user;
                 db.ref(`users/${user.uid}`).once('value').then(snap => {
-                    const val = snap.val();
-                    if(val) {
-                        userRole = val.role;
-                        document.getElementById('dashboardUserName').textContent = val.name;
-                        document.getElementById('dashboardUserRole').textContent = val.role;
-                        if(val.role === 'Admin' || val.role === 'SAdmin') {
-                            document.getElementById('dashboardAdminButton').style.display = 'flex';
-                        }
-                        if(val.status === 'pending') {
-                            // Re-show auth container if pending
-                            document.getElementById('authContainer').style.display = 'flex';
-                            document.getElementById('pendingForm').style.display = 'block';
-                            document.getElementById('loginForm').style.display = 'none';
-                        }
-                    }
+                    const val = snap.val(); if(val) { userRole = val.role; document.getElementById('dashboardUserName').textContent = val.name; document.getElementById('dashboardUserRole').textContent = val.role; if(val.role === 'Admin' || val.role === 'SAdmin') document.getElementById('dashboardAdminButton').style.display = 'flex'; if(val.status === 'pending') { document.getElementById('authContainer').style.display = 'flex'; document.getElementById('pendingForm').style.display = 'block'; document.getElementById('loginForm').style.display = 'none'; } }
                 });
                 loadQuantitiesFromFirebase();
             } else {
-                // User Not Logged In
-                document.getElementById('authContainer').style.display = 'flex';
-                document.getElementById('loginForm').style.display = 'block';
-                document.getElementById('pendingForm').style.display = 'none';
-                document.getElementById('mainAppContent').style.opacity = '0'; // Hide main content
-                splashShown = false; // Reset
+                document.getElementById('authContainer').style.display = 'flex'; document.getElementById('loginForm').style.display = 'block'; document.getElementById('pendingForm').style.display = 'none'; document.getElementById('mainAppContent').style.opacity = '0'; splashShown = false;
             }
         });
 
-        // Robust Login Logic with Safety Checks
-        document.getElementById('loginButton').onclick = () => {
-            try { playEffect('click'); } catch(e) { console.error(e); }
-            
-            const emailField = document.getElementById('loginEmail');
-            const passField = document.getElementById('loginPassword');
-            
-            const e = emailField.value.trim(); 
-            const p = passField.value;
-            
-            if(!e || !p) {
-                alert("Please enter email and password");
-                return;
-            }
-
-            const btn = document.getElementById('loginButton');
-            const originalText = btn.innerText;
-            btn.innerText = "Logging in...";
-            btn.disabled = true;
-
-            auth.signInWithEmailAndPassword(e, p)
-                .then(() => {
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                    // Auth state change handles the rest including animation
-                })
-                .catch(error => {
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                    alert("Login Failed: " + error.message);
-                });
-        };
-        
-        // Robust Register Logic
-        document.getElementById('registerButton').onclick = () => {
-            try { playEffect('click'); } catch(e) {}
-            
-            const e = document.getElementById('registerEmail').value.trim();
-            const p = document.getElementById('registerPassword').value;
-            const n = document.getElementById('registerName').value.trim();
-            
-            if(!e || !p || !n) { alert("Please fill all fields"); return; }
-
-            const btn = document.getElementById('registerButton');
-            const originalText = btn.innerText;
-            btn.innerText = "Creating Account...";
-            btn.disabled = true;
-
-            auth.createUserWithEmailAndPassword(e, p).then(creds => {
-                db.ref(`users/${creds.user.uid}`).set({ email:e, name:n, role:'User', status:'pending', createdAt: Date.now() })
-                .then(() => {
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                    // onAuthStateChanged handles the rest
-                });
-            }).catch(error => {
-                btn.innerText = originalText;
-                btn.disabled = false;
-                alert("Registration Failed: " + error.message);
-            });
-        };
-
-        function switchToRegister() {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').style.display = 'block';
-            document.getElementById('authTitle').textContent = 'Register';
-        }
-        function switchToLogin() {
-            document.getElementById('registerForm').style.display = 'none';
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('authTitle').textContent = 'Welcome Back';
-        }
+        document.getElementById('loginButton').onclick = () => { try { playEffect('click'); } catch(e) {} const e = document.getElementById('loginEmail').value.trim(); const p = document.getElementById('loginPassword').value; if(!e || !p) { alert("Please enter credentials"); return; } const btn = document.getElementById('loginButton'); const orig = btn.innerText; btn.innerText = "Logging in..."; btn.disabled = true; auth.signInWithEmailAndPassword(e, p).then(() => { btn.innerText = orig; btn.disabled = false; }).catch(err => { btn.innerText = orig; btn.disabled = false; alert("Login Failed: " + err.message); }); };
+        document.getElementById('registerButton').onclick = () => { try { playEffect('click'); } catch(e) {} const e = document.getElementById('registerEmail').value.trim(); const p = document.getElementById('registerPassword').value; const n = document.getElementById('registerName').value.trim(); if(!e || !p || !n) { alert("Please fill all fields"); return; } const btn = document.getElementById('registerButton'); const orig = btn.innerText; btn.innerText = "Creating..."; btn.disabled = true; auth.createUserWithEmailAndPassword(e, p).then(creds => { db.ref(`users/${creds.user.uid}`).set({ email:e, name:n, role:'User', status:'pending', createdAt: Date.now() }).then(() => { btn.innerText = orig; btn.disabled = false; }); }).catch(err => { btn.innerText = orig; btn.disabled = false; alert("Failed: " + err.message); }); };
+        function switchToRegister() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; document.getElementById('authTitle').textContent = 'Register'; }
+        function switchToLogin() { document.getElementById('registerForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; document.getElementById('authTitle').textContent = 'Welcome Back'; }
         function logout() { auth.signOut(); window.location.reload(); }
         function backToLogin() { logout(); }
-
-        function copyAndSendWhatsApp() {
-            playEffect('success');
-            const text = generateText(true);
-            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-            window.open(url, '_blank');
-        }
-        
-        function confirmAndSendWhatsApp() {
-             // Same logic as copy but used in modal
-            copyAndSendWhatsApp();
-            closeFullscreenConfirm();
-        }
-        
-        function closeFullscreenConfirm() { 
-            playEffect('click');
-            document.getElementById('fullscreenConfirm').style.display = 'none'; 
-        }
-        function toggleItems(){}
+        function copyAndSendWhatsApp() { playEffect('success'); const text = generateText(true); const url = `https://wa.me/?text=${encodeURIComponent(text)}`; window.open(url, '_blank'); }
 
         window.addEventListener('load', () => {
             initAllProducts();
-            const savedTheme = localStorage.getItem('dark-mode');
-            if(savedTheme === 'disabled') changeTheme('light');
-            toggleView(currentView);
-            toggleVibration(localStorage.getItem('vibration-enabled') !== 'disabled');
-            
-            db.ref('announcement').on('value', snap => {
-                const data = snap.val();
-                const banner = document.getElementById('announcementBanner');
-                const textEl = document.getElementById('announcementScrollText');
-                
-                if(data && data.enabled) {
-                    // Simply show if enabled
-                    // Ensure text is set
-                    if(data.text) {
-                        textEl.textContent = data.text; // Fix: ensure text is assigned
-                        banner.style.display = 'block';
-                        
-                        // Apply styles
-                        banner.style.background = data.background && data.background.color ? data.background.color : 
-                            (data.background && data.background.type === 'custom' ? 
-                            `linear-gradient(45deg, ${data.background.startColor}, ${data.background.endColor})` : 
-                            'linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1)');
-                            
-                        banner.style.fontSize = data.fontSize || '14px';
-                        banner.style.color = data.textColor || 'white';
-                        textEl.style.animationDuration = data.speed || '15s';
-                    }
-                } else {
-                    banner.style.display = 'none';
-                }
-            });
-            
-            // Periodic check for new product expiration
-             setInterval(() => {
-                const now = Date.now();
-                db.ref('newProducts').once('value').then(snap => {
-                    snap.forEach(child => {
-                        if(child.val().until < now) child.ref.remove();
-                    });
-                });
-            }, 3600000); // Check every hour
+            init3DScene(); // Start 3D
+            const savedTheme = localStorage.getItem('dark-mode'); if(savedTheme === 'disabled') changeTheme('light');
+            toggleView(currentView); toggleVibration(localStorage.getItem('vibration-enabled') !== 'disabled');
+            createSnowflakes();
+            db.ref('announcement').on('value', snap => { const data = snap.val(); const banner = document.getElementById('announcementBanner'); const textEl = document.getElementById('announcementScrollText'); if(data && data.enabled && data.text) { textEl.textContent = data.text; banner.style.display = 'block'; banner.style.background = data.background && data.background.color ? data.background.color : (data.background && data.background.type === 'custom' ? `linear-gradient(45deg, ${data.background.startColor}, ${data.background.endColor})` : 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #1976D2)'); banner.style.fontSize = data.fontSize || '14px'; banner.style.color = data.textColor || 'white'; textEl.style.animationDuration = data.speed || '15s'; } else { banner.style.display = 'none'; } });
+            setInterval(() => { const now = Date.now(); db.ref('newProducts').once('value').then(snap => { snap.forEach(child => { if(child.val().until < now) child.ref.remove(); }); }); }, 3600000);
         });
     </script>
 </body>
