@@ -40,7 +40,7 @@
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Christmas Stock Request - 3D Edition</title>
+    <title>Christmas Stock Request - 3D Gift Edition</title>
     
     <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -180,6 +180,11 @@
             width: 100%;
             height: 100%;
             display: block;
+            touch-action: none;
+            cursor: grab;
+        }
+        #canvas-container:active {
+            cursor: grabbing;
         }
         .canvas-overlay-msg {
             position: absolute;
@@ -197,13 +202,12 @@
             transition: all 0.3s ease;
         }
         
-        /* UPDATED: 3D Reset Button (Optimized Location & Style) */
         #reset-3d-btn {
             position: absolute;
             top: 2px;
-            left: 3px; /* Moved to Left (Standard Back position) */
+            left: 3px; 
             right: auto;
-            background: rgba(0, 0, 0, 0.65); /* Darker glass for better contrast */
+            background: rgba(0, 0, 0, 0.65);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -211,7 +215,7 @@
             padding: 5px 10px;
             border-radius: 50px;
             z-index: 50;
-            display: none; /* Hidden by default */
+            display: none; 
             font-size: 0.6rem;
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
             align-items: center;
@@ -220,7 +224,7 @@
         }
 
         #reset-3d-btn:hover {
-            background: rgba(211, 47, 47, 0.9); /* Red on hover */
+            background: rgba(211, 47, 47, 0.9);
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(211, 47, 47, 0.4);
         }
@@ -491,7 +495,7 @@
                 <span class="material-icons">arrow_back</span> Change Shop
             </button>
             <div id="canvas-container"></div>
-            <div class="canvas-overlay-msg" id="canvas-msg">Tap a gift card to select shop</div>
+            <div class="canvas-overlay-msg" id="canvas-msg">Swipe to rotate &bull; Tap card to select</div>
         </div>
 
         <!-- Hidden Radio Inputs for Form Logic (Preserved from original) -->
@@ -703,6 +707,14 @@
         let is3DPaused = false;
         let selectedMesh = null;
         let animationId;
+        
+        // Variables for manual rotation interaction
+        let isDragging = false;
+        let previousPointerX = 0;
+        let totalDragDistance = 0;
+
+        // New Variable for Gift
+        let currentGift = null;
 
         // Shop Data mapped to values
         const shopData = [
@@ -843,30 +855,85 @@
             const snowSystem = new THREE.Points(snowGeo, snowMat);
             scene.add(snowSystem);
 
-            // Interaction
+            // --- INTERACTION LOGIC (Drag to Rotate + Click to Select) ---
             const raycaster = new THREE.Raycaster();
             const pointer = new THREE.Vector2();
 
+            // Pointer Down: Start tracking
             function onPointerDown(event) {
-                if (is3DPaused) return;
+                // If shop is selected (gift view), we still allow drag
+                isDragging = true;
+                previousPointerX = event.clientX || event.touches[0].clientX;
+                totalDragDistance = 0; // Reset distance to distinguish click vs drag
+            }
 
-                // Calculate pointer position in normalized device coordinates
-                const rect = renderer.domElement.getBoundingClientRect();
-                pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-                pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            // Pointer Move: Rotate tree OR GIFT if dragging
+            function onPointerMove(event) {
+                if (!isDragging) return;
 
-                raycaster.setFromCamera(pointer, camera);
-                const intersects = raycaster.intersectObjects(shopsGroup.children);
+                const clientX = event.clientX || (event.touches ? event.touches[0].clientX : 0);
+                const deltaX = clientX - previousPointerX;
+                
+                const sensitivity = 0.005;
 
-                if (intersects.length > 0) {
-                    const hit = intersects[0].object;
-                    if (hit.userData.isShop) {
-                        selectShopFrom3D(hit);
+                // Check: Are we in Gift Mode or Tree Mode?
+                if (currentGift) {
+                    currentGift.rotation.y += deltaX * sensitivity;
+                } else {
+                    treeGroup.rotation.y += deltaX * sensitivity;
+                }
+
+                // Track total movement
+                totalDragDistance += Math.abs(deltaX);
+                
+                previousPointerX = clientX;
+            }
+
+            // Pointer Up: Decide if it was a Click or a Drag
+            function onPointerUp(event) {
+                isDragging = false;
+
+                // Only detect click if moved very little AND we are in tree mode (not gift mode)
+                if (totalDragDistance < 5 && !currentGift) {
+                    
+                    // Raycast Logic for Clicking
+                    const rect = renderer.domElement.getBoundingClientRect();
+                    
+                    // Handle touch or mouse coordinates
+                    let clientX, clientY;
+                    if (event.changedTouches && event.changedTouches.length > 0) {
+                        clientX = event.changedTouches[0].clientX;
+                        clientY = event.changedTouches[0].clientY;
+                    } else {
+                        clientX = event.clientX;
+                        clientY = event.clientY;
+                    }
+
+                    pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+                    pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+
+                    raycaster.setFromCamera(pointer, camera);
+                    const intersects = raycaster.intersectObjects(shopsGroup.children);
+
+                    if (intersects.length > 0) {
+                        const hit = intersects[0].object;
+                        if (hit.userData.isShop) {
+                            selectShopFrom3D(hit);
+                        }
                     }
                 }
             }
 
-            renderer.domElement.addEventListener('pointerdown', onPointerDown);
+            // Add Event Listeners (Support Mouse & Touch)
+            const canvasEl = renderer.domElement;
+            canvasEl.addEventListener('mousedown', onPointerDown);
+            canvasEl.addEventListener('mousemove', onPointerMove);
+            canvasEl.addEventListener('mouseup', onPointerUp);
+            canvasEl.addEventListener('mouseleave', () => { isDragging = false; });
+
+            canvasEl.addEventListener('touchstart', onPointerDown, { passive: false });
+            canvasEl.addEventListener('touchmove', onPointerMove, { passive: false });
+            canvasEl.addEventListener('touchend', onPointerUp);
 
             // Animation Loop
             const clock = new THREE.Clock();
@@ -875,8 +942,13 @@
                 
                 const delta = clock.getDelta();
 
-                if (!is3DPaused) {
-                    treeGroup.rotation.y += 0.003;
+                if (!isDragging) {
+                    // Auto rotate whatever is visible
+                    if (currentGift) {
+                        currentGift.rotation.y += 0.005;
+                    } else {
+                        treeGroup.rotation.y += 0.003;
+                    }
                 }
 
                 // Snow
@@ -971,35 +1043,86 @@
             return tex;
         }
 
+        // Helper: Create 3D Gift Box
+        function createGiftBox() {
+            const giftGroup = new THREE.Group();
+
+            // Main Box
+            const boxGeo = new THREE.BoxGeometry(3, 3, 3);
+            const boxMat = new THREE.MeshStandardMaterial({ color: 0xD32F2F, roughness: 0.4 }); // Red
+            const box = new THREE.Mesh(boxGeo, boxMat);
+            giftGroup.add(box);
+
+            // Ribbon Material
+            const ribMat = new THREE.MeshStandardMaterial({ color: 0xFFD700, metalness: 0.3, roughness: 0.2 }); // Gold
+
+            // Ribbon 1 (Y-axis wrap)
+            const rib1Geo = new THREE.BoxGeometry(3.1, 3.1, 0.5);
+            const rib1 = new THREE.Mesh(rib1Geo, ribMat);
+            giftGroup.add(rib1);
+
+            // Ribbon 2 (X-axis wrap)
+            const rib2Geo = new THREE.BoxGeometry(0.5, 3.1, 3.1);
+            const rib2 = new THREE.Mesh(rib2Geo, ribMat);
+            giftGroup.add(rib2);
+
+            // Lid
+            const lidGeo = new THREE.BoxGeometry(3.2, 0.5, 3.2);
+            const lid = new THREE.Mesh(lidGeo, boxMat);
+            lid.position.y = 1.6;
+            giftGroup.add(lid);
+
+            // Bow (Simplified as crossed torus knots or boxes)
+            const bowGeo = new THREE.TorusKnotGeometry(0.6, 0.15, 64, 8);
+            const bow = new THREE.Mesh(bowGeo, ribMat);
+            bow.position.y = 2.1;
+            bow.rotation.x = Math.PI / 2;
+            giftGroup.add(bow);
+
+            return giftGroup;
+        }
+
         function selectShopFrom3D(mesh) {
             playEffect('select');
             
-            if (selectedMesh) {
-                // Reset previous mesh scale
-                selectedMesh.scale.set(1, 1, 1);
-            }
-            
-            selectedMesh = mesh;
-            is3DPaused = true;
-            
-            // Visual Effect: Scale up mesh
-            mesh.scale.set(1.3, 1.3, 1.3);
-            
-            // Trigger App Logic
+            // 1. Logic: Select Radio
             const radio = document.querySelector(`input[value="${mesh.userData.value}"]`);
             if(radio) {
                 radio.checked = true;
                 
+                // 2. Hide Tree Scene
+                treeGroup.visible = false;
+
+                // 3. Create and Show Gift
+                if (currentGift) scene.remove(currentGift);
+                currentGift = createGiftBox();
+                // Position gift nicely in camera view (Camera is at y=5)
+                currentGift.position.set(0, 4, 0); 
+                
+                // Add scale animation effect
+                currentGift.scale.set(0.1, 0.1, 0.1);
+                scene.add(currentGift);
+                
+                // Simple scale up animation
+                let scale = 0.1;
+                const scaleInt = setInterval(() => {
+                    scale += 0.1;
+                    if(scale >= 1) {
+                        currentGift.scale.set(1,1,1);
+                        clearInterval(scaleInt);
+                    } else {
+                        currentGift.scale.set(scale, scale, scale);
+                    }
+                }, 20);
+
+                // 4. Update UI
                 document.getElementById('categoryTitle').style.display = 'block';
                 document.getElementById('categoryContainer').style.display = 'grid';
                 document.getElementById('searchContainer').style.display = 'flex';
                 
-                // Show Reset Button (with new animation)
                 document.getElementById('reset-3d-btn').style.display = 'flex'; 
-                
-                document.getElementById('canvas-msg').innerText = "Selected: " + mesh.userData.name;
+                document.getElementById('canvas-msg').innerText = "Swipe to rotate gift • Selected: " + mesh.userData.name;
 
-                // Smooth scroll
                 setTimeout(() => { 
                     document.getElementById('categoryTitle').scrollIntoView({ behavior: 'smooth', block: 'start' }); 
                 }, 100);
@@ -1011,11 +1134,16 @@
 
         function reset3DView() {
             playEffect('click');
-            is3DPaused = false;
-            if(selectedMesh) selectedMesh.scale.set(1, 1, 1);
-            selectedMesh = null;
+            
+            // 1. Restore Tree Scene
+            if (currentGift) {
+                scene.remove(currentGift);
+                currentGift = null;
+            }
+            treeGroup.visible = true;
+
             document.getElementById('reset-3d-btn').style.display = 'none';
-            document.getElementById('canvas-msg').innerText = "Tap a gift card to select shop";
+            document.getElementById('canvas-msg').innerText = "Swipe to rotate • Tap card to select";
             
             // Hide categories logic
             document.getElementById('categoryTitle').style.display = 'none';
@@ -1358,7 +1486,7 @@
         function toggleView(viewMode) {
             playEffect('click'); currentView = viewMode; localStorage.setItem('view-mode', viewMode);
             const productList = document.getElementById('productList');
-            if (viewMode === 'list') { productList.classList.remove('grid-view'); document.getElementById('listViewBtn').classList.add('active'); document.getElementById('gridViewBtn').classList.remove('active'); } 
+            if (viewMode === 'list') { productList.classList.remove('grid-view'); document.getElementById('listViewBtn').classList.add('active'); document.getElementById('listViewBtn').classList.remove('active'); document.getElementById('listViewBtn').classList.add('active'); document.getElementById('gridViewBtn').classList.remove('active'); } 
             else { productList.classList.add('grid-view'); document.getElementById('listViewBtn').classList.remove('active'); document.getElementById('gridViewBtn').classList.add('active'); }
             const selectedCategory = document.querySelector('input[name="category"]:checked');
             if (selectedCategory && categories[selectedCategory.value]) loadProducts(categories[selectedCategory.value]);
