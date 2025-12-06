@@ -1,5 +1,78 @@
 <!DOCTYPE html>
 <html lang="zh">
+<head>
+    <!-- [PWA FIX] 1. 链接 manifest.json 文件，这是 PWA 安装提示的关键 -->
+    <link rel="manifest" href="manifest.json">
+    <!-- PWA 和响应式设计所需的视口设置 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- iOS PWA 配置（可选，但推荐） -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="SmartProfits">
+</head>
+<body style="height:100vh; margin:0;">
+  <audio id="bgMusic" src="https://raw.githubusercontent.com/SmartProfits/orderplus/main/pic/Taylor%20Swift%20-%20Last%20Christmas%20(Audio).mp3" loop muted></audio>
+
+   <script>
+    const audio = document.getElementById('bgMusic');
+
+    audio.play().catch(() => {});
+
+    function fadeInAudio(duration = 3000) {
+      audio.muted = false;
+      audio.volume = 0; // 从静音开始
+      audio.play();
+
+      const interval = 50; // 每 50ms 增加一次音量
+      const step = interval / duration;
+
+      const fade = setInterval(() => {
+        if (audio.volume < 1) {
+          audio.volume = Math.min(audio.volume + step, 1);
+        } else {
+          clearInterval(fade); // 音量到最大停止渐变
+        }
+      }, interval);
+    }
+
+    function enableMusic() {
+      fadeInAudio(5000); // 3秒渐入
+      document.removeEventListener('click', enableMusic);
+    }
+
+    document.addEventListener('click', enableMusic);
+  </script>
+
+    <script src="https://ajax.googleapis.com/ajax..."></script>
+    <!-- ... 省略原有大量代码内容 ... -->
+
+   <script>
+    // 假设这是您文件中已有的 load 事件监听器或主初始化逻辑
+    window.addEventListener('load', () => {
+        // ... 原有逻辑 (initAllProducts, init3DScene, theme switching, etc.) ...
+        // initAllProducts();
+        // init3DScene(); // Start 3D
+        // const savedTheme = localStorage.getItem('dark-mode'); if(savedTheme === 'disabled') changeTheme('light');
+        // toggleView(currentView); toggleVibration(localStorage.getItem('vibration-enabled') !== 'disabled');
+        // createSnowflakes();
+        // db.ref('announcement').on('value', snap => { const data = snap.val(); const banner = document.getElementById('announcementBanner'); const textEl = document.getElementById('announcementScrollText'); if(data && data.enabled && data.text) { textEl.textContent = data.text; banner.style.display = 'block'; banner.style.background = data.background && data.background.color ? data.background.color : (data.background && data.background.type === 'custom' ? `linear-gradient(45deg, ${data.background.startColor}, ${data.background.endColor})` : 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #1976D2)'); banner.style.fontSize = data.fontSize || '14px'; banner.style.color = data.textColor || 'white'; textEl.style.animationDuration = data.speed || '15s'; } else { banner.style.display = 'none'; } });
+        // setInterval(() => { const now = Date.now(); db.ref('newProducts').once('value').then(snap => { snap.forEach(child => {
+
+        // [PWA FIX] 2. 注册 Service Worker
+        if ('serviceWorker' in navigator) {
+            // 修复 Service Worker 注册失败的错误：将路径从 './sw.js' 更改为 '/sw.js'，使用绝对路径。
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('Service Worker 注册成功，范围:', registration.scope);
+                })
+                .catch(err => {
+                    console.error('Service Worker 注册失败:', err);
+                });
+        }
+
+        // ... 请确保这里包含您所有其他的 window.addEventListener('load', ...) 逻辑
+    });
+  </script>
     
 <head>
 </head>
