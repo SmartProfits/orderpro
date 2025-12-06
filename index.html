@@ -581,6 +581,8 @@
             <input type="radio" name="store" value="*Wrapping(MAS)*" id="mas">
             <input type="radio" name="store" value="*Ole-Ole Tawau*" id="twu">
             <input type="radio" name="store" value="*Wisma*" id="wisma">
+            <input type="radio" name="store" value="*Tamoi*" id="tamoi">
+            <input type="radio" name="store" value="*KTSP*" id="ktsp">
         </div>
 
         <h3 id="categoryTitle" style="display: none;">
@@ -603,9 +605,9 @@
                 <input type="radio" name="category" value="Chocolate" id="chocolate" style="display:none">
                 <span class="category-icon">🍫</span><label>Chocolate</label>
             </div>
-            <div class="category-card" onclick="selectCategory(this, 'Sotong')">
-                <input type="radio" name="category" value="Sotong" id="sotong" style="display:none">
-                <span class="category-icon">🦑</span><label>Sotong</label>
+            <div class="category-card" onclick="selectCategory(this, 'Seafood')">
+                <input type="radio" name="category" value="Seafood" id="Seafood" style="display:none">
+                <span class="category-icon">🦐</span><label>Seafood</label>
             </div>
             <div class="category-card" onclick="selectCategory(this, 'Coffee')">
                 <input type="radio" name="category" value="Coffee" id="coffee" style="display:none">
@@ -798,7 +800,9 @@
             { name: "Wrapping (AA)", value: "*Wrapping(AA)*", img: "shop/Aa.png", color: "#44FFFF" },
             { name: "Wrapping (MAS)", value: "*Wrapping(MAS)*", img: "shop/Mas.png", color: "#FF44FF" },
             { name: "Ole-Ole Tawau", value: "*Ole-Ole Tawau*", img: "shop/tawau.png", color: "#FFA500" },
-            { name: "Wisma", value: "*Wisma*", img: "shop/wisma.png", color: "#800080" }
+            { name: "Wisma", value: "*Wisma*", img: "shop/wisma.png", color: "#800080" },
+            { name: "Tamoi", value: "*Tamoi*", img: "shop/tamoi.png", color: "#800080" },
+            { name: "KTSP", value: "*KTSP*", img: "shop/ktsp.png", color: "#800080" }
         ];
 
         function init3DScene() {
@@ -1349,8 +1353,13 @@
                 { id: 216, name: "Musang King Durian Candy" }, { id: 217, name: "HH Durian Cookies" },
                 { id: 218, name: "Fish Chips Classic" }, { id: 221, name: "HH Crisp - So Original" },
                 { id: 224, name: "HH Crisp - So Seaweed" }, { id: 223, name: "HH Crisp - So Shrimp" },
-                { id: 219, name: "Salted Egg Fish Chips" }, { id: 220, name: "Salted Egg Fish Chips Mala" }
+                { id: 219, name: "Salted Egg Fish Chips" }, { id: 220, name: "Salted Egg Fish Chips Mala" },
+                { id: 221, name: "Cuttlefish Red" }, { id: 222, name: "Cuttlefish Lemon" }, { id: 223, name: "Cuttlefish Honey" },
+                { id: 224, name: "Cuttlefish Floss Original" }, { id: 225, name: "Cuttlefish Massive" }, { id: 226, name: "Cuttlefish Whole" },
+                { id: 227, name: "Cuttlefish Roasted" }, { id: 228, name: "Cuttlefish Chili" }, { id: 229, name: "Cuttlefish Slices" },
+                { id: 230, name: "Cuttlefish Sugar" }, { id: 241, name: "Five Star Cuttlefish" }
             ],
+        
             Chocolate: [
                 { id: 314, name: "Sabah Tea Chocolate Original", unit: 'pc', defaultQuantity: 70 }, { id: 315, name: "Sabah Tea Chocolate Mangosteen", unit: 'pc', defaultQuantity: 70 },
                 { id: 316, name: "Sabah Tea Chocolate Tenom Coffee", unit: 'pc', defaultQuantity: 70 }, { id: 317, name: "Sabah Tea Chocolate Durian", unit: 'pc', defaultQuantity: 70 },
@@ -1362,11 +1371,17 @@
                 { id: 311, name: "AD Chocolate Soursup", unit: 'pc', defaultQuantity: 50 }, { id: 312, name: "AD Chocolate Coconut", unit: 'pc', defaultQuantity: 50 },
                 { id: 313, name: "AD Chocolate Mangosteen", unit: 'pc', defaultQuantity: 50 }
             ],
-            Sotong: [
-                { id: 401, name: "Cuttlefish Red" }, { id: 402, name: "Cuttlefish Lemon" }, { id: 403, name: "Cuttlefish Honey" },
-                { id: 404, name: "Cuttlefish Floss Original" }, { id: 405, name: "Cuttlefish Massive" }, { id: 406, name: "Cuttlefish Whole" },
-                { id: 407, name: "Cuttlefish Roasted" }, { id: 408, name: "Cuttlefish Chili" }, { id: 409, name: "Cuttlefish Slices" },
-                { id: 410, name: "Cuttlefish Sugar" }, { id: 411, name: "Five Star Cuttlefish" }
+            Seafood: [
+                { id: 401, name: "Tiger Prawn 3/7" }, { id: 402, name: "Flower Prawn 7/12" }, { id: 403, name: "Flower Prawn 12/18" },
+                { id: 404, name: "Flower Prawn 18/25" }, { id: 405, name: "Flower Prawn 25/35" }, { id: 406, name: "Yellow Prawn 10/20" },
+                { id: 407, name: "Yellow Prawn 26/35" }, { id: 408, name: "Sunoh" }, { id: 409, name: "Hoi Tai Kai" },
+                { id: 410, name: "Kerapu Tikus" }, { id: 411, name: "Telur Ikan" },{ id: 412, name: "Scallop" },
+                { id: 413, name: "Slipper Lobster" }, { id: 414, name: "Udang Kering" },{ id: 415, name: "Kua Chi Lap" },
+                { id: 416, name: "Conch Meat" }, { id: 417, name: "Crab Meat" },{ id: 418, name: "Hoi Li" },
+                { id: 419, name: "Ikan Bilis Mata Biru" }, { id: 420, name: "Sotong Kering" },{ id: 421, name: "Black Empurau (1.5kg-2kg)" },
+                { id: 422, name: "Black Empurau (3.5kg up)" }, { id: 423, name: "Isi Keratang" },{ id: 424, name: "Baby Lobster" },
+                { id: 425, name: "Sea Cucumber Tusen" }, { id: 426, name: "Ikan bilis mata biru besar" },{ id: 427, name: "Sotong Cumi-Cumi" },
+                { id: 428, name: "Ikan Masin Tipis" }
             ],
             Coffee: [
                 { id: 501, name: "BH White Coffee Mini" }, { id: 502, name: "BH White Coffee NS Mini" }, { id: 503, name: "BH Durian White Coffee Mini" },
