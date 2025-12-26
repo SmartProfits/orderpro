@@ -775,8 +775,8 @@ function generateText(forWhatsApp) {
         // 去除value中可能自带的星号，防止重复
         let storeName = selectedStore.value.replace(/\*/g, '');
         
-        result += `🏪 *(${storeName})* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
-        result += `👤 *(${userName})*\n`;
+        result += `🎆 *(${storeName})* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
+        result += `🥳 *(${userName})*\n`;
         result += `📅 ${dateStr}\n`;
         result += `🕠 ${timeStr}\n\n`;
     }
@@ -813,7 +813,7 @@ function generateText(forWhatsApp) {
             // 获取对应图标，如果没有则不显示
             const icon = categoryIcons[cat] || '';
             
-            result += `\n🔹🔸🔹 ${cat} ${icon} 🔹🔸🔹\n`;
+            result += `\n✨ ${cat} ${icon} ✨\n`;
             
             items.forEach(item => {
                 const unit = item.unit || 'ctn'; // 默认单位 ctn
@@ -833,7 +833,7 @@ function generateText(forWhatsApp) {
         }
     }
 
-    result += '\n_App Version 2.1_';
+    result += '\n_Happy New Year 2️⃣0️⃣2️⃣6️⃣_';
 
     return result;
 }
