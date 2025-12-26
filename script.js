@@ -833,7 +833,7 @@ function generateText(forWhatsApp) {
         }
     }
 
-    result += '\n_Happy New Year 2️⃣0️⃣2️⃣6️⃣_';
+    result += '\n_Happy New Year ２ ０ ２ ６_';
 
     return result;
 }
