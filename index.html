@@ -1,542 +1,153 @@
- <!DOCTYPE html>
+<!-- START OF FILE 2026v2.html -->
+<!DOCTYPE html>
 <html lang="zh">
 <head>
-    <!-- [PWA FIX] 1. 链接 manifest.json 文件，这是 PWA 安装提示的关键 -->
-    <link rel="manifest" href="manifest.json">
-    <!-- PWA 和响应式设计所需的视口设置 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- iOS PWA 配置（可选，但推荐） -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="SmartProfits">
-</head>
-<body style="height:100vh; margin:0;">
-  <audio id="bgMusic" src="https://raw.githubusercontent.com/SmartProfits/orderplus/main/pic/Taylor%20Swift%20-%20Last%20Christmas%20(Audio).mp3" loop muted></audio>
-
-   <script>
-    const audio = document.getElementById('bgMusic');
-
-    audio.play().catch(() => {});
-
-    function fadeInAudio(duration = 3000) {
-      audio.muted = false;
-      audio.volume = 0; // 从静音开始
-      audio.play();
-
-      const interval = 50; // 每 50ms 增加一次音量
-      const step = interval / duration;
-
-      const fade = setInterval(() => {
-        if (audio.volume < 1) {
-          audio.volume = Math.min(audio.volume + step, 1);
-        } else {
-          clearInterval(fade); // 音量到最大停止渐变
-        }
-      }, interval);
-    }
-
-    function enableMusic() {
-      fadeInAudio(5000); // 3秒渐入
-      document.removeEventListener('click', enableMusic);
-    }
-
-    document.addEventListener('click', enableMusic);
-  </script>
-
-    <script src="https://ajax.googleapis.com/ajax..."></script>
-    <!-- ... 省略原有大量代码内容 ... -->
-
-   <script>
-    // 假设这是您文件中已有的 load 事件监听器或主初始化逻辑
-    window.addEventListener('load', () => {
-        // ... 原有逻辑 (initAllProducts, init3DScene, theme switching, etc.) ...
-        // initAllProducts();
-        // init3DScene(); // Start 3D
-        // const savedTheme = localStorage.getItem('dark-mode'); if(savedTheme === 'disabled') changeTheme('light');
-        // toggleView(currentView); toggleVibration(localStorage.getItem('vibration-enabled') !== 'disabled');
-        // createSnowflakes();
-        // db.ref('announcement').on('value', snap => { const data = snap.val(); const banner = document.getElementById('announcementBanner'); const textEl = document.getElementById('announcementScrollText'); if(data && data.enabled && data.text) { textEl.textContent = data.text; banner.style.display = 'block'; banner.style.background = data.background && data.background.color ? data.background.color : (data.background && data.background.type === 'custom' ? `linear-gradient(45deg, ${data.background.startColor}, ${data.background.endColor})` : 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #1976D2)'); banner.style.fontSize = data.fontSize || '14px'; banner.style.color = data.textColor || 'white'; textEl.style.animationDuration = data.speed || '15s'; } else { banner.style.display = 'none'; } });
-        // setInterval(() => { const now = Date.now(); db.ref('newProducts').once('value').then(snap => { snap.forEach(child => {
-
-        // [PWA FIX] 2. 注册 Service Worker
-        if ('serviceWorker' in navigator) {
-            // 修复 Service Worker 注册失败的错误：将路径从 './sw.js' 更改为 '/sw.js'，使用绝对路径。
-            navigator.serviceWorker.register('/sw.js')
-                .then(registration => {
-                    console.log('Service Worker 注册成功，范围:', registration.scope);
-                })
-                .catch(err => {
-                    console.error('Service Worker 注册失败:', err);
-                });
-        }
-
-        // ... 请确保这里包含您所有其他的 window.addEventListener('load', ...) 逻辑
-    });
-  </script>
-    
-<head>
-</head>
-<body style="height:100vh; margin:0;">
-  <audio id="bgMusic" src="https://raw.githubusercontent.com/SmartProfits/orderplus/main/pic/Taylor%20Swift%20-%20Last%20Christmas%20(Audio).mp3" loop muted></audio>
-
-   <script>
-    const audio = document.getElementById('bgMusic');
-
-    audio.play().catch(() => {});
-
-    function fadeInAudio(duration = 3000) {
-      audio.muted = false;
-      audio.volume = 0; // 从静音开始
-      audio.play();
-
-      const interval = 50; // 每 50ms 增加一次音量
-      const step = interval / duration;
-
-      const fade = setInterval(() => {
-        if (audio.volume < 1) {
-          audio.volume = Math.min(audio.volume + step, 1);
-        } else {
-          clearInterval(fade); // 音量到最大停止渐变
-        }
-      }, interval);
-    }
-
-    function enableMusic() {
-      fadeInAudio(5000); // 3秒渐入
-      document.removeEventListener('click', enableMusic);
-    }
-
-    document.addEventListener('click', enableMusic);
-  </script>
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Christmas Stock Request - 3D Gift Edition</title>
+    <title>2026 Celebration Stock</title>
     
     <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
-    <!-- Three.js (Added for 3D Tree) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- PWA相关 -->
+    <meta name="theme-color" content="#050505">
+    
+    <!-- 引入外部样式表 -->
+    <link rel="stylesheet" href="style.css">
 
-    <!-- PWA Tags -->
-    <meta name="theme-color" content="#0F1712">
-    <link rel="manifest" href="./manifest.json">
-    <link rel="apple-touch-icon" href="./icons/s2.png">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        /* --- 3D 场景专用样式 --- */
+        body {
+            background-color: #050505;
+            overflow-x: hidden;
+        }
+
+        #three-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+            display: none; 
+            pointer-events: auto;
+        }
+        
+        canvas { display: block; }
+
+        #three-ui {
+            position: absolute;
+            bottom: 100px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            z-index: 110;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        /* --- 修改：店铺卡片样式 --- */
+        .floating-shop-card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 210px; 
+            background: rgba(25, 25, 35, 0.85); 
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            border-radius: 12px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            pointer-events: auto;
+            transform-origin: center center;
+            display: none;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
+            opacity: 0; /* 初始完全透明 */
+            transition: opacity 1.2s ease-out, transform 0.2s;
+            will-change: transform, opacity;
+            z-index: 105;
+        }
+        
+        .floating-shop-card:active {
+            transform: scale(0.95);
+        }
+
+        .floating-shop-card img {
+            width: 100%;
+            height: 135px; 
+            object-fit: contain;
+            margin-bottom: 5px;
+            background: rgba(255,255,255,0.05); 
+            border-radius: 6px;
+        }
+
+        .floating-shop-card .shop-name {
+            font-size: 21px; 
+            color: #ffd700; 
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+
+        .shop-container.original-list { display: none !important; }
+
+        .hide-3d {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+        }
+    </style>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-
-    <style>
-        :root {
-            /* Christmas Color Palette */
-            --primary-color: #D32F2F; 
-            --primary-gradient: linear-gradient(135deg, #D32F2F, #B71C1C);
-            --accent-color: #FFC107; 
-            --danger-color: #ff4444;
-            --success-color: #2E7D32; 
-            
-            /* Light Mode Variables */
-            --bg-color: #f0f4f8;
-            --surface-color: #ffffff;
-            --surface-color-transparent: rgba(255, 255, 255, 0.9);
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --border-color: rgba(0, 0, 0, 0.08);
-            --shadow-sm: 0 2px 8px rgba(211, 47, 47, 0.1);
-            --shadow-md: 0 4px 12px rgba(211, 47, 47, 0.15);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.5);
-            
-            /* Layout */
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 24px;
-            --nav-height: 65px;
-            --safe-area-bottom: env(safe-area-inset-bottom, 20px);
-        }
-
-        body.dark-mode {
-            /* Dark Christmas Night Theme */
-            --bg-color: #0b1e15; 
-            --surface-color: #142920;
-            --surface-color-transparent: rgba(20, 41, 32, 0.9);
-            --text-primary: #e8f5e9;
-            --text-secondary: #a5d6a7;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-            --glass-bg: rgba(20, 41, 32, 0.8);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-color: #FFD54F; 
-        }
-
-        /* Global Reset & Typography */
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            scrollbar-width: none;
-            transition: background-color 0.5s ease, color 0.3s ease;
-            overflow-x: hidden;
-            position: relative; 
-        }
-
-        body {
-            padding: 20px;
-            padding-bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 20px);
-        }
-
-        ::-webkit-scrollbar { display: none; }
-
-        h1, h2, h3, h4 { margin: 0; font-weight: 700; }
-        h1 { font-size: 1.75rem; margin-bottom: 1rem; text-align: center; letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); color: var(--primary-color); }
-        h3 { font-size: 1.1rem; margin-bottom: 0.8rem; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
-
-        /* UI Elements */
-        button {
-            font-family: inherit;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-        button:active { transform: scale(0.96); }
-
-        input[type="text"], input[type="number"], input[type="password"], input[type="email"], input[type="datetime-local"], select, textarea {
-            background: var(--surface-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: var(--radius-md);
-            padding: 12px;
-            font-size: 16px;
-            transition: border-color 0.2s;
-            width: 100%;
-        }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary-color); }
-
-        /* --- 3D CANVAS CONTAINER & OPTIMIZED BUTTON --- */
-        #canvas-wrapper {
-            position: relative;
-            width: 100%;
-            height: 55vh; /* Adjustable height */
-            min-height: 400px;
-            border-radius: var(--radius-xl);
-            overflow: hidden;
-            margin-bottom: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid var(--border-color);
-        }
-        #canvas-container {
-            width: 100%;
-            height: 100%;
-            display: block;
-            touch-action: none;
-            cursor: grab;
-        }
-        #canvas-container:active {
-            cursor: grabbing;
-        }
-        .canvas-overlay-msg {
-            position: absolute;
-            bottom: 20px;
-            width: 100%;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.9);
-            pointer-events: none;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            z-index: 10;
-            font-weight: bold;
-            letter-spacing: 1px;
-            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
-            padding-bottom: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        #reset-3d-btn {
-            position: absolute;
-            top: 2px;
-            left: 3px; 
-            right: auto;
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 50px;
-            z-index: 50;
-            display: none; 
-            font-size: 0.6rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-            align-items: center;
-            gap: 8px;
-            animation: fadeInBtn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        #reset-3d-btn:hover {
-            background: rgba(211, 47, 47, 0.9);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(211, 47, 47, 0.4);
-        }
-        
-        @keyframes fadeInBtn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- END 3D CSS --- */
-
-        .reselect-text-btn {
-            background: none;
-            border: none;
-            color: var(--primary-color);
-            text-decoration: underline;
-            font-size: 0.85rem;
-            padding: 0;
-            margin-left: 8px;
-            cursor: pointer;
-        }
-
-        /* Category Grid */
-        .category-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 24px;
-        }
-
-        .category-card {
-            background: var(--surface-color);
-            padding: 12px;
-            border-radius: var(--radius-md);
-            text-align: center;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-sm);
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 80px;
-        }
-
-        .category-card.selected {
-            background: var(--success-color);
-            color: white;
-            border-color: transparent;
-            box-shadow: var(--shadow-md);
-        }
-        
-        .category-card.selected .category-icon { transform: scale(1.1); }
-        .category-icon { font-size: 1.8rem; margin-bottom: 5px; transition: transform 0.2s; }
-        .category-card label { font-size: 0.8rem; font-weight: 600; cursor: pointer; display: block; }
-
-        /* Product List */
-        #productList { display: flex; flex-direction: column; gap: 10px; padding-bottom: 20px; }
-        #productList > div {
-            background: var(--surface-color);
-            border-radius: var(--radius-md);
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            position: relative;
-            transition: transform 0.1s;
-        }
-        #productList > div:active { transform: scale(0.99); background-color: rgba(0,0,0,0.02); }
-
-        #productList input[type="checkbox"] { width: 20px; height: 20px; margin-right: 12px; accent-color: var(--success-color); }
-        #productList label { flex: 1; font-weight: 500; font-size: 0.95rem; display: flex; flex-direction: column; cursor: pointer; }
-        #productList label span { font-size: 0.8rem; color: var(--accent-color); margin-top: 2px; }
-        #productList .zero-stock { color: var(--danger-color) !important; font-weight: bold; }
-
-        .view-image-btn {
-            background: rgba(211, 47, 47, 0.1);
-            color: var(--primary-color);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            margin-left: 6px;
-            vertical-align: middle;
-            display: inline-flex !important;
-            cursor: pointer;
-            border: 1px solid rgba(211, 47, 47, 0.2);
-        }
-
-        .quantity-controls-wrapper {
-            display: flex;
-            align-items: center;
-            background: var(--bg-color);
-            border-radius: 20px;
-            padding: 2px;
-        }
-        .quantity-btn {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: var(--surface-color); color: var(--primary-color);
-            box-shadow: var(--shadow-sm); padding: 0;
-            display: flex; align-items: center; justify-content: center;
-        }
-        #productList input[type="number"] { width: 40px; text-align: center; border: none; background: transparent; padding: 0; font-weight: 600; color: var(--text-primary); -moz-appearance: textfield; }
-
-        #productList.grid-view { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
-        #productList.grid-view > div { flex-direction: column; align-items: center; padding: 16px 12px; text-align: center; height: auto; min-height: 160px; }
-        #productList.grid-view .product-image {
-            width: 80px; height: 80px; border-radius: var(--radius-md); margin-bottom: 10px;
-            background: var(--bg-color); object-fit: cover; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid var(--border-color);
-        }
-        #productList.grid-view .product-image img { width: 100%; height: 100%; object-fit: cover; }
-        #productList.grid-view .quantity-controls-wrapper { margin-top: auto; width: 100%; justify-content: space-between; padding: 4px; }
-        #productList.grid-view input[type="checkbox"] { position: absolute; top: 10px; left: 10px; margin: 0; }
-
-        .product-unit-badge { position: absolute; top: -8px; right: -5px; background: var(--accent-color); color: #000; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; z-index: 2; box-shadow: var(--shadow-sm); font-weight: bold; }
-        .new-product-glow { animation: pulse-red 1.5s infinite; border: 2px solid var(--danger-color) !important; }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(255, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 68, 68, 0); } }
-
-        /* Bottom Nav */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            height: calc(var(--nav-height) + var(--safe-area-bottom));
-            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-top: 1px solid var(--glass-border);
-            display: flex; justify-content: space-around; align-items: flex-start;
-            padding-top: 10px; z-index: 1000; padding-bottom: var(--safe-area-bottom);
-        }
-        .bottom-nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); font-size: 0.75rem; position: relative; cursor: pointer; }
-        .bottom-nav-item.active { color: var(--primary-color); text-shadow: 0 0 8px rgba(211,47,47,0.4); }
-        .bottom-nav-item .material-icons { font-size: 24px; margin-bottom: 4px; }
-        .order-count-badge { position: absolute; top: -5px; right: calc(50% - 20px); background: var(--accent-color); color: #000; font-size: 10px; font-weight: bold; min-width: 16px; height: 16px; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--glass-bg); }
-
-        /* Tools Bar */
-        .tools-bar { display: flex; gap: 10px; margin: 16px 0; align-items: center; }
-        #searchContainer { flex: 1; margin: 0; position: relative; }
-        #searchContainer input { padding-left: 40px; border-radius: 50px; background: var(--surface-color-transparent); }
-        #searchContainer .material-icons { left: 12px; color: var(--text-secondary); }
-        .view-toggle-group { display: flex; background: var(--surface-color); border-radius: var(--radius-md); padding: 2px; border: 1px solid var(--border-color); }
-        .view-toggle-btn { padding: 8px; border-radius: 6px; color: var(--text-secondary); background: transparent; border: none; }
-        .view-toggle-btn.active { background: var(--success-color); color: white; }
-
-        /* Preview Window */
-        #preview-window {
-            position: fixed; bottom: calc(var(--nav-height) + var(--safe-area-bottom) + 10px); left: 10px; right: 10px;
-            background: var(--surface-color-transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); border: 1px solid var(--glass-border);
-            padding: 20px; z-index: 900; display: none; transform-origin: bottom center; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 60vh; overflow-y: auto;
-        }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-        .whatsapp-button { background: #25D366; color: white; width: 100%; padding: 14px; border-radius: var(--radius-md); font-weight: 600; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3); margin-top: 10px; }
-
-        /* Auth */
-        .auth-container { background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); }
-        .auth-box { background: var(--surface-color); color: var(--text-primary); border-radius: var(--radius-xl); padding: 32px 24px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); }
-        .auth-box h2 { color: var(--primary-color); margin-bottom: 24px; }
-        .auth-form button { width: 100%; padding: 14px; border-radius: var(--radius-lg); background: var(--primary-color); color: white; font-size: 1rem; margin-top: 10px; }
-        .auth-form button:disabled { opacity: 0.7; cursor: not-allowed; }
-        .auth-form .switch-form { color: var(--text-secondary); margin-top: 20px; font-size: 0.9rem; }
-
-        /* Admin & Splash (Keeping original styles) */
-        #adminPanel .auth-box { max-width: 90%; height: 90vh; display: flex; flex-direction: column; overflow: hidden; }
-        .admin-tabs { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; gap: 10px; display: flex; overflow-x: auto; flex-shrink: 0; }
-        .tab-button { background: transparent; color: var(--text-secondary); padding: 8px 16px; border-radius: 20px; white-space: nowrap; }
-        .tab-button.active { background: var(--primary-color); color: white; }
-        .admin-tab-content { height: 100%; overflow-y: auto; padding-bottom: 20px; }
-        
-        .user-card { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 15px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
-        .action-button { padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; margin-right: 8px; color: white; }
-        .action-button.approve { background: var(--success-color); }
-        .action-button.delete { background: var(--danger-color); }
-        .action-button.promote { background: var(--primary-color); }
-        .action-button.demote { background: #ff9800; }
-        .product-item { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px; margin-bottom: 10px; }
-
-        @keyframes scroll { 0% { transform: translate3d(100vw, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
-        .snowflake { position: fixed; top: -10px; color: #fff; font-size: 1em; font-family: Arial, sans-serif; text-shadow: 0 0 5px #000; z-index: 999; user-select: none; pointer-events: none; animation-name: snowfall; animation-timing-function: linear; animation-iteration-count: infinite; }
-        @keyframes snowfall { 0% { transform: translateY(0); } 100% { transform: translateY(100vh); } }
-
-        #splashScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 20000; display: none; justify-content: center; align-items: center; flex-direction: column; transition: opacity 0.5s ease-out; }
-        #splashScreen::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at center, rgba(211, 47, 47, 0.2) 0%, rgba(0,0,0,0) 70%); z-index: -1; }
-        .splash-content { text-align: center; padding: 20px; animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .splash-logo-icon { font-size: 4.5rem; margin-bottom: 15px; display: inline-block; background: linear-gradient(135deg, #FFC107, #FF9800); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: floatIcon 3s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5)); }
-        .splash-title { font-size: 2.2rem; font-weight: 800; margin: 0; line-height: 1.2; color: var(--primary-color); text-shadow: 2px 2px 0px #fff; animation: shine 3s linear infinite; }
-        .splash-loader { width: 60px; height: 4px; background: rgba(255,255,255,0.2); margin: 30px auto 0; border-radius: 4px; overflow: hidden; position: relative; }
-        .splash-loader::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 40%; background: var(--accent-color); border-radius: 4px; animation: loadBar 1.5s infinite ease-in-out; }
-
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes floatIcon { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-10px) rotate(5deg); } }
-        @keyframes loadBar { 0% { left: -40%; } 100% { left: 100%; } }
-
-        /* Responsive Tweaks */
-        @media (max-width: 380px) { .category-container { grid-template-columns: repeat(3, 1fr); } }
-    </style>
 </head>
 <body class="dark-mode">
-
-    <!-- Snow Container -->
-    <div id="snow-container"></div>
 
     <!-- SPLASH SCREEN -->
     <div id="splashScreen">
         <div class="splash-content">
-            <span class="material-icons-round splash-logo-icon">forest</span>
-            <h1 class="splash-title">Merry Christmas</h1>
-            <div class="splash-subtitle" style="color:var(--success-color); margin-top:5px; opacity:0.9;">SmartProfits Stock</div>
+            <span class="material-icons-round splash-logo-icon">auto_awesome</span>
+            <h1 class="splash-title">Happy New Year</h1>
+            <div class="splash-subtitle">2026</div>
             <div class="splash-loader"></div>
         </div>
     </div>
 
-    <!-- Announcement Banner -->
-    <div id="announcementBanner" style="position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(45deg, #D32F2F, #2E7D32, #1976D2); background-size: 300% 300%; animation: gradientShift 3s ease infinite; color: white; font-weight: bold; font-size: 14px; padding: 10px 0; z-index: 10000; overflow: hidden; white-space: nowrap; display: none; border-bottom: 1px solid rgba(255,255,255,0.2);">
-        <div id="announcementScrollText" style="display: inline-block; animation: scroll 15s linear infinite; line-height: 1.2; white-space: nowrap;"></div>
-    </div>
-
-    <!-- Auth Container -->
+    <!-- 认证容器 -->
     <div id="authContainer" class="auth-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 9999;">
         <div class="auth-box" style="width: 90%; max-width: 400px;">
-            <div style="text-align: center; font-size: 3rem; margin-bottom: 10px;">🎅</div>
-            <h2 id="authTitle" style="text-align: center;">Ho Ho Ho! Welcome</h2>
-            
+            <h2 id="authTitle" style="text-align: center;">Welcome Back</h2>
             <div id="loginForm" class="auth-form">
                 <div style="margin-bottom: 16px;"><input type="email" id="loginEmail" placeholder="Email Address" required></div>
                 <div style="margin-bottom: 20px;"><input type="password" id="loginPassword" placeholder="Password" required></div>
                 <button id="loginButton">Login</button>
                 <div class="switch-form" onclick="switchToRegister()" style="text-align: center;">Create an account</div>
             </div>
-            
-            <div id="registerForm" class="auth-form" style="display: none;">
+             <div id="registerForm" class="auth-form" style="display: none;">
                 <div style="margin-bottom: 16px;"><input type="email" id="registerEmail" placeholder="Email Address" required></div>
                 <div style="margin-bottom: 16px;"><input type="password" id="registerPassword" placeholder="Create Password" required></div>
                 <div style="margin-bottom: 20px;"><input type="text" id="registerName" placeholder="Your Name" required></div>
                 <button id="registerButton">Register</button>
                 <div class="switch-form" onclick="switchToLogin()" style="text-align: center;">Already have an account? Login</div>
             </div>
-            
             <div id="pendingForm" class="auth-form" style="display: none; text-align: center;">
                 <div style="font-size: 50px; margin-bottom: 20px;">⏳</div>
                 <h3>Verification Pending</h3>
@@ -546,109 +157,70 @@
         </div>
     </div>
 
-    <!-- Hidden User Info -->
+    <!-- 隐藏的用户信息 -->
     <div id="userInfo" style="display: none;">
         <span id="userName"><span class="username-text">Guest</span></span>
         <span id="userRole">User</span>
     </div>
 
-    <!-- Main Content -->
+    <!-- === THREE.JS 3D 容器 === -->
+    <div id="three-container">
+        <div id="three-ui">
+            双击屏幕 选择店铺 <br>
+            <span style="font-size:10px; opacity:0.6;">Double Tap to Select Shop</span>
+        </div>
+        <div id="floating-shops-layer"></div>
+    </div>
+
+    <!-- 主要内容区域 -->
     <div id="mainAppContent" style="opacity: 0; transition: opacity 0.5s;">
-        <h1 style="padding-top: 20px; font-family: 'Georgia', serif;">🎄 Merry Christmas 🎄</h1>
-
-        <!-- 3D SHOP SELECTOR -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
-            <h3 id="shopSelectHeader"><span class="material-icons-round" style="color: var(--primary-color)">store</span> Select Outlet</h3>
-        </div>
-
-        <!-- 3D Canvas Wrapper -->
-        <div id="canvas-wrapper">
-            <!-- OPTIMIZED BUTTON POSITION: Top Left inside canvas -->
-            <button id="reset-3d-btn" onclick="reset3DView()">
-                <span class="material-icons">arrow_back</span> Change Shop
-            </button>
-            <div id="canvas-container"></div>
-            <div class="canvas-overlay-msg" id="canvas-msg">Swipe to rotate &bull; Tap card to select</div>
-        </div>
-
-        <!-- Hidden Radio Inputs for Form Logic (Preserved from original) -->
-        <div style="display:none;">
-            <input type="radio" name="store" value="*JKL*" id="jkl">
-            <input type="radio" name="store" value="*TOM*" id="tom">
-            <input type="radio" name="store" value="*Ole-Ole Dalam*" id="dalam">
-            <input type="radio" name="store" value="*Ole-Ole Luar*" id="new">
-            <input type="radio" name="store" value="*Wrapping(AA)*" id="aa">
-            <input type="radio" name="store" value="*Wrapping(MAS)*" id="mas">
-            <input type="radio" name="store" value="*Ole-Ole Tawau*" id="twu">
-            <input type="radio" name="store" value="*Wisma*" id="wisma">
-            <input type="radio" name="store" value="*Tamoi*" id="tamoi">
-            <input type="radio" name="store" value="*KTSP*" id="ktsp">
-        </div>
-
-        <h3 id="categoryTitle" style="display: none;">
-            <div style="display:flex; align-items:center;">
-                <span class="material-icons-round" style="color: var(--primary-color); margin-right:6px;">category</span> 
-                Category 
-                <button class="reselect-text-btn" onclick="reset3DView()">(Change Shop)</button>
-            </div>
-        </h3>
-        <div class="category-container" id="categoryContainer" style="display: none;">
-            <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
-                <input type="radio" name="category" value="BanHeang" id="banheang" style="display:none">
-                <span class="category-icon">🍪</span><label>BanHeang</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'HoeHup')">
-                <input type="radio" name="category" value="HoeHup" id="HoeHup" style="display:none">
-                <span class="category-icon">🥮</span><label>HoeHup</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Chocolate')">
-                <input type="radio" name="category" value="Chocolate" id="chocolate" style="display:none">
-                <span class="category-icon">🍫</span><label>Chocolate</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Seafood')">
-                <input type="radio" name="category" value="Seafood" id="Seafood" style="display:none">
-                <span class="category-icon">🦐</span><label>Seafood</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Coffee')">
-                <input type="radio" name="category" value="Coffee" id="coffee" style="display:none">
-                <span class="category-icon">☕</span><label>Coffee</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Amplang')">
-                <input type="radio" name="category" value="Amplang" id="amplang" style="display:none">
-                <span class="category-icon">🌕</span><label>Amplang</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Other')">
-                <input type="radio" name="category" value="Other" id="other" style="display:none">
-                <span class="category-icon">🎁</span><label>Other</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Wrapping')">
-                <input type="radio" name="category" value="Wrapping" id="wrapping" style="display:none">
-                <span class="category-icon">🧸</span><label>Wrapping</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Office')">
-                <input type="radio" name="category" value="Office" id="Office" style="display:none">
-                <span class="category-icon">📦</span><label>Office</label>
-            </div>
-        </div>
-
-        <!-- Search and View Toggle -->
-        <div class="tools-bar" id="searchContainer" style="display: none;">
-            <div style="position: relative; flex: 1;">
-                <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">search</span>
-                <input type="text" id="productSearch" placeholder="Search product..." oninput="searchProduct()" autocomplete="off">
-            </div>
-            <div class="view-toggle-group" id="viewToggleContainer">
-                <button id="listViewBtn" onclick="toggleView('list')" class="view-toggle-btn active"><span class="material-icons">view_list</span></button>
-                <button id="gridViewBtn" onclick="toggleView('grid')" class="view-toggle-btn"><span class="material-icons">grid_view</span></button>
-            </div>
-        </div>
-
-        <div id="suggestions" style="background: var(--surface-color); border-radius: 12px; margin-bottom: 10px; overflow: hidden; display: none;"></div>
+        <h1 id="mainTitle" style="padding-top: 20px; display: none;">SmartProfits Stock Request</h1>
         
-        <h3 id="selectItemsTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">list_alt</span> Select Items</h3>
-        <div id="productList" style="display: none;"></div>
+        <div class="shop-container original-list">
+            <div class="shop-data" data-id="*JKL*" data-name="JKL" data-img="shop/jkl.png"></div>
+            <div class="shop-data" data-id="*TOM*" data-name="TOM" data-img="shop/tom.png"></div>
+            <div class="shop-data" data-id="*Ole-Ole Dalam*" data-name="Ole-Ole Dalam" data-img="shop/dalam.png"></div>
+            <div class="shop-data" data-id="*Ole-Ole Luar*" data-name="Ole-Ole Luar" data-img="shop/luar.png"></div>
+            <div class="shop-data" data-id="*Wrapping(AA)*" data-name="Wrapping(AA)" data-img="shop/Aa.png"></div>
+            <div class="shop-data" data-id="*Wrapping(MAS)*" data-name="Wrapping(MAS)" data-img="shop/Mas.png"></div>
+            <div class="shop-data" data-id="*Ole-Ole Tawau*" data-name="Ole-Ole Tawau" data-img="shop/tawau.png"></div>
+            <div class="shop-data" data-id="*Wisma*" data-name="Wisma" data-img="shop/wisma.png"></div>
+            <div class="shop-data" data-id="*Tamoi*" data-name="Tamoi" data-img="shop/Tamoi.png"></div>
+            <div class="shop-data" data-id="*KTSP*" data-name="KTSP" data-img="shop/KTSP.png"></div>
+        </div>
 
-        <!-- Bottom Navigation -->
+        <div id="after-shop-selection" style="display: none;">
+             <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
+                <h3><span class="material-icons-round" style="color: var(--primary-color)">store</span> Selected: <span id="selectedShopDisplay" style="color: var(--primary-color)"></span></h3>
+                <button onclick="resetToShopSelection()" style="padding: 5px 10px; font-size: 0.8rem;">Change</button>
+            </div>
+            <h3 id="categoryTitle"><span class="material-icons-round" style="color: var(--primary-color)">category</span> Category</h3>
+            <div class="category-container" id="categoryContainer">
+                <div class="category-card" onclick="selectCategory(this, 'BanHeang')"><input type="radio" name="category" value="BanHeang" id="banheang" style="display:none"><span class="category-icon">🍪</span><label>BanHeang</label></div>
+                <div class="category-card" onclick="selectCategory(this, 'HoeHup')"><input type="radio" name="category" value="HoeHup" id="HoeHup" style="display:none"><span class="category-icon">🥮</span><label>HoeHup</label></div>
+                <div class="category-card" onclick="selectCategory(this, 'Chocolate')"><input type="radio" name="category" value="Chocolate" id="chocolate" style="display:none"><span class="category-icon">🍫</span><label>Chocolate</label></div>
+                <div class="category-card" onclick="selectCategory(this, 'Seafood')"><input type="radio" name="category" value="Seafood" id="seafood" style="display:none"><span class="category-icon">🦐</span><label>Seafood</label></div>
+                <div class="category-card" onclick="selectCategory(this, 'Coffee')"><input type="radio" name="category" value="Coffee" id="coffee" style="display:none"><span class="category-icon">☕</span><label>Coffee</label></div>
+                <div class="category-card" onclick="selectCategory(this, 'Amplang')"><input type="radio" name="category" value="Amplang" id="amplang" style="display:none"><span class="category-icon">🌕</span><label>Amplang</label></div>
+                <div class="category-card" onclick="selectCategory(this, 'Other')"><input type="radio" name="category" value="Other" id="other" style="display:none"><span class="category-icon">🎁</span><label>Other</label></div>
+                <div class="category-card" onclick="selectCategory(this, 'Wrapping')"><input type="radio" name="category" value="Wrapping" id="wrapping" style="display:none"><span class="category-icon">🧸</span><label>Wrapping</label></div>
+                <div class="category-card" onclick="selectCategory(this, 'Office')"><input type="radio" name="category" value="Office" id="Office" style="display:none"><span class="category-icon">📦</span><label>Office</label></div>
+            </div>
+            <div class="tools-bar" id="searchContainer">
+                <div style="position: relative; flex: 1;">
+                    <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">search</span>
+                    <input type="text" id="productSearch" placeholder="Search product..." oninput="searchProduct()" autocomplete="off">
+                </div>
+                <div class="view-toggle-group" id="viewToggleContainer">
+                    <button id="listViewBtn" onclick="toggleView('list')" class="view-toggle-btn active"><span class="material-icons">view_list</span></button>
+                    <button id="gridViewBtn" onclick="toggleView('grid')" class="view-toggle-btn"><span class="material-icons">grid_view</span></button>
+                </div>
+            </div>
+            <div id="suggestions" style="background: var(--surface-color); border-radius: 12px; margin-bottom: 10px; overflow: hidden; display: none;"></div>
+            <h3 id="selectItemsTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">list_alt</span> Select Items</h3>
+            <div id="productList" style="display: none;"></div>
+        </div>
+
         <div class="bottom-nav">
             <div class="bottom-nav-item" id="menuNavItem" onclick="toggleDashboard()">
                 <span class="material-icons">menu</span><span>Menu</span>
@@ -664,56 +236,37 @@
                 <span class="material-icons">settings</span><span>Setting</span>
             </div>
         </div>
-    </div> <!-- End Main Content -->
+    </div> 
 
-    <!-- Image Modal -->
+    <!-- Preview Bottom Sheet & Modals -->
     <div id="imageModal" class="image-modal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; justify-content:center; align-items:center;">
         <span class="close-modal" onclick="closeImageModal()" style="position:absolute; top:20px; right:20px; color:white; font-size:30px; cursor:pointer; z-index: 2001;">&times;</span>
         <div class="modal-content" style="max-width:90%; max-height:80%; position: relative;">
-            <img id="modalImage" src="" style="max-width:100%; max-height:100%; border-radius:8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+            <img id="modalImage" src="" style="max-width:100%; max-height:100%; border-radius:8px;">
         </div>
     </div>
-
-    <!-- Preview Bottom Sheet -->
+    
     <div id="preview-window">
         <div class="preview-header">
             <div style="display: flex; align-items: center; gap: 10px; font-weight: bold;">
                 <span class="material-icons-round" style="color: var(--primary-color);">receipt_long</span>
                 Order Summary
             </div>
-            <div style="display: flex; align-items: center; gap: 15px;">
+             <div style="display: flex; align-items: center; gap: 15px;">
                 <label style="display: flex; align-items: center; gap: 6px; font-size: 0.9rem;">
-                    <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()" style="width: 16px; height: 16px;"> Add On
+                    <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()" style="width: 16px; height: 16px;">
+                    Add On
                 </label>
                 <span class="material-icons-round" onclick="togglePreview()" style="cursor: pointer; color: var(--text-secondary);">close</span>
             </div>
         </div>
         <div id="preview-content" style="font-size: 0.9rem; line-height: 1.6; max-height: 40vh; overflow-y: auto;"></div>
         <button class="whatsapp-button" onclick="copyAndSendWhatsApp()">
-            <span class="material-icons-round" style="margin-right: 8px;">whatsapp</span> Send to WhatsApp 🎄
+            <span class="material-icons-round" style="margin-right: 8px;">whatsapp</span>
+            Send to WhatsApp
         </button>
     </div>
 
-    <!-- Settings Panel -->
-    <div id="settings-panel" style="position: fixed; bottom: 80px; right: 20px; width: 260px; background: var(--surface-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 20px; z-index: 1001; display: none; border: 1px solid var(--border-color);">
-        <h3 style="margin-top: 0;">Settings</h3>
-        <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Appearance</label>
-            <div style="display: flex; gap: 8px;">
-                <button onclick="changeTheme('dark')" style="flex: 1; padding: 8px; background: #0b1e15; color: white; border-radius: 6px;">Dark</button>
-                <button onclick="changeTheme('light')" style="flex: 1; padding: 8px; background: #f0f0f0; color: #333; border-radius: 6px;">Light</button>
-            </div>
-        </div>
-        <div>
-            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Vibration</label>
-            <div style="display: flex; gap: 8px;">
-                <button id="vibration-on-btn" onclick="toggleVibration(true)" style="flex: 1; padding: 8px; border-radius: 6px;">On</button>
-                <button id="vibration-off-btn" onclick="toggleVibration(false)" style="flex: 1; padding: 8px; border-radius: 6px;">Off</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Side Dashboard -->
     <div id="side-dashboard" style="position: fixed; top: 0; left: 0; width: 280px; height: 100%; background: var(--surface-color); z-index: 1500; display: none; flex-direction: column; box-shadow: 2px 0 20px rgba(0,0,0,0.2);">
         <div style="padding: 40px 20px 20px; background: var(--primary-color); color: white;">
             <h2 style="margin-bottom: 5px;">Welcome</h2>
@@ -731,968 +284,757 @@
     </div>
     <div id="dashboard-overlay" onclick="toggleDashboard()" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1499; display: none;"></div>
 
-    <!-- Admin Panel (Preserved) -->
-    <div id="adminPanel" class="auth-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 2000;">
-        <div class="auth-box" style="width: 95%; height: 90vh; max-width: 800px; display: flex; flex-direction: column; overflow: hidden;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h2>Admin Panel</h2>
-                <span onclick="document.getElementById('adminPanel').style.display='none'" style="font-size: 28px; cursor: pointer;">&times;</span>
-            </div>
-            <div class="admin-tabs">
-                <button class="tab-button active" onclick="showAdminTab('users')">Users</button>
-                <button class="tab-button" onclick="showAdminTab('products')">Products</button>
-                <button class="tab-button" onclick="showAdminTab('announcement')">Announce</button>
-            </div>
-            <div style="flex: 1; overflow-y: auto; padding-top: 15px; padding-bottom: 20px;">
-                <div id="users-tab" class="admin-tab-content">
-                    <h3>Pending Users</h3><div id="pendingUsersList" class="users-list">Loading...</div>
-                    <h3 style="margin-top: 20px;">All Users</h3><div id="allUsersList" class="users-list">Loading...</div>
-                </div>
-                <div id="products-tab" class="admin-tab-content" style="display: none;">
-                    <select id="categorySelect" onchange="loadProductsForAdmin()" style="margin-bottom: 15px;"></select>
-                    <div id="productManagementList" class="product-management-list"></div>
-                </div>
-                <div id="announcement-tab" class="admin-tab-content" style="display: none;">
-                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                        <input type="checkbox" id="announcementEnabled" onchange="toggleAnnouncement()"> Enable Announcement
-                    </label>
-                    <div id="announcementSettings" style="display: none;">
-                        <textarea id="announcementText" rows="3" placeholder="Announcement content..." style="margin-bottom: 10px;"></textarea>
-                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                            <label style="font-size:0.8rem">Start Time:<input type="datetime-local" id="announcementStartTime"></label>
-                            <label style="font-size:0.8rem">End Time:<input type="datetime-local" id="announcementEndTime"></label>
-                        </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button onclick="saveAnnouncementSettings()" style="flex: 1; padding: 12px; background: var(--success-color); color: white;">Save</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- 3D 依赖库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
 
-    <!-- 3D LOGIC & MAIN APP SCRIPT -->
+    <!-- 原始脚本 -->
+    <script src="script.js"></script>
+
     <script>
-        // ==========================================
-        // 3D CHRISTMAS SHOP SELECTOR (Three.js)
-        // ==========================================
-        
-        let scene, camera, renderer, treeGroup;
-        let shopsGroup; // Holds the shop meshes
-        let is3DPaused = false;
-        let selectedMesh = null;
-        let animationId;
-        
-        // Variables for manual rotation interaction
-        let isDragging = false;
-        let previousPointerX = 0;
-        let totalDragDistance = 0;
+        let selectedStore = "";
+        let isTransitioning = false; 
 
-        // New Variable for Gift
-        let currentGift = null;
+        window.startShopSelection = function(element, storeId) {
+            if (isTransitioning) return; 
+            isTransitioning = true; 
 
-        // Shop Data mapped to values
-        const shopData = [
-            { name: "JKL", value: "*JKL*", img: "shop/jkl.png", color: "#FF4444" },
-            { name: "TOM", value: "*TOM*", img: "shop/tom.png", color: "#44FF44" },
-            { name: "Ole-Ole Dalam", value: "*Ole-Ole Dalam*", img: "shop/dalam.png", color: "#4444FF" },
-            { name: "Ole-Ole Luar", value: "*Ole-Ole Luar*", img: "shop/luar.png", color: "#FFFF44" },
-            { name: "Wrapping (AA)", value: "*Wrapping(AA)*", img: "shop/Aa.png", color: "#44FFFF" },
-            { name: "Wrapping (MAS)", value: "*Wrapping(MAS)*", img: "shop/Mas.png", color: "#FF44FF" },
-            { name: "Ole-Ole Tawau", value: "*Ole-Ole Tawau*", img: "shop/tawau.png", color: "#FFA500" },
-            { name: "Wisma", value: "*Wisma*", img: "shop/wisma.png", color: "#800080" },
-            { name: "Tamoi", value: "*Tamoi*", img: "shop/tamoi.png", color: "#800080" },
-            { name: "KTSP", value: "*KTSP*", img: "shop/ktsp.png", color: "#800080" }
-        ];
+            const radio = document.querySelector(`input[value="${storeId}"]`);
+            if(radio) radio.checked = true;
+            selectedStore = storeId;
+            document.getElementById('selectedShopDisplay').innerText = storeId.replace(/\*/g, '');
 
-        function init3DScene() {
-            const container = document.getElementById('canvas-container');
-            const width = container.clientWidth;
-            const height = container.clientHeight;
+            // 1. 隐藏 UI
+            document.querySelectorAll('.floating-shop-card').forEach(el => {
+                el.style.opacity = '0';
+                el.style.pointerEvents = 'none';
+            });
+            document.getElementById('three-ui').innerHTML = "<span style='color:#ffd700; font-size: 18px; font-weight:bold;'>CELEBRATING...</span>";
 
-            // 1. Scene Setup
+            // 2. 发射店铺名字专用烟花 (白色粒子)
+            // 提取店铺纯名
+            const cleanName = storeId.replace(/\*/g, '');
+            launchShopNameFirework(cleanName);
+
+            // 3. 过渡到主页面
+            setTimeout(() => {
+                const threeContainer = document.getElementById('three-container');
+                const afterShopSelection = document.getElementById('after-shop-selection');
+                const mainTitle = document.getElementById('mainTitle');
+                
+                threeContainer.classList.add('hide-3d');
+                
+                setTimeout(() => {
+                    threeContainer.style.display = 'none';
+                    afterShopSelection.style.display = 'block';
+                    mainTitle.style.display = 'block';
+                    document.getElementById('categoryTitle').style.display = 'block';
+                    document.getElementById('categoryContainer').style.display = 'grid';
+                    isTransitioning = false; 
+                }, 800);
+            }, 3000); // 维持5秒过渡期，与原逻辑一致，烟花在3.5秒内完成
+        };
+
+        window.resetToShopSelection = function() {
+            const threeContainer = document.getElementById('three-container');
+            const afterShopSelection = document.getElementById('after-shop-selection');
+            const mainTitle = document.getElementById('mainTitle');
+
+            afterShopSelection.style.display = 'none';
+            mainTitle.style.display = 'none';
+            
+            threeContainer.style.display = 'block';
+            void threeContainer.offsetWidth; 
+            threeContainer.classList.remove('hide-3d');
+            
+            isExploded = false;
+            isTransitioning = false;
+            document.getElementById('three-ui').innerHTML = "Double Tap to Select Shop<br><span style='font-size:10px'>Happy New Year</span>";
+            
+            if(material) gsap.to(material.uniforms.uMix, { value: 0.0, duration: 2 });
+            if(innerMaterial) gsap.to(innerMaterial.uniforms.uOpacity, { value: 0.0, duration: 1.5 });
+            
+            document.querySelectorAll('.floating-shop-card').forEach(el => {
+                el.style.display = 'none';
+                el.style.opacity = '0';
+                el.style.pointerEvents = 'auto';
+            });
+        };
+
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                setTimeout(() => {
+                    init3DWorld();
+                    document.getElementById('three-container').style.display = 'block';
+                }, 1000);
+            }
+        });
+
+        // --- 3D 核心代码 ---
+        let scene, camera, renderer, controls, material;
+        let innerMaterial; 
+        let isExploded = false;
+        let activeFireworks = [];
+        let fireworkTexture;
+
+        // --- 修改 1: 更新配置为三行 ---
+        const CONFIG = {
+            particleCount: 10000, 
+            textLine1: "HAPPY",  
+            textLine2: "NEW",    // 修改这里
+            textLine3: "YEAR",   // 新增这里
+            font: "Bold 90px Arial", 
+            innerText: "2026", 
+            innerFont: "Bold 180px Arial", 
+            color1: new THREE.Color(0xffd700),
+            color2: new THREE.Color(0x00ffff),
+            scatterRadius: 300,
+            fireworkChance: 0.03
+        };
+
+        let shopElements = []; 
+
+        function init3DWorld() {
+            const container = document.getElementById('three-container');
+            if(container.querySelector('canvas')) return; 
+
             scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x050505, 0.02);
+            scene.fog = new THREE.FogExp2(0x050505, 0.002);
 
-            camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-            camera.position.set(0, 5, 14);
-            camera.lookAt(0, 3, 0);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 450; 
 
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(width, height);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(renderer.domElement);
 
-            // 2. Lights
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-            scene.add(ambientLight);
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 1.0;
+            controls.enableZoom = false; 
 
-            const dirLight = new THREE.DirectionalLight(0xffdfba, 1.2);
-            dirLight.position.set(10, 15, 10);
-            dirLight.castShadow = true;
-            dirLight.shadow.mapSize.width = 1024;
-            dirLight.shadow.mapSize.height = 1024;
-            scene.add(dirLight);
+            fireworkTexture = getFireworkTexture();
 
-            // 3. Tree Group
-            treeGroup = new THREE.Group();
-            scene.add(treeGroup);
-
-            // Trunk
-            const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.8, 2.5, 8);
-            const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x4d2926, roughness: 0.9 });
-            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-            trunk.position.y = 1.25;
-            trunk.castShadow = true;
-            trunk.receiveShadow = true;
-            treeGroup.add(trunk);
-
-            // Leaves
-            const treeMaterial = new THREE.MeshStandardMaterial({ color: 0x1a472a, roughness: 0.7, flatShading: true });
-            function createTreeLayer(radiusBottom, radiusTop, height, yPos) {
-                const geometry = new THREE.ConeGeometry(radiusBottom, height, 8);
-                const mesh = new THREE.Mesh(geometry, treeMaterial);
-                mesh.position.y = yPos;
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                treeGroup.add(mesh);
-                return mesh;
-            }
-            createTreeLayer(3.5, 0, 3.5, 3.5);
-            createTreeLayer(2.8, 0, 3.0, 5.5);
-            createTreeLayer(2.0, 0, 2.5, 7.2);
-
-            // Star
-            const starGeometry = new THREE.IcosahedronGeometry(0.5, 0);
-            const starMaterial = new THREE.MeshStandardMaterial({ color: 0xffd700, emissive: 0xffd700, emissiveIntensity: 1 });
-            const star = new THREE.Mesh(starGeometry, starMaterial);
-            star.position.y = 8.6;
-            treeGroup.add(star);
-            const starLight = new THREE.PointLight(0xffd700, 1.5, 8);
-            starLight.position.set(0, 8.6, 0);
-            treeGroup.add(starLight);
-
-            // Ornaments (Simplified)
-            const ornamentGeo = new THREE.SphereGeometry(0.18, 8, 8);
-            const colors = [0xff0000, 0xffd700, 0x00bfff, 0xff69b4];
-            for (let i = 0; i < 30; i++) {
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                const mat = new THREE.MeshStandardMaterial({ color: color, emissive: color, emissiveIntensity: 0.4 });
-                const mesh = new THREE.Mesh(ornamentGeo, mat);
-                const angle = Math.random() * Math.PI * 2;
-                const y = 3 + Math.random() * 4;
-                const r = 3 * (1 - (y-3)/5) + 0.2;
-                mesh.position.set(Math.cos(angle)*r, y, Math.sin(angle)*r);
-                treeGroup.add(mesh);
-            }
-
-            // --- ADD SHOPS ---
-            shopsGroup = new THREE.Group();
-            treeGroup.add(shopsGroup); // Shops rotate with tree
-
-            const shopRadius = 6.0; // Distance from center
-            const shopY = 4.5;
-            
-            shopData.forEach((shop, index) => {
-                const angle = (index / shopData.length) * Math.PI * 2;
-                const x = Math.cos(angle) * shopRadius;
-                const z = Math.sin(angle) * shopRadius;
-
-                // Create Texture (Try image, fallback to canvas)
-                const texture = createShopTexture(shop);
-                
-                // Card Geometry
-                const cardGeo = new THREE.BoxGeometry(2.5, 1.8, 0.1);
-                const cardMat = new THREE.MeshBasicMaterial({ map: texture });
-                const card = new THREE.Mesh(cardGeo, cardMat);
-                
-                card.position.set(x, shopY, z);
-                // Make card face outwards from center
-                card.lookAt(0, shopY, 0);
-                // Correct rotation to face outward (rotate 180 deg around Y)
-                card.rotateY(Math.PI);
-                
-                // Add Metadata for Raycaster
-                card.userData = { isShop: true, value: shop.value, name: shop.name };
-                
-                shopsGroup.add(card);
-            });
-
-            // Snow
-            const snowGeo = new THREE.BufferGeometry();
-            const snowCount = 600;
-            const pos = [];
-            for(let i=0; i<snowCount; i++) {
-                pos.push((Math.random()-0.5)*30, Math.random()*20, (Math.random()-0.5)*30);
-            }
-            snowGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-            const snowMat = new THREE.PointsMaterial({ size: 0.15, color: 0xffffff, transparent: true });
-            const snowSystem = new THREE.Points(snowGeo, snowMat);
-            scene.add(snowSystem);
-
-            // --- INTERACTION LOGIC (Drag to Rotate + Click to Select) ---
-            const raycaster = new THREE.Raycaster();
-            const pointer = new THREE.Vector2();
-
-            // Pointer Down: Start tracking
-            function onPointerDown(event) {
-                // If shop is selected (gift view), we still allow drag
-                isDragging = true;
-                previousPointerX = event.clientX || event.touches[0].clientX;
-                totalDragDistance = 0; // Reset distance to distinguish click vs drag
-            }
-
-            // Pointer Move: Rotate tree OR GIFT if dragging
-            function onPointerMove(event) {
-                if (!isDragging) return;
-
-                const clientX = event.clientX || (event.touches ? event.touches[0].clientX : 0);
-                const deltaX = clientX - previousPointerX;
-                
-                const sensitivity = 0.005;
-
-                // Check: Are we in Gift Mode or Tree Mode?
-                if (currentGift) {
-                    currentGift.rotation.y += deltaX * sensitivity;
-                } else {
-                    treeGroup.rotation.y += deltaX * sensitivity;
-                }
-
-                // Track total movement
-                totalDragDistance += Math.abs(deltaX);
-                
-                previousPointerX = clientX;
-            }
-
-            // Pointer Up: Decide if it was a Click or a Drag
-            function onPointerUp(event) {
-                isDragging = false;
-
-                // Only detect click if moved very little AND we are in tree mode (not gift mode)
-                if (totalDragDistance < 5 && !currentGift) {
-                    
-                    // Raycast Logic for Clicking
-                    const rect = renderer.domElement.getBoundingClientRect();
-                    
-                    // Handle touch or mouse coordinates
-                    let clientX, clientY;
-                    if (event.changedTouches && event.changedTouches.length > 0) {
-                        clientX = event.changedTouches[0].clientX;
-                        clientY = event.changedTouches[0].clientY;
-                    } else {
-                        clientX = event.clientX;
-                        clientY = event.clientY;
-                    }
-
-                    pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
-                    pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
-
-                    raycaster.setFromCamera(pointer, camera);
-                    const intersects = raycaster.intersectObjects(shopsGroup.children);
-
-                    if (intersects.length > 0) {
-                        const hit = intersects[0].object;
-                        if (hit.userData.isShop) {
-                            selectShopFrom3D(hit);
-                        }
-                    }
-                }
-            }
-
-            // Add Event Listeners (Support Mouse & Touch)
-            const canvasEl = renderer.domElement;
-            canvasEl.addEventListener('mousedown', onPointerDown);
-            canvasEl.addEventListener('mousemove', onPointerMove);
-            canvasEl.addEventListener('mouseup', onPointerUp);
-            canvasEl.addEventListener('mouseleave', () => { isDragging = false; });
-
-            canvasEl.addEventListener('touchstart', onPointerDown, { passive: false });
-            canvasEl.addEventListener('touchmove', onPointerMove, { passive: false });
-            canvasEl.addEventListener('touchend', onPointerUp);
-
-            // Animation Loop
-            const clock = new THREE.Clock();
-            function animate() {
-                animationId = requestAnimationFrame(animate);
-                
-                const delta = clock.getDelta();
-
-                if (!isDragging) {
-                    // Auto rotate whatever is visible
-                    if (currentGift) {
-                        currentGift.rotation.y += 0.005;
-                    } else {
-                        treeGroup.rotation.y += 0.003;
-                    }
-                }
-
-                // Snow
-                const positions = snowSystem.geometry.attributes.position.array;
-                for(let i=1; i<snowCount*3; i+=3) {
-                    positions[i] -= 0.05;
-                    if(positions[i] < 0) positions[i] = 20;
-                }
-                snowSystem.geometry.attributes.position.needsUpdate = true;
-
-                renderer.render(scene, camera);
-            }
+            initParticles();       
+            initInnerParticles();  
+            initShopCards();
             animate();
 
-            // Handle Resize
-            window.addEventListener('resize', () => {
-                const w = container.clientWidth;
-                const h = container.clientHeight;
-                camera.aspect = w / h;
-                camera.updateProjectionMatrix();
-                renderer.setSize(w, h);
+            let lastTap = 0;
+            container.addEventListener('touchend', (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                if (tapLength < 500 && tapLength > 0) {
+                    toggleExplosion();
+                    e.preventDefault();
+                }
+                lastTap = currentTime;
+            });
+            container.addEventListener('dblclick', toggleExplosion);
+
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+        // --- 新增：专门用于生成白色名字烟花的函数 ---
+        function launchShopNameFirework(text) {
+            // 1. 生成目标文字的坐标点
+            const textCoords = getSmartTextCoordinates(text);
+            const rocketStart = new THREE.Vector3(0, -300, 0);
+            const explosionCenter = new THREE.Vector3(0, 50, 0); // 在屏幕中心偏上爆炸
+
+            // 2. 创建升空的白色粒子 (Rocket)
+            const rocketGeo = new THREE.BufferGeometry().setFromPoints([rocketStart]);
+            const rocketMat = new THREE.PointsMaterial({
+                size: 15,
+                color: 0xffffff, // 纯白
+                map: fireworkTexture,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+            const rocket = new THREE.Points(rocketGeo, rocketMat);
+            scene.add(rocket);
+
+            // 3. 升空动画 (1秒)
+            const rocketPos = { y: rocketStart.y };
+            gsap.to(rocketPos, {
+                y: explosionCenter.y,
+                duration: 1.0,
+                ease: "power2.out",
+                onUpdate: () => {
+                    rocket.geometry.attributes.position.setY(0, rocketPos.y);
+                    rocket.geometry.attributes.position.needsUpdate = true;
+                },
+                onComplete: () => {
+                    // 4. 到达顶部，移除Rocket，生成文字粒子
+                    scene.remove(rocket);
+                    explodeIntoText(textCoords, explosionCenter);
+                }
             });
         }
 
-        // Texture Generator for Shops
-        function createShopTexture(shop) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 512;
-            canvas.height = 360;
-            const ctx = canvas.getContext('2d');
+        // --- 新增：文字爆炸逻辑 ---
+        function explodeIntoText(coords, centerPos) {
+            const count = coords.length;
+            const positions = new Float32Array(count * 3);
+            
+            // 初始所有点都在爆炸中心
+            for(let i=0; i<count; i++) {
+                positions[i*3] = centerPos.x;
+                positions[i*3+1] = centerPos.y;
+                positions[i*3+2] = centerPos.z;
+            }
 
-            // Background (Card style)
-            const gradient = ctx.createLinearGradient(0, 0, 512, 360);
-            gradient.addColorStop(0, '#fff');
-            gradient.addColorStop(1, '#eee');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, 512, 360);
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 5, // 粒子大小
+                color: 0xffffff, // 纯白
+                map: fireworkTexture,
+                transparent: true,
+                opacity: 1.0,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+
+            const textSystem = new THREE.Points(geometry, material);
+            scene.add(textSystem);
+
+            // 5. 粒子扩散成文字形状 (0.8秒)
+            // 我们不直接用GSAP数组tween，这太慢。我们用一个对象记录进度
+            const anim = { progress: 0 };
             
-            // Border
-            ctx.lineWidth = 20;
-            ctx.strokeStyle = '#D32F2F'; // Christmas Red
-            ctx.strokeRect(0, 0, 512, 360);
+            gsap.to(anim, {
+                progress: 1,
+                duration: 0.8,
+                ease: "back.out(1.2)", // 带一点弹性的爆炸感
+                onUpdate: () => {
+                    const posAttr = textSystem.geometry.attributes.position;
+                    const p = anim.progress;
+                    for(let i=0; i<count; i++) {
+                        const target = coords[i];
+                        // 从中心插值到目标点
+                        const x = centerPos.x + (target.x * p);
+                        const y = centerPos.y + (target.y * p);
+                        const z = centerPos.z + (target.z * p);
+                        posAttr.setXYZ(i, x, y, z);
+                    }
+                    posAttr.needsUpdate = true;
+                },
+                onComplete: () => {
+                    // 6. 停留一小会，然后消失
+                    gsap.to(material, {
+                        opacity: 0,
+                        duration: 1.5, // 慢慢消失
+                        delay: 0.5,    // 停留0.5秒
+                        onComplete: () => {
+                            scene.remove(textSystem);
+                            geometry.dispose();
+                            material.dispose();
+                        }
+                    });
+                }
+            });
+        }
+
+        // --- 新增：智能文字坐标生成 (适应不同长度的店铺名) ---
+        function getSmartTextCoordinates(text) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const width = 1024;
+            const height = 256;
+            canvas.width = width;
+            canvas.height = height;
+
+            // 根据字数调整字体大小
+            let fontSize = 100;
+            if (text.length > 10) fontSize = 70; 
+            if (text.length > 15) fontSize = 50;
+
+            ctx.font = `Bold ${fontSize}px Arial`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, width / 2, height / 2);
+
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+            const coords = [];
+            const step = 2; // 采样密度，越小越密
+
+            for(let y = 0; y < height; y += step) {
+                for(let x = 0; x < width; x += step) {
+                    if(data[(y * width + x) * 4 + 3] > 128) {
+                        coords.push({
+                            x: (x - width / 2) * 1.5, // 适当放大
+                            y: (height / 2 - y) * 1.5,
+                            z: (Math.random() - 0.5) * 5 // 增加一点点厚度
+                        });
+                    }
+                }
+            }
+            return coords;
+        }
+
+        // --- 修改 2: 更新文字坐标获取逻辑以支持3行 ---
+        function getTextCoordinates(textLines, fontSize) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const width = 1200;
+            const height = 500; 
+            canvas.width = width; 
+            canvas.height = height; 
             
-            // Text
-            ctx.fillStyle = '#1f2937';
-            ctx.font = 'bold 60px Arial';
+            ctx.font = fontSize || CONFIG.font;
+            ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
-            // Handle long names
-            const words = shop.name.split(' ');
-            if (words.length > 2) {
-                ctx.fillText(words.slice(0,2).join(' '), 256, 140);
-                ctx.fillText(words.slice(2).join(' '), 256, 220);
+            if (textLines.length === 1) {
+                ctx.fillText(textLines[0], width / 2, height / 2);
+            } else if (textLines.length === 2) {
+                ctx.fillText(textLines[0], width / 2, height * 0.35);
+                ctx.fillText(textLines[1], width / 2, height * 0.75);
             } else {
-                ctx.fillText(shop.name, 256, 180);
+                // 三行文字排版
+                ctx.fillText(textLines[0], width / 2, height * 0.22);
+                ctx.fillText(textLines[1], width / 2, height * 0.50);
+                ctx.fillText(textLines[2], width / 2, height * 0.78);
             }
             
-            // Add a small icon graphic (Circle)
-            ctx.beginPath();
-            ctx.arc(256, 60, 20, 0, Math.PI*2);
-            ctx.fillStyle = '#D32F2F';
-            ctx.fill();
+            const imageData = ctx.getImageData(0,0,width,height);
+            const data = imageData.data;
+            const coords = [];
+            const step = 4; 
 
-            const tex = new THREE.CanvasTexture(canvas);
-            
-            // Attempt to load real image, if successful, replace texture
-            const img = new Image();
-            img.src = shop.img;
-            img.onload = () => {
-                const imgCanvas = document.createElement('canvas');
-                imgCanvas.width = 512;
-                imgCanvas.height = 360;
-                const iCtx = imgCanvas.getContext('2d');
-                // Draw rounded rect clip
-                iCtx.fillStyle = '#fff';
-                iCtx.fillRect(0,0,512,360);
-                iCtx.drawImage(img, 0, 0, 512, 360);
-                
-                // Add Name overlay
-                iCtx.fillStyle = 'rgba(211, 47, 47, 0.9)';
-                iCtx.fillRect(0, 290, 512, 70);
-                iCtx.fillStyle = '#fff';
-                iCtx.font = 'bold 40px Arial';
-                iCtx.textAlign = 'center';
-                iCtx.fillText(shop.name, 256, 335);
-                
-                tex.image = imgCanvas;
-                tex.needsUpdate = true;
-            };
-
-            return tex;
-        }
-
-        // Helper: Create 3D Gift Box
-        function createGiftBox() {
-            const giftGroup = new THREE.Group();
-
-            // Main Box
-            const boxGeo = new THREE.BoxGeometry(3, 3, 3);
-            const boxMat = new THREE.MeshStandardMaterial({ color: 0xD32F2F, roughness: 0.4 }); // Red
-            const box = new THREE.Mesh(boxGeo, boxMat);
-            giftGroup.add(box);
-
-            // Ribbon Material
-            const ribMat = new THREE.MeshStandardMaterial({ color: 0xFFD700, metalness: 0.3, roughness: 0.2 }); // Gold
-
-            // Ribbon 1 (Y-axis wrap)
-            const rib1Geo = new THREE.BoxGeometry(3.1, 3.1, 0.5);
-            const rib1 = new THREE.Mesh(rib1Geo, ribMat);
-            giftGroup.add(rib1);
-
-            // Ribbon 2 (X-axis wrap)
-            const rib2Geo = new THREE.BoxGeometry(0.5, 3.1, 3.1);
-            const rib2 = new THREE.Mesh(rib2Geo, ribMat);
-            giftGroup.add(rib2);
-
-            // Lid
-            const lidGeo = new THREE.BoxGeometry(3.2, 0.5, 3.2);
-            const lid = new THREE.Mesh(lidGeo, boxMat);
-            lid.position.y = 1.6;
-            giftGroup.add(lid);
-
-            // Bow (Simplified as crossed torus knots or boxes)
-            const bowGeo = new THREE.TorusKnotGeometry(0.6, 0.15, 64, 8);
-            const bow = new THREE.Mesh(bowGeo, ribMat);
-            bow.position.y = 2.1;
-            bow.rotation.x = Math.PI / 2;
-            giftGroup.add(bow);
-
-            return giftGroup;
-        }
-
-        function selectShopFrom3D(mesh) {
-            playEffect('select');
-            
-            // 1. Logic: Select Radio
-            const radio = document.querySelector(`input[value="${mesh.userData.value}"]`);
-            if(radio) {
-                radio.checked = true;
-                
-                // 2. Hide Tree Scene
-                treeGroup.visible = false;
-
-                // 3. Create and Show Gift
-                if (currentGift) scene.remove(currentGift);
-                currentGift = createGiftBox();
-                // Position gift nicely in camera view (Camera is at y=5)
-                currentGift.position.set(0, 4, 0); 
-                
-                // Add scale animation effect
-                currentGift.scale.set(0.1, 0.1, 0.1);
-                scene.add(currentGift);
-                
-                // Simple scale up animation
-                let scale = 0.1;
-                const scaleInt = setInterval(() => {
-                    scale += 0.1;
-                    if(scale >= 1) {
-                        currentGift.scale.set(1,1,1);
-                        clearInterval(scaleInt);
-                    } else {
-                        currentGift.scale.set(scale, scale, scale);
+            for(let y=0; y<height; y+=step) {
+                for(let x=0; x<width; x+=step) {
+                    if(data[(y*width+x)*4+3] > 128) {
+                        coords.push({
+                            x: (x - width/2) * 1.0, 
+                            y: (height/2 - y) * 1.0
+                        });
                     }
-                }, 20);
-
-                // 4. Update UI
-                document.getElementById('categoryTitle').style.display = 'block';
-                document.getElementById('categoryContainer').style.display = 'grid';
-                document.getElementById('searchContainer').style.display = 'flex';
-                
-                document.getElementById('reset-3d-btn').style.display = 'flex'; 
-                document.getElementById('canvas-msg').innerText = "Swipe to rotate gift • Selected: " + mesh.userData.name;
-
-                setTimeout(() => { 
-                    document.getElementById('categoryTitle').scrollIntoView({ behavior: 'smooth', block: 'start' }); 
-                }, 100);
-                
-                toggleItems();
-                updatePreview();
-            }
-        }
-
-        function reset3DView() {
-            playEffect('click');
-            
-            // 1. Restore Tree Scene
-            if (currentGift) {
-                scene.remove(currentGift);
-                currentGift = null;
-            }
-            treeGroup.visible = true;
-
-            document.getElementById('reset-3d-btn').style.display = 'none';
-            document.getElementById('canvas-msg').innerText = "Swipe to rotate • Tap card to select";
-            
-            // Hide categories logic
-            document.getElementById('categoryTitle').style.display = 'none';
-            document.getElementById('categoryContainer').style.display = 'none';
-            document.getElementById('searchContainer').style.display = 'none';
-            document.getElementById('productList').style.display = 'none';
-            document.getElementById('selectItemsTitle').style.display = 'none';
-            
-            // Uncheck radios
-            const checked = document.querySelector('input[name="store"]:checked');
-            if(checked) checked.checked = false;
-        }
-
-        // ==========================================
-        // APP CONFIG & LOGIC (Preserved)
-        // ==========================================
-        
-        const authFirebaseConfig = {
-            apiKey: "AIzaSyCiwlw10jP3RTyLZ69bh0fAqZjUSwD59Xc",
-            authDomain: "order-pro-c0af9.firebaseapp.com",
-            databaseURL: "https://order-pro-c0af9-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "order-pro-c0af9",
-            storageBucket: "order-pro-c0af9.firebasestorage.app",
-            messagingSenderId: "1062589065402",
-            appId: "1:1062589065402:web:499c586bdfb399a461ba83",
-            measurementId: "G-4W7C1FKW1M"
-        };
-        const stockFirebaseConfig = {
-            apiKey: "AIzaSyDAK5KVv9oln2qS5EfNzox1snM19wa83-o",
-            authDomain: "smart-profits-stock.firebaseapp.com",
-            databaseURL: "https://smart-profits-stock-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "smart-profits-stock",
-            storageBucket: "smart-profits-stock.firebasestorage.app",
-            messagingSenderId: "1029424292465",
-            appId: "1:1029424292465:web:6de46925db8818d462b1d0",
-            measurementId: "G-R0K4Q7JTGE"
-        };
-
-        const authApp = firebase.initializeApp(authFirebaseConfig);
-        const db = authApp.database();
-        const auth = authApp.auth();
-        const stockApp = firebase.initializeApp(stockFirebaseConfig, "stock");
-        const stockDb = stockApp.database();
-
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playEffect(type) {
-            try {
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                const gainNode = audioCtx.createGain();
-                gainNode.connect(audioCtx.destination);
-                if (type === 'add') playTone(880, 0.1, 'sine');
-                else if (type === 'remove') playTone(440, 0.1, 'sine');
-                else if (type === 'select') { playTone(600, 0.05, 'triangle'); setTimeout(() => playTone(800, 0.05, 'triangle'), 100); }
-                else if (type === 'success') { playTone(523.25, 0.1, 'sine'); setTimeout(() => playTone(659.25, 0.1, 'sine'), 150); setTimeout(() => playTone(783.99, 0.2, 'sine'), 300); }
-                else playTone(800, 0.03, 'sine');
-                if (localStorage.getItem('vibration-enabled') !== 'disabled' && window.navigator.vibrate) window.navigator.vibrate(10);
-            } catch(e) {}
-        }
-        function playTone(freq, duration, type) {
-            try {
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                oscillator.type = type; oscillator.frequency.value = freq;
-                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                oscillator.connect(gainNode); gainNode.connect(audioCtx.destination);
-                oscillator.start(); oscillator.stop(audioCtx.currentTime + duration);
-            } catch(e) {}
-        }
-
-        let stockMap = {};
-        let currentUser = null;
-        let userRole = "User";
-        let selectedItems = {};
-        let currentView = localStorage.getItem('view-mode') || 'list';
-        let splashShown = false;
-        window.allProducts = {};
-
-        // Product Categories Data
-        const categories = {
-            BanHeang: [
-                { id: 101, name: "BH Tambun Original" }, { id: 102, name: "BH Tambun Pandan" }, { id: 103, name: "BH Tambun White Lotus" },
-                { id: 104, name: "BH Tau Sar Pheah" }, { id: 166, name: "BH Tau Sar Pheah Spicy Shrimp" },
-                { id: 170, name: "BH Tau Shar Pheah Durian" }, { id: 171, name: "BH Tau Shar Pheah Salted Egg" },
-                { id: 172, name: "BH Tau Shar Pheah Almond" }, { id: 173, name: "BH Tau Shar Pheah Cheese" },
-                { id: 174, name: "BH Tau Shar Pheah Original" }, { id: 175, name: "BH Tau Shar Pheah Matcha" },
-                { id: 176, name: "BH Tau Shar Pheah Paprika Seaweed" }, { id: 178, name: "BH Tau Shar Pheah White Coffee" },
-                { id: 179, name: "BH Tau Shar Pheah Cempedak" }, { id: 180, name: "BH Tau Shar Pheah Strawberry" },
-                { id: 105, name: "BH Heong Pheah" }, { id: 106, name: "BH Beh Teh Saw" }, { id: 107, name: "BH Phong Pheah" },
-                { id: 108, name: "BH Pepper Biscuit" }, { id: 109, name: "BH Hup Toh Soh" },
-                { id: 110, name: "BH Omelette Crisp Chocolate" }, { id: 111, name: "BH Omelette Crisp Pandan" },
-                { id: 112, name: "BH Kai Chai Biscuit" }, { id: 113, name: "BH Almond Slice" },
-                { id: 114, name: "BH Almond Slice Salted Egg" }, { id: 115, name: "BH Durian Crisp" },
-                { id: 116, name: "BH Coconut Crisp" }, { id: 117, name: "BH Salted Fish Crisp" },
-                { id: 118, name: "BH Salted Egg Crisp" }, { id: 119, name: "BH Cheese Crisp" },
-                { id: 120, name: "BH Chic Kut Teh" }, { id: 121, name: "BH Ginger Slice" },
-                { id: 122, name: "BH Dried Mango" }, { id: 123, name: "BH Kacang Tumbuk" },
-                { id: 124, name: "BH Gula Kacang" }, { id: 125, name: "BH Black Sesame Peanut" },
-                { id: 126, name: "BH Shat Kek Ma" }, { id: 127, name: "BH Shat Kek Ma (Brown Sugar)" },
-                { id: 128, name: "BH Coconut Biscuits" }, { id: 129, name: "BH Freeze Dried Durian 50g" },
-                { id: 130, name: "BH Freeze Dried Mango 50g" }, { id: 131, name: "BH Freeze Dried Durian 30g" },
-                { id: 160, name: "BH Freeze Dried Mango 30g" }, { id: 161, name: "BH Freeze Dried Cempedak 25g" },
-                { id: 162, name: "BH Freeze Dried Jackfruit 30g" }, { id: 167, name: "BH Freeze Dried Strawberry 20g" },
-                { id: 132, name: "BH Butter Cookies" }, { id: 133, name: "BH Chocolate Cookies" },
-                { id: 134, name: "BH Raisin Cookies" }, { id: 135, name: "BH Almond Cookies" },
-                { id: 136, name: "BH Pineapple Tart" }, { id: 137, name: "BH Red Bean Mochi" },
-                { id: 138, name: "BH Peanut Mochi" }, { id: 139, name: "BH Green Tea Mochi" },
-                { id: 140, name: "BH Durian Mochi" }, { id: 141, name: "BH Yam Mochi" },
-                { id: 142, name: "BH Mochi Milk Yam Filling" }, { id: 143, name: "BH Mochi Milk Mango Filling" },
-                { id: 144, name: "BH Mochi Milk Green Tea" }, { id: 145, name: "BH Sotong Cuttlefish" },
-                { id: 146, name: "BH Gula Sotong Cuttlefish" }, { id: 147, name: "BH Satay Fish" },
-                { id: 148, name: "BH Fillet Cracker With Anchovy" }, { id: 149, name: "BH Fillet Cracker With Seaweed" },
-                { id: 150, name: "BH Sakura Shrimp" }, { id: 151, name: "BH Frugurt Yogurt Blueberry" },
-                { id: 152, name: "BH Frugurt Yogurt Peach" }, { id: 153, name: "BH Frugurt Yogurt Mango" },
-                { id: 154, name: "BH Durian Pudding" }, { id: 155, name: "BH Coconut Pudding" },
-                { id: 156, name: "BH Dodol Durian" }, { id: 157, name: "BH Dodol Coconut" },
-                { id: 158, name: "BH Dodol Pandan" }, { id: 159, name: "BH Durian Beh Teh Saw" },
-                { id: 168, name: "Coconut Chip 50g" }, { id: 163, name: "Fruity Marshmallow" },
-                { id: 164, name: "Matcha Marshmallow" }, { id: 165, name: "Durian Marshmallow" },
-                { id: 190, name: "BH Original Cracker" },{ id: 191, name: "BH Chocolate Cracker" },
-                { id: 192, name: "BH Original Cracker (Durian)" },{ id: 193, name: "BH Chocolate Cracker (Mango)" },
-                { id: 177, name: "BH Shopping Bag" }
-            ],
-            HoeHup: [
-              { id: 201, name: "HH Durian Tart" },        { id: 202, name: "HH Mango Tart" },           { id: 203, name: "HH Dried Fruit Mango" },
-{ id: 204, name: "HH Durian Wafer Roll" },  { id: 205, name: "HH Mango Wafer Roll" },     { id: 206, name: "HH Omelette Crisp Durian" },
-{ id: 207, name: "HH Coconut Ori Cookies" },{ id: 208, name: "HH Coconut Pandan Cookies" },{ id: 209, name: "HH Dodol Original" },
-{ id: 210, name: "HH Dodol Kopi" },          { id: 211, name: "HH Dodol Durian" },         { id: 212, name: "HH Freeze Dried Mango" },
-{ id: 213, name: "HH Freeze Dried Durian" }, { id: 214, name: "Salted Egg Fish Skin" },    { id: 215, name: "Salted Egg Fish Skin Spicy" },
-{ id: 216, name: "Salted Egg Salmon Skin" }, { id: 217, name: "Salted Egg Salmon Skin Spicy" }, { id: 218, name: "Musang King Durian Candy" },
-{ id: 219, name: "HH Durian Cookies" },      { id: 220, name: "Fish Chips Classic" },      { id: 221, name: "HH Crisp - So Original" },
-{ id: 222, name: "HH Crisp - So Seaweed" },  { id: 223, name: "HH Crisp - So Shrimp" },    { id: 224, name: "Salted Egg Fish Chips" },
-{ id: 225, name: "Salted Egg Fish Chips Mala" }, { id: 226, name: "Cuttlefish Red" },       { id: 227, name: "Cuttlefish Lemon" },
-{ id: 228, name: "Cuttlefish Honey" },       { id: 229, name: "Cuttlefish Floss Original" },{ id: 230, name: "Cuttlefish Massive" },
-{ id: 231, name: "Cuttlefish Whole" },       { id: 232, name: "Cuttlefish Roasted" },      { id: 233, name: "Cuttlefish Chili" },
-{ id: 234, name: "Cuttlefish Slices" },      { id: 235, name: "Cuttlefish Sugar" },        { id: 236, name: "Five Star Cuttlefish" }
-
-            ],
-        
-            Chocolate: [
-                { id: 314, name: "Sabah Tea Chocolate Original", unit: 'pc', defaultQuantity: 70 }, { id: 315, name: "Sabah Tea Chocolate Mangosteen", unit: 'pc', defaultQuantity: 70 },
-                { id: 316, name: "Sabah Tea Chocolate Tenom Coffee", unit: 'pc', defaultQuantity: 70 }, { id: 317, name: "Sabah Tea Chocolate Durian", unit: 'pc', defaultQuantity: 70 },
-                { id: 301, name: "AD Chocolate Durian", unit: 'pc', defaultQuantity: 50 }, { id: 302, name: "AD Chocolate Sabah Tea", unit: 'pc', defaultQuantity: 50 },
-                { id: 303, name: "AD Chocolate Mango", unit: 'pc', defaultQuantity: 50 }, { id: 304, name: "AD Chocolate Chili", unit: 'pc', defaultQuantity: 50 },
-                { id: 305, name: "AD Chocolate Dark", unit: 'pc', defaultQuantity: 50 }, { id: 306, name: "AD Chocolate Coffee", unit: 'pc', defaultQuantity: 50 },
-                { id: 307, name: "AD Chocolate Banana", unit: 'pc', defaultQuantity: 50 }, { id: 308, name: "AD Chocolate Tiramisu", unit: 'pc', defaultQuantity: 50 },
-                { id: 309, name: "AD Chocolate Mint", unit: 'pc', defaultQuantity: 50 }, { id: 310, name: "AD Chocolate Rambutan", unit: 'pc', defaultQuantity: 50 },
-                { id: 311, name: "AD Chocolate Soursup", unit: 'pc', defaultQuantity: 50 }, { id: 312, name: "AD Chocolate Coconut", unit: 'pc', defaultQuantity: 50 },
-                { id: 313, name: "AD Chocolate Mangosteen", unit: 'pc', defaultQuantity: 50 }
-            ],
-            Seafood: [
-                { id: 401, name: "Tiger Prawn 3/7" }, { id: 402, name: "Flower Prawn 7/12" }, { id: 403, name: "Flower Prawn 12/18" },
-                { id: 404, name: "Flower Prawn 18/25" }, { id: 405, name: "Flower Prawn 25/35" }, { id: 406, name: "Yellow Prawn 10/20" },
-                { id: 407, name: "Yellow Prawn 26/35" }, { id: 408, name: "Sunoh" }, { id: 409, name: "Hoi Tai Kai" },
-                { id: 410, name: "Kerapu Tikus" }, { id: 411, name: "Telur Ikan" },{ id: 412, name: "Scallop" },
-                { id: 413, name: "Slipper Lobster" }, { id: 414, name: "Udang Kering" },{ id: 415, name: "Kua Chi Lap" },
-                { id: 416, name: "Conch Meat" }, { id: 417, name: "Crab Meat" },{ id: 418, name: "Hoi Li" },
-                { id: 419, name: "Ikan Bilis Mata Biru" }, { id: 420, name: "Sotong Kering" },{ id: 421, name: "Black Empurau (1.5kg-2kg)" },
-                { id: 422, name: "Black Empurau (3.5kg up)" }, { id: 423, name: "Isi Keratang" },{ id: 424, name: "Baby Lobster" },
-                { id: 425, name: "Sea Cucumber Tusen" }, { id: 426, name: "Ikan bilis mata biru besar" },{ id: 427, name: "Sotong Cumi-Cumi" },
-                { id: 428, name: "Ikan Masin Tipis" }, { id: 429, name: "Sea Cucumber Susu" }
-            ],
-            Coffee: [
-                { id: 501, name: "BH White Coffee Mini" }, { id: 502, name: "BH White Coffee NS Mini" }, { id: 503, name: "BH Durian White Coffee Mini" },
-                { id: 504, name: "BH Teh Tarik Mini" }, { id: 516, name: "BH Teh Tarik Mini 5 packet" }, { id: 505, name: "BH W/Coffee" },
-                { id: 506, name: "BH W/Coffee No Sugar" }, { id: 507, name: "BH Kopi O 2in1" }, { id: 508, name: "BH Kopi O No Sugar" },
-                { id: 509, name: "BH Teh Tarik" }, { id: 510, name: "BH Durian White Coffee" }, { id: 511, name: "Kopi Tenom Silver" },
-                { id: 512, name: "Kopi Tenom Gold" }, { id: 513, name: "Kopi Tenom Blue" }, { id: 514, name: "Kopi Tenom Green" },
-                { id: 515, name: "Kopi Tenom Red" }
-            ],
-            Amplang: [
-                { id: 601, name: "Amplang Ikan", unit: 'bdl', defaultQuantity: 1 }, { id: 602, name: "Amplang Udang", unit: 'bdl', defaultQuantity: 1 },
-                { id: 603, name: "Amplang Sotong", unit: 'bdl', defaultQuantity: 1 }, { id: 604, name: "Amplang Ikan 30Pkt", unit: 'bdl', defaultQuantity: 1 },
-                { id: 605, name: "Amplang Udang 30pkt", unit: 'bdl', defaultQuantity: 1 }, { id: 606, name: "Amplang Pandan 180g", unit: 'bdl', defaultQuantity: 1 },
-                { id: 607, name: "Amplang Tomyum 180g", unit: 'bdl', defaultQuantity: 1 }, { id: 608, name: "Amplang Sotong 200g", unit: 'bdl', defaultQuantity: 1 },
-                { id: 609, name: "Amplang Udang 200g", unit: 'bdl', defaultQuantity: 1 }, { id: 610, name: "Amplang Ikan 200g", unit: 'bdl', defaultQuantity: 1 },
-                { id: 611, name: "Amplang Cheese 200g", unit: 'bdl', defaultQuantity: 1 }, { id: 612, name: "Amplang Ayam", unit: 'bdl', defaultQuantity: 1 }
-            ],
-            Other: [
-                { id: 701, name: "Fruity Gummy Assorted" }, { id: 702, name: "Fruity Gummy Mango" }, { id: 720, name: "Sour Gummy Blackcurrant" },
-                { id: 711, name: "Sour Gummy Apple" }, { id: 710, name: "Sour Gummy Orange" }, { id: 703, name: "Durian Kuih" }, { id: 704, name: "Anchovy Blue" },
-                { id: 705, name: "Anchovy Green" }, { id: 706, name: "Anchovy Red" }, { id: 707, name: "Anchovy Yellow" },
-                { id: 713, name: "A1 Bak Kut Teh" }, { id: 708, name: "Prawn Cracker 500g", unit: 'pkt' }, { id: 709, name: "Fish Maw", unit: 'pkt' }
-            ],
-            Wrapping: [
-                { id: 801, name: "Wrapping Machine", unit: 'roll' }, { id: 802, name: "Wrapping Mini", unit: 'roll' }, { id: 809, name: "Neck Pillow", unit: 'pc' }
-            ],
-            Office: [
-                { id: 901, name: "Assorted candy", unit: 'ctn' }, { id: 902, name: "Assorted jelly", unit: 'ctn' },
-                { id: 903, name: "Dried mango", unit: 'ctn' }, { id: 904, name: "Coconut milk candy", unit: 'ctn' },
-                { id: 905, name: "Durian milk candy", unit: 'ctn' }, { id: 906, name: "Bird Nest Candy", unit: 'ctn' },
-                { id: 907, name: "Traditional Coconut Candy", unit: 'ctn' }, { id: 908, name: "Kuih Cincin Mini (office)", unit: 'ctn' },
-                { id: 909, name: "Kuih Cincin Besar (office)", unit: 'ctn' }, { id: 910, name: "Kerepek Pisang Manis", unit: 'ctn' },{ id: 911, name: "Kerepek Pisang Masin", unit: 'ctn' }
-            ]
-        };
-
-        function playOpeningAnimation(callback) {
-            const splash = document.getElementById('splashScreen');
-            const mainContent = document.getElementById('mainAppContent');
-            splash.style.display = 'flex'; mainContent.style.opacity = '0';
-            setTimeout(() => {
-                splash.style.opacity = '0';
-                setTimeout(() => { splash.style.display = 'none'; splash.style.opacity = '1'; mainContent.style.opacity = '1'; if (callback) callback(); }, 500);
-            }, 2500);
-        }
-
-        function createSnowflakes() {
-            const container = document.getElementById('snow-container');
-            for (let i = 0; i < 20; i++) {
-                const snowflake = document.createElement('div');
-                snowflake.className = 'snowflake'; snowflake.textContent = '❄';
-                snowflake.style.left = Math.random() * 100 + 'vw';
-                snowflake.style.animationDuration = Math.random() * 3 + 5 + 's';
-                snowflake.style.opacity = Math.random() * 0.5 + 0.3;
-                snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
-                snowflake.style.animationDelay = Math.random() * 5 + 's';
-                container.appendChild(snowflake);
-            }
-        }
-
-        function initAllProducts() {
-            window.allProducts = {};
-            Object.entries(categories).forEach(([category, products]) => {
-                products.forEach(product => { window.allProducts[product.id] = product; });
-            });
-        }
-
-        function loadProducts(products) {
-            const productList = document.getElementById('productList');
-            productList.innerHTML = '';
-            Promise.all([ db.ref('newProducts').once('value'), db.ref('productBoxes').once('value') ]).then(([newProductsSnapshot, productBoxesSnapshot]) => {
-                const newProductsData = newProductsSnapshot.val() || {};
-                const sortedProducts = [...products].sort((a, b) => {
-                    const stockA = stockMap[a.name] || 0; const stockB = stockMap[b.name] || 0;
-                    if ((stockA > 0) === (stockB > 0)) return 0; return stockA > 0 ? -1 : 1;
-                });
-                sortedProducts.forEach(product => {
-                    const div = document.createElement('div');
-                    div.setAttribute('data-product-id', product.id);
-                    const isNew = newProductsData[product.id];
-                    const isStillNew = isNew && new Date(isNew.until) > new Date();
-                    if (isStillNew) div.classList.add('new-product-glow');
-                    const isChecked = selectedItems[product.id] ? 'checked' : '';
-                    const defaultQuantity = product.defaultQuantity || 1;
-                    const currentQuantity = selectedItems[product.id] || defaultQuantity;
-                    
-                    if (currentView === 'grid') {
-                        const hasImage = product.imageUrl ? true : false;
-                        const imageHTML = hasImage ? 
-                            `<div class="product-image" onclick="showImage('${product.imageUrl}', '${product.name}'); event.stopPropagation();">
-                                <img src="${product.imageUrl}" alt="${product.name}" onerror="this.style.display='none';this.parentNode.innerHTML='<span class=\'material-icons-round\' style=\'font-size:32px;color:var(--text-secondary)\'>inventory_2</span>'">
-                             </div>` : 
-                            `<div class="product-image"><span class="material-icons-round" style="font-size: 32px; color: var(--text-secondary);">inventory_2</span></div>`;
-                        div.innerHTML = `
-                            <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
-                            <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
-                            ${isStillNew ? '<span style="position:absolute; top:5px; left:5px; background:red; color:white; font-size:10px; padding:2px 4px; border-radius:4px; z-index:5">NEW</span>' : ''}
-                            ${imageHTML}
-                            <span class="product-name" onclick="document.getElementById('item${product.id}').click()">${product.name}</span>
-                            <span class="stock-info" id="stock${product.id}" style="font-size:0.8rem; color: var(--text-secondary); margin-bottom:6px;">Checking...</span>
-                            <div class="quantity-controls-wrapper">
-                                <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)"><span class="material-icons-round">add</span></button>
-                                <input type="number" id="quantity${product.id}" min="1" value="${currentQuantity}" readonly>
-                                <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)"><span class="material-icons-round">remove</span></button>
-                            </div>
-                        `;
-                    } else {
-                        const viewImageButton = product.imageUrl ? `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}'); event.stopPropagation();"><span class="material-icons-outlined" style="font-size: 14px; margin-right: 2px;">image</span> View</button>` : '';
-                        const newBadge = isStillNew ? '<span style="background:red; color:white; font-size:10px; padding:1px 4px; border-radius:4px; margin-left:5px;">NEW</span>' : '';
-                        div.innerHTML = `
-                            <div style="display:flex; align-items:center; flex:1;">
-                                <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
-                                <label for="item${product.id}">
-                                    <div style="display:flex; align-items:center;">${product.name} ${newBadge} ${viewImageButton}</div>
-                                    <span id="stock${product.id}" style="font-size:0.8rem; color: var(--text-secondary);">Checking...</span>
-                                </label>
-                            </div>
-                            <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
-                            <div class="quantity-controls-wrapper">
-                                 <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)"><span class="material-icons-round">remove</span></button>
-                                 <input type="number" id="quantity${product.id}" min="1" value="${currentQuantity}" readonly>
-                                 <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)"><span class="material-icons-round">add</span></button>
-                            </div>
-                        `;
-                    }
-                    productList.appendChild(div);
-                });
-                loadQuantitiesFromFirebase();
-                updateProductBoxDisplay();
-            });
-        }
-
-        // --- Admin Functions ---
-        function openAdminPanel() { playEffect('click'); document.getElementById('adminPanel').style.display = 'flex'; loadUsersList(); initAdminPanel(); showAdminTab('users'); }
-        function showAdminTab(tabName) {
-            playEffect('click'); document.querySelectorAll('.admin-tab-content').forEach(tab => tab.style.display = 'none'); document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
-            document.getElementById(tabName + '-tab').style.display = 'block'; document.querySelector(`.tab-button[onclick="showAdminTab('${tabName}')"]`).classList.add('active');
-            if (tabName === 'products') { const sel = document.getElementById('categorySelect'); if (sel.value) loadProductsForAdmin(); }
-            if (tabName === 'announcement') loadAnnouncementSettings();
-        }
-        function initAdminPanel() { const sel = document.getElementById('categorySelect'); sel.innerHTML = '<option value="">-- Select Category --</option>'; Object.keys(categories).forEach(c => { const o = document.createElement('option'); o.value = c; o.text = c; sel.add(o); }); }
-        
-        function loadUsersList() {
-            db.ref('users').once('value').then(snapshot => {
-                const pendingDiv = document.getElementById('pendingUsersList'); const allDiv = document.getElementById('allUsersList');
-                pendingDiv.innerHTML = ''; allDiv.innerHTML = '';
-                if (!snapshot.exists()) { pendingDiv.innerHTML = '<p>No pending users.</p>'; allDiv.innerHTML = '<p>No users found.</p>'; return; }
-                snapshot.forEach(child => {
-                    const uid = child.key; const user = child.val();
-                    if (user.status === 'pending') { pendingDiv.innerHTML += `<div class="user-card"><div class="user-name">${user.name} (${user.email})</div><div style="margin-top:5px;"><button class="action-button approve" onclick="approveUser('${uid}')">Approve</button></div></div>`; }
-                    if (userRole === 'Admin' && user.role === 'SAdmin') return;
-                    let actions = '';
-                    if (userRole === 'SAdmin' && uid !== currentUser.uid) {
-                        if (user.role === 'User') actions += `<button class="action-button promote" onclick="changeUserRole('${uid}','User','Admin')">Make Admin</button>`;
-                        if (user.role === 'Admin') actions += `<button class="action-button demote" onclick="changeUserRole('${uid}','Admin','User')">Demote</button>`;
-                        actions += `<button class="action-button delete" onclick="deleteUser('${uid}')">Delete</button>`;
-                    }
-                    if (user.status === 'pending') actions = `<button class="action-button approve" onclick="approveUser('${uid}')">Activate</button>` + actions;
-                    allDiv.innerHTML += `<div class="user-card"><div class="user-name">${user.name}</div><div class="user-status"><span style="color:${user.status === 'active' ? 'var(--success-color)' : 'orange'}">● ${user.status}</span><span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">${user.role}</span></div><div style="margin-top:8px;">${actions}</div></div>`;
-                });
-                if (pendingDiv.innerHTML === '') pendingDiv.innerHTML = '<p style="color:var(--text-secondary)">No pending users.</p>';
-            });
-        }
-        function approveUser(uid) { playEffect('success'); db.ref(`users/${uid}`).update({ status: 'active' }).then(() => { alert('Approved'); loadUsersList(); }); }
-        function changeUserRole(uid, oldRole, newRole) { if(confirm(`Change role?`)) { playEffect('click'); db.ref(`users/${uid}`).update({ role: newRole }).then(() => { alert('Role updated'); loadUsersList(); }); } }
-        function deleteUser(uid) { if(confirm('Delete user?')) { playEffect('click'); db.ref(`users/${uid}`).remove().then(() => { alert('Deleted'); loadUsersList(); }); } }
-
-        function loadProductsForAdmin() {
-            const cat = document.getElementById('categorySelect').value; const div = document.getElementById('productManagementList');
-            if (!cat) return; const products = categories[cat]; div.innerHTML = 'Loading...';
-            Promise.all([ db.ref('newProducts').once('value'), db.ref('productBoxes').once('value') ]).then(([newSnap, boxSnap]) => {
-                const newData = newSnap.val() || {}; const boxData = boxSnap.val() || {}; div.innerHTML = '';
-                products.forEach(p => {
-                    const isNew = newData[p.id]; const newUntil = isNew ? new Date(isNew.until) : null; const isStillNew = isNew && newUntil > new Date(); const boxCount = boxData[p.id] || 0;
-                    div.innerHTML += `<div class="product-item ${isStillNew ? 'new-product' : ''}"><div style="font-weight:bold; margin-bottom:5px;">${p.name} ${isStillNew ? '🔥' : ''}</div><label style="font-size:0.85rem; display:block;">Unit Count: <input type="number" value="${boxCount}" onchange="saveProductBoxCount(${p.id}, this.value)" style="width:60px; padding:4px;"></label><div style="margin-top:8px;">${isStillNew ? `<button class="action-button delete" onclick="toggleNewProduct(${p.id}, false)">Remove New Tag</button>` : `<button class="action-button promote" onclick="toggleNewProduct(${p.id}, true)">Mark as New</button>`}</div></div>`;
-                });
-            });
-        }
-        function saveProductBoxCount(pid, val) { db.ref(`productBoxes/${pid}`).set(parseInt(val)); }
-        function toggleNewProduct(pid, state) { if(state) { const until = new Date(); until.setDate(until.getDate() + 7); db.ref(`newProducts/${pid}`).set({ markedAt: Date.now(), until: until.getTime() }).then(() => loadProductsForAdmin()); } else { db.ref(`newProducts/${pid}`).remove().then(() => loadProductsForAdmin()); } }
-
-        function toggleAnnouncement() { document.getElementById('announcementSettings').style.display = document.getElementById('announcementEnabled').checked ? 'block' : 'none'; }
-        function loadAnnouncementSettings() { db.ref('announcement').once('value').then(snap => { const data = snap.val(); if (data && data.enabled) { document.getElementById('announcementEnabled').checked = true; document.getElementById('announcementSettings').style.display = 'block'; document.getElementById('announcementText').value = data.text || ''; document.getElementById('announcementStartTime').value = data.startTime ? new Date(data.startTime).toISOString().slice(0,16) : ''; document.getElementById('announcementEndTime').value = data.endTime ? new Date(data.endTime).toISOString().slice(0,16) : ''; } else { document.getElementById('announcementEnabled').checked = false; document.getElementById('announcementSettings').style.display = 'none'; } }); }
-        function saveAnnouncementSettings() { playEffect('success'); const enabled = document.getElementById('announcementEnabled').checked; if (!enabled) { db.ref('announcement').set({ enabled: false }).then(() => alert('Announcement disabled')); return; } const data = { enabled: true, text: document.getElementById('announcementText').value, startTime: new Date(document.getElementById('announcementStartTime').value).getTime(), endTime: new Date(document.getElementById('announcementEndTime').value).getTime() }; db.ref('announcement').set(data).then(() => { alert('Saved'); loadAnnouncementSettings(); }); }
-
-        // --- Standard Logic ---
-        function showImage(url, name) { playEffect('click'); document.getElementById('modalImage').src = url; document.getElementById('imageModal').style.display = 'flex'; }
-        function closeImageModal() { playEffect('click'); document.getElementById('imageModal').style.display = 'none'; }
-        document.getElementById('imageModal').onclick = function(e) { if(e.target === this) closeImageModal(); }
-        
-        function toggleView(viewMode) {
-            playEffect('click'); currentView = viewMode; localStorage.setItem('view-mode', viewMode);
-            const productList = document.getElementById('productList');
-            if (viewMode === 'list') { productList.classList.remove('grid-view'); document.getElementById('listViewBtn').classList.add('active'); document.getElementById('listViewBtn').classList.remove('active'); document.getElementById('listViewBtn').classList.add('active'); document.getElementById('gridViewBtn').classList.remove('active'); } 
-            else { productList.classList.add('grid-view'); document.getElementById('listViewBtn').classList.remove('active'); document.getElementById('gridViewBtn').classList.add('active'); }
-            const selectedCategory = document.querySelector('input[name="category"]:checked');
-            if (selectedCategory && categories[selectedCategory.value]) loadProducts(categories[selectedCategory.value]);
-        }
-
-        function toggleVibration(enable) {
-            localStorage.setItem('vibration-enabled', enable ? 'enabled' : 'disabled');
-            playEffect('click');
-            document.getElementById('vibration-on-btn').style.backgroundColor = enable ? 'var(--primary-color)' : 'var(--surface-color)';
-            document.getElementById('vibration-on-btn').style.color = enable ? 'white' : 'var(--text-primary)';
-            document.getElementById('vibration-off-btn').style.backgroundColor = !enable ? 'var(--primary-color)' : 'var(--surface-color)';
-            document.getElementById('vibration-off-btn').style.color = !enable ? 'white' : 'var(--text-primary)';
-        }
-
-        function selectCategory(element, value) {
-            playEffect('select'); document.querySelectorAll('.category-card').forEach(card => card.classList.remove('selected'));
-            element.classList.add('selected'); element.querySelector('input[type="radio"]').checked = true;
-            document.getElementById('selectItemsTitle').style.display = 'flex'; document.getElementById('productList').style.display = 'flex';
-            if (categories[value]) loadProducts(categories[value]);
-            setTimeout(() => { document.getElementById('selectItemsTitle').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
-        }
-
-        function togglePreview() { playEffect('click'); const win = document.getElementById('preview-window'); win.style.display = win.style.display === 'none' ? 'block' : 'none'; }
-        function updatePreview() {
-            const content = document.getElementById('preview-content'); const itemsCount = Object.keys(selectedItems).length; const badge = document.getElementById('orderCountBadge');
-            if (itemsCount > 0) { badge.textContent = itemsCount; badge.style.display = 'flex'; } else { badge.style.display = 'none'; document.getElementById('preview-window').style.display = 'none'; }
-            content.innerHTML = generateText(false).replace(/\n/g, '<br>');
-        }
-
-        function generateText(forWhatsApp) {
-            let result = ''; let selectedStore = document.querySelector('input[name="store"]:checked'); let hasAddOn = document.getElementById('addOnCheckbox').checked; let totalItems = 0;
-            let userName = currentUser ? (currentUser.email ? currentUser.email.split('@')[0] : "Guest") : "Guest";
-            try { const nameEl = document.querySelector('#dashboardUserName'); if(nameEl && nameEl.textContent !== 'Not logged in') userName = nameEl.textContent; } catch(e){}
-            const now = new Date(); const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
-            let hours = now.getHours(); const ampm = hours >= 12 ? 'pm' : 'am'; hours = hours % 12; hours = hours ? hours : 12;
-            const timeStr = `${String(hours).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}${ampm}`;
-            if (selectedStore) { let storeName = selectedStore.value.replace(/\*/g, ''); result += `🎄 *${storeName}* ${hasAddOn ? '💥(ADD ON)' : ''}\n🎅 ${userName}\n📅 ${dateStr}\n🕠 ${timeStr}\n\n`; }
-            const categorizedItems = {}; Object.keys(categories).forEach(c => categorizedItems[c] = []);
-            for (const [id, quantity] of Object.entries(selectedItems)) { for (const [cat, products] of Object.entries(categories)) { const p = products.find(i => i.id == id); if (p) { categorizedItems[cat].push({ ...p, quantity }); if(p.name.includes("Chocolate")) totalItems += 1; else totalItems += parseInt(quantity); break; } } }
-            result += `📦 Total Items: *${totalItems}*\n`;
-            for (const [cat, items] of Object.entries(categorizedItems)) {
-                if (items.length > 0) {
-                    result += `\n🎁 ${cat} 🎁\n`;
-                    items.forEach(item => {
-                        const unit = item.unit || 'ctn';
-                        if (forWhatsApp) result += `${item.name} - ${item.quantity} ${unit}\n`;
-                        else result += `${(stockMap[item.name]||0)===0 ? `<span style="color:var(--danger-color)">${item.name}</span>` : item.name} - <b>${item.quantity} ${unit}</b>\n`;
-                    });
                 }
             }
-            result += '\n_Merry Christmas! 🎅_';
-            return result;
+            return coords;
         }
 
-        function loadQuantitiesFromFirebase() {
-            ['office', 'kepayan'].forEach(loc => {
-                stockDb.ref(`inventory/${loc}`).on('value', snap => {
-                    const data = snap.val();
-                    if(data) { Object.values(data).forEach(item => { stockMap[item.name] = Math.max(stockMap[item.name] || 0, item.quantity); if (item.imageUrl) { Object.values(window.allProducts).forEach(product => { if (product.name === item.name) { product.imageUrl = item.imageUrl; updateProductImageInDOM(product.id, item.imageUrl); } }); } }); updateStockDisplay(); }
+        function initParticles() {
+            // --- 修改 3: 传入三行文字 ---
+            const coords = getTextCoordinates([CONFIG.textLine1, CONFIG.textLine2, CONFIG.textLine3], CONFIG.font); 
+            const totalPoints = CONFIG.particleCount;
+            
+            const positions = new Float32Array(totalPoints * 3);
+            const targets = new Float32Array(totalPoints * 3);
+            const randoms = new Float32Array(totalPoints * 3);
+            const colors = new Float32Array(totalPoints * 3);
+            const sizes = new Float32Array(totalPoints);
+            const randomOffsets = new Float32Array(totalPoints);
+
+            for (let i = 0; i < totalPoints; i++) {
+                const coord = coords[i % coords.length];
+                targets[i*3] = coord.x;
+                targets[i*3+1] = coord.y;
+                targets[i*3+2] = (Math.random() - 0.5) * 50; 
+
+                const phi = Math.acos(-1 + (2 * i) / totalPoints);
+                const theta = Math.sqrt(totalPoints * Math.PI) * phi;
+                const r = CONFIG.scatterRadius * (0.8 + Math.random() * 0.4);
+                
+                randoms[i*3] = r * Math.cos(theta) * Math.sin(phi);
+                randoms[i*3+1] = r * Math.sin(theta) * Math.sin(phi);
+                randoms[i*3+2] = r * Math.cos(phi);
+
+                positions[i*3] = targets[i*3];
+                positions[i*3+1] = targets[i*3+1];
+                positions[i*3+2] = targets[i*3+2];
+
+                const mixedColor = new THREE.Color().lerpColors(CONFIG.color1, CONFIG.color2, Math.random());
+                colors[i*3] = mixedColor.r;
+                colors[i*3+1] = mixedColor.g;
+                colors[i*3+2] = mixedColor.b;
+                sizes[i] = Math.random();
+                randomOffsets[i] = Math.random() * Math.PI;
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('targetPos', new THREE.BufferAttribute(targets, 3));
+            geometry.setAttribute('randomPos', new THREE.BufferAttribute(randoms, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            geometry.setAttribute('aOffset', new THREE.BufferAttribute(randomOffsets, 1));
+
+            material = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                    uPixelRatio: { value: renderer.getPixelRatio() },
+                    uMix: { value: 0.0 }
+                },
+                vertexShader: `
+                    uniform float uTime;
+                    uniform float uPixelRatio;
+                    uniform float uMix;
+                    attribute vec3 targetPos;
+                    attribute vec3 randomPos;
+                    attribute vec3 color;
+                    attribute float size;
+                    attribute float aOffset;
+                    varying vec3 vColor;
+                    void main() {
+                        vColor = color;
+                        vec3 pos = mix(targetPos, randomPos, uMix);
+                        float wave = sin(uTime * 0.5 + aOffset) * (0.5 + uMix * 5.0);
+                        pos += normalize(pos) * wave;
+                        vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                        gl_Position = projectionMatrix * mvPosition;
+                        gl_PointSize = (4.0 * size * uPixelRatio) * (300.0 / -mvPosition.z);
+                    }
+                `,
+                fragmentShader: `
+                    varying vec3 vColor;
+                    void main() {
+                        float r = distance(gl_PointCoord, vec2(0.5));
+                        if (r > 0.5) discard;
+                        gl_FragColor = vec4(vColor, 0.8);
+                    }
+                `,
+                transparent: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+        }
+
+        function initInnerParticles() {
+            const coords = getTextCoordinates([CONFIG.innerText], CONFIG.innerFont); 
+            const totalPoints = Math.floor(CONFIG.particleCount * 0.5); 
+            
+            const positions = new Float32Array(totalPoints * 3);
+            const colors = new Float32Array(totalPoints * 3);
+            const sizes = new Float32Array(totalPoints);
+            const randomOffsets = new Float32Array(totalPoints);
+
+            const gold = new THREE.Color(0xffd700);
+            const white = new THREE.Color(0xffffff);
+
+            for (let i = 0; i < totalPoints; i++) {
+                const coord = coords[i % coords.length];
+                
+                const scale = 0.5; 
+                positions[i*3] = coord.x * scale;
+                positions[i*3+1] = coord.y * scale;
+                positions[i*3+2] = (Math.random() - 0.5) * 20;
+
+                const mixedColor = new THREE.Color().lerpColors(gold, white, Math.random() * 0.5);
+                colors[i*3] = mixedColor.r;
+                colors[i*3+1] = mixedColor.g;
+                colors[i*3+2] = mixedColor.b;
+                sizes[i] = Math.random();
+                randomOffsets[i] = Math.random() * Math.PI;
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            geometry.setAttribute('aOffset', new THREE.BufferAttribute(randomOffsets, 1));
+
+            innerMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                    uPixelRatio: { value: renderer.getPixelRatio() },
+                    uOpacity: { value: 0.0 }
+                },
+                vertexShader: `
+                    uniform float uTime;
+                    uniform float uPixelRatio;
+                    attribute vec3 color;
+                    attribute float size;
+                    attribute float aOffset;
+                    varying vec3 vColor;
+                    void main() {
+                        vColor = color;
+                        vec3 pos = position;
+                        pos.y += sin(uTime + aOffset) * 1.5;
+                        vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                        gl_Position = projectionMatrix * mvPosition;
+                        gl_PointSize = (3.0 * size * uPixelRatio) * (300.0 / -mvPosition.z);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float uOpacity;
+                    varying vec3 vColor;
+                    void main() {
+                        if (uOpacity <= 0.01) discard;
+                        float r = distance(gl_PointCoord, vec2(0.5));
+                        if (r > 0.5) discard;
+                        gl_FragColor = vec4(vColor, uOpacity); 
+                    }
+                `,
+                transparent: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particles = new THREE.Points(geometry, innerMaterial);
+            scene.add(particles);
+        }
+
+        function getFireworkTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 32; canvas.height = 32;
+            const context = canvas.getContext('2d');
+            const gradient = context.createRadialGradient(16, 16, 0, 16, 16, 16);
+            gradient.addColorStop(0, 'rgba(255,255,255,1)');
+            gradient.addColorStop(0.4, 'rgba(255,255,255,0.4)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, 32, 32);
+            return new THREE.Texture(canvas);
+        }
+
+        const gravityVector = new THREE.Vector3(0, -0.08, 0);
+
+        class Firework {
+            constructor(scene) {
+                this.scene = scene;
+                this.isDead = false;
+                this.exploded = false;
+                const startX = (Math.random() - 0.5) * 600;
+                const startZ = (Math.random() - 0.5) * 300;
+                this.position = new THREE.Vector3(startX, -200, startZ);
+                this.targetY = -50 + Math.random() * 200; 
+                this.velocity = new THREE.Vector3(0, 3 + Math.random() * 2, 0);
+                this.color = new THREE.Color();
+                this.color.setHSL(Math.random(), 1, 0.6);
+
+                const rocketGeo = new THREE.BufferGeometry();
+                rocketGeo.setAttribute('position', new THREE.Float32BufferAttribute(this.position.toArray(), 3));
+                const rocketMat = new THREE.PointsMaterial({
+                    size:   15,
+                    color: this.color,
+                    map: fireworkTexture,
+                    transparent: true,
+                    blending: THREE.AdditiveBlending,
+                    depthWrite: false,
+                    opacity: 1
                 });
+                this.rocket = new THREE.Points(rocketGeo, rocketMat);
+                fireworkTexture.needsUpdate = true; 
+                this.scene.add(this.rocket);
+                this.sparks = []; 
+                this.sparkSystem = null; 
+            }
+            update() {
+                if (this.isDead) return;
+                if (!this.exploded) {
+                    this.position.add(this.velocity);
+                    this.rocket.geometry.attributes.position.setXYZ(0, this.position.x, this.position.y, this.position.z);
+                    this.rocket.geometry.attributes.position.needsUpdate = true;
+                    if (this.position.y >= this.targetY || this.velocity.y < 0) this.explode();
+                } else {
+                    if (!this.sparkSystem) return;
+                    const positions = this.sparkSystem.geometry.attributes.position.array;
+                    for (let i = 0; i < this.sparks.length; i++) {
+                        const spark = this.sparks[i];
+                        spark.velocity.add(gravityVector); 
+                        spark.velocity.multiplyScalar(0.96); 
+                        spark.position.add(spark.velocity);
+                        positions[i * 3] = spark.position.x;
+                        positions[i * 3 + 1] = spark.position.y;
+                        positions[i * 3 + 2] = spark.position.z;
+                        spark.life -= 0.015;
+                    }
+                    this.sparkSystem.geometry.attributes.position.needsUpdate = true;
+                    this.sparkSystem.material.opacity -= 0.015;
+                    if (this.sparkSystem.material.opacity <= 0) this.cleanup();
+                }
+            }
+            explode() {
+                this.exploded = true;
+                this.scene.remove(this.rocket);
+                const sparkCount = 40 + Math.floor(Math.random() * 40);
+                const positions = [];
+                for (let i = 0; i < sparkCount; i++) {
+                    const u = Math.random();
+                    const v = Math.random();
+                    const theta = 2 * Math.PI * u;
+                    const phi = Math.acos(2 * v - 1);
+                    const speed = 1.0 + Math.random() * 2.0;
+                    const vx = speed * Math.sin(phi) * Math.cos(theta);
+                    const vy = speed * Math.sin(phi) * Math.sin(theta);
+                    const vz = speed * Math.cos(phi);
+                    this.sparks.push({
+                        position: this.position.clone(),
+                        velocity: new THREE.Vector3(vx, vy, vz),
+                        life: 1.0
+                    });
+                    positions.push(this.position.x, this.position.y, this.position.z);
+                }
+                const sparkGeo = new THREE.BufferGeometry();
+                sparkGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+                const sparkMat = new THREE.PointsMaterial({
+                    size: 4,
+                    color: this.color,
+                    map: fireworkTexture,
+                    transparent: true,
+                    blending: THREE.AdditiveBlending,
+                    depthWrite: false,
+                    opacity: 1.0
+                });
+                this.sparkSystem = new THREE.Points(sparkGeo, sparkMat);
+                this.scene.add(this.sparkSystem);
+            }
+            cleanup() {
+                this.isDead = true;
+                if (this.rocket) {
+                    this.scene.remove(this.rocket);
+                    this.rocket.geometry.dispose();
+                    this.rocket.material.dispose();
+                }
+                if (this.sparkSystem) {
+                    this.scene.remove(this.sparkSystem);
+                    this.sparkSystem.geometry.dispose();
+                    this.sparkSystem.material.dispose();
+                }
+            }
+        }
+
+        function initShopCards() {
+            const layer = document.getElementById('floating-shops-layer');
+            const originalData = document.querySelectorAll('.shop-data');
+            const phi = Math.PI * (3 - Math.sqrt(5)); 
+            const count = originalData.length;
+            const radius = 280; 
+
+            originalData.forEach((data, i) => {
+                const card = document.createElement('div');
+                card.className = 'floating-shop-card';
+                card.innerHTML = `
+                    <img src="${data.dataset.img}" onerror="this.src='https://placehold.co/140x100?text=Shop'">
+                    <div class="shop-name">${data.dataset.name}</div>
+                `;
+                card.onclick = () => startShopSelection(card, data.dataset.id);
+                layer.appendChild(card);
+                const y = 1 - (i / (count - 1)) * 2; 
+                const r = Math.sqrt(1 - y * y); 
+                const theta = phi * i; 
+                const x = Math.cos(theta) * r;
+                const z = Math.sin(theta) * r;
+                const posVector = new THREE.Vector3(x * radius, y * radius * 0.8, z * radius);
+                shopElements.push({ dom: card, pos: posVector });
             });
         }
-        function updateProductImageInDOM(id, url) { if (currentView === 'grid') { const card = document.querySelector(`div[data-product-id="${id}"]`); if (card) { const img = card.querySelector('.product-image'); if (img && !img.querySelector('img')) img.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:cover;" onclick="showImage('${url}','')">`; } } }
-        function updateProductBoxDisplay() { db.ref('productBoxes').once('value').then(snap => { const boxData = snap.val() || {}; Object.keys(boxData).forEach(pid => { const badge = document.getElementById(`unitBadge${pid}`); if(badge) { if(boxData[pid] > 0) { badge.style.display = 'block'; badge.textContent = `Unit: ${boxData[pid]}`; } else { badge.style.display = 'none'; } } }); }); }
-        function updateStockDisplay() { for (const [id, product] of Object.entries(window.allProducts)) { let stock = stockMap[product.name] || 0; if ([601, 602, 603, 604, 605, 606, 609, 610, 611, 612, 607, 608].includes(parseInt(id))) { if(id <= 603) stock = Math.floor(stock/60); else if(id <= 605) stock = Math.floor(stock/30); else if([606,609,610,611,612].includes(parseInt(id))) stock = Math.floor(stock/80); else stock = Math.floor(stock/70); } const stockEl = document.getElementById(`stock${id}`); if (stockEl) { stockEl.textContent = stock === 0 ? '(No Stock)' : `(Stock: ${stock})`; if(stock === 0) stockEl.classList.add('zero-stock'); else stockEl.classList.remove('zero-stock'); } } }
-        function saveItem(id, name) { playEffect('select'); const chk = document.getElementById('item' + id); const qty = document.getElementById('quantity' + id); if (chk.checked) selectedItems[id] = qty.value; else delete selectedItems[id]; updatePreview(); }
-        function changeQuantity(id, change) { const input = document.getElementById('quantity' + id); let val = parseInt(input.value) || 1; if (change > 0) playEffect('add'); else playEffect('remove'); val = Math.max(1, val + change); input.value = val; const chk = document.getElementById('item' + id); if (selectedItems[id] || chk.checked) { chk.checked = true; selectedItems[id] = val; updatePreview(); } }
-        
-        function searchProduct() {
-            const term = document.getElementById('productSearch').value.toLowerCase(); const sugg = document.getElementById('suggestions'); sugg.innerHTML = '';
-            if(term.length === 0) { sugg.style.display = 'none'; return; }
-            const matches = Object.values(window.allProducts).filter(p => p.name.toLowerCase().includes(term));
-            matches.slice(0, 5).forEach(p => { const d = document.createElement('div'); d.style.padding = '12px'; d.style.borderBottom = '1px solid var(--border-color)'; d.textContent = p.name; d.onclick = () => { selectProductFromSearch(p); sugg.style.display='none'; }; sugg.appendChild(d); });
-            sugg.style.display = matches.length ? 'block' : 'none';
-        }
-        function selectProductFromSearch(product) { playEffect('select'); const list = document.getElementById('productList'); list.innerHTML = ''; const div = document.createElement('div'); div.innerHTML = `<div style="display:flex; align-items:center; justify-content:space-between; width:100%;"><label>${product.name}</label><div class="quantity-controls-wrapper"><button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)"><span class="material-icons-round">add</span></button><input type="number" id="quantity${product.id}" value="1" style="width:40px; text-align:center;"></div><input type="checkbox" id="item${product.id}" checked style="display:none;"></div>`; list.appendChild(div); saveItem(product.id, product.name); }
-        function toggleSettings() { playEffect('click'); const panel = document.getElementById('settings-panel'); panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; }
-        function toggleDashboard() { playEffect('click'); const dash = document.getElementById('side-dashboard'); const over = document.getElementById('dashboard-overlay'); const isHidden = dash.style.display === 'none'; dash.style.display = isHidden ? 'flex' : 'none'; over.style.display = isHidden ? 'block' : 'none'; }
-        function changeTheme(theme) { playEffect('click'); document.body.classList.remove('dark-mode'); if(theme === 'dark') document.body.classList.add('dark-mode'); localStorage.setItem('dark-mode', theme === 'dark' ? 'enabled' : 'disabled'); }
-        function toggleItems(){} // Legacy function placeholder
 
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('authContainer').style.display = 'none';
-                if (!splashShown) { playOpeningAnimation(() => { splashShown = true; }); }
-                currentUser = user;
-                db.ref(`users/${user.uid}`).once('value').then(snap => {
-                    const val = snap.val(); if(val) { userRole = val.role; document.getElementById('dashboardUserName').textContent = val.name; document.getElementById('dashboardUserRole').textContent = val.role; if(val.role === 'Admin' || val.role === 'SAdmin') document.getElementById('dashboardAdminButton').style.display = 'flex'; if(val.status === 'pending') { document.getElementById('authContainer').style.display = 'flex'; document.getElementById('pendingForm').style.display = 'block'; document.getElementById('loginForm').style.display = 'none'; } }
+        function toggleExplosion() {
+            if (isTransitioning) return;
+
+            isExploded = !isExploded;
+            
+            gsap.to(material.uniforms.uMix, {
+                value: isExploded ? 1.0 : 0.0,
+                duration: 2.5,
+                ease: "power2.inOut"
+            });
+
+            if (innerMaterial) {
+                gsap.to(innerMaterial.uniforms.uOpacity, {
+                    value: isExploded ? 1.0 : 0.0, 
+                    duration: isExploded ? 3.0 : 1.5,
+                    ease: "power2.inOut"
                 });
-                loadQuantitiesFromFirebase();
-            } else {
-                document.getElementById('authContainer').style.display = 'flex'; document.getElementById('loginForm').style.display = 'block'; document.getElementById('pendingForm').style.display = 'none'; document.getElementById('mainAppContent').style.opacity = '0'; splashShown = false;
             }
-        });
 
-        document.getElementById('loginButton').onclick = () => { try { playEffect('click'); } catch(e) {} const e = document.getElementById('loginEmail').value.trim(); const p = document.getElementById('loginPassword').value; if(!e || !p) { alert("Please enter credentials"); return; } const btn = document.getElementById('loginButton'); const orig = btn.innerText; btn.innerText = "Logging in..."; btn.disabled = true; auth.signInWithEmailAndPassword(e, p).then(() => { btn.innerText = orig; btn.disabled = false; }).catch(err => { btn.innerText = orig; btn.disabled = false; alert("Login Failed: " + err.message); }); };
-        document.getElementById('registerButton').onclick = () => { try { playEffect('click'); } catch(e) {} const e = document.getElementById('registerEmail').value.trim(); const p = document.getElementById('registerPassword').value; const n = document.getElementById('registerName').value.trim(); if(!e || !p || !n) { alert("Please fill all fields"); return; } const btn = document.getElementById('registerButton'); const orig = btn.innerText; btn.innerText = "Creating..."; btn.disabled = true; auth.createUserWithEmailAndPassword(e, p).then(creds => { db.ref(`users/${creds.user.uid}`).set({ email:e, name:n, role:'User', status:'pending', createdAt: Date.now() }).then(() => { btn.innerText = orig; btn.disabled = false; }); }).catch(err => { btn.innerText = orig; btn.disabled = false; alert("Failed: " + err.message); }); };
-        function switchToRegister() { document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; document.getElementById('authTitle').textContent = 'Register'; }
-        function switchToLogin() { document.getElementById('registerForm').style.display = 'none'; document.getElementById('loginForm').style.display = 'block'; document.getElementById('authTitle').textContent = 'Welcome Back'; }
-        function logout() { auth.signOut(); window.location.reload(); }
-        function backToLogin() { logout(); }
-        function copyAndSendWhatsApp() { playEffect('success'); const text = generateText(true); const url = `https://wa.me/?text=${encodeURIComponent(text)}`; window.open(url, '_blank'); }
+            gsap.to(controls, {
+                autoRotateSpeed: isExploded ? 0.2 : 1.0,
+                duration: 1
+            });
 
-        window.addEventListener('load', () => {
-            initAllProducts();
-            init3DScene(); // Start 3D
-            const savedTheme = localStorage.getItem('dark-mode'); if(savedTheme === 'disabled') changeTheme('light');
-            toggleView(currentView); toggleVibration(localStorage.getItem('vibration-enabled') !== 'disabled');
-            createSnowflakes();
-            db.ref('announcement').on('value', snap => { const data = snap.val(); const banner = document.getElementById('announcementBanner'); const textEl = document.getElementById('announcementScrollText'); if(data && data.enabled && data.text) { textEl.textContent = data.text; banner.style.display = 'block'; banner.style.background = data.background && data.background.color ? data.background.color : (data.background && data.background.type === 'custom' ? `linear-gradient(45deg, ${data.background.startColor}, ${data.background.endColor})` : 'linear-gradient(45deg, #ff6b6b, #4ecdc4, #1976D2)'); banner.style.fontSize = data.fontSize || '14px'; banner.style.color = data.textColor || 'white'; textEl.style.animationDuration = data.speed || '15s'; } else { banner.style.display = 'none'; } });
-            setInterval(() => { const now = Date.now(); db.ref('newProducts').once('value').then(snap => { snap.forEach(child => { if(child.val().until < now) child.ref.remove(); }); }); }, 3600000);
-        });
+            const cards = document.querySelectorAll('.floating-shop-card');
+            
+            if(isExploded) {
+                // 修改点：延迟2.2秒后，卡片才逐个出现
+                setTimeout(() => {
+                    cards.forEach((card, i) => {
+                        card.style.display = 'block';
+                        // 使用CSS transition配合延时
+                        setTimeout(() => {
+                            card.style.opacity = 1;
+                        }, i * 150); // 逐个出现
+                    });
+                }, 2200);
+            } else {
+                cards.forEach((card) => {
+                    card.style.opacity = 0;
+                    setTimeout(() => card.style.display = 'none', 500);
+                });
+            }
+            
+            document.querySelector('#three-ui').innerHTML = isExploded 
+                ? "Click a Card to Select<br><span style='font-size:10px'>Double tap to Back</span>" 
+                : "Double Tap to Select Shop<br><span style='font-size:10px'>Happy New Year</span>";
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            material.uniforms.uPixelRatio.value = renderer.getPixelRatio();
+            if(innerMaterial) innerMaterial.uniforms.uPixelRatio.value = renderer.getPixelRatio();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if(document.getElementById('three-container').style.display === 'none') return;
+            const time = performance.now() * 0.001;
+            
+            if(material) material.uniforms.uTime.value = time;
+            if(innerMaterial) innerMaterial.uniforms.uTime.value = time;
+
+            let chance = CONFIG.fireworkChance;
+            if (isTransitioning) chance = 0.4;
+
+            if (Math.random() < chance) activeFireworks.push(new Firework(scene));
+            
+            for (let i = activeFireworks.length - 1; i >= 0; i--) {
+                const fw = activeFireworks[i];
+                fw.update();
+                if (fw.isDead) activeFireworks.splice(i, 1);
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+
+            if(isExploded && !isTransitioning) updateShopCardPositions();
+        }
+
+        function updateShopCardPositions() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const widthHalf = width / 2;
+            const heightHalf = height / 2;
+            shopElements.forEach(item => {
+                const pos = item.pos.clone();
+                pos.project(camera);
+                if (pos.z < 1) {
+                    const x = (pos.x * widthHalf) + widthHalf;
+                    const y = -(pos.y * heightHalf) + heightHalf;
+                    const scale = Math.max(0.5, 1 - pos.z); 
+                    item.dom.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+                    item.dom.style.zIndex = Math.floor((1 - pos.z) * 100); 
+                    // 这里不做 display 控制，交给 toggleExplosion 的逻辑
+                    // 仅更新位置
+                }
+            });
+        }
     </script>
 </body>
-
 </html>
-
-
-
-
-
-
