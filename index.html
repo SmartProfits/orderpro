@@ -119,6 +119,167 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
+<!-- === 把这段代码加入 index.html 的 </body> 之前 === -->
+
+<div id="adminPanel" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; flex-direction: column; align-items: center; justify-content: center;">
+    
+    <div style="width: 90%; max-width: 600px; background: var(--surface-color, #1e1e1e); border-radius: 12px; height: 80%; display: flex; flex-direction: column; border: 1px solid var(--border-color, #333); overflow: hidden;">
+        
+        <!-- Header -->
+        <div style="padding: 15px; background: var(--primary-color, #ffd700); color: black; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0; font-size: 1.2rem;">Admin Panel</h2>
+            <span class="material-icons" onclick="document.getElementById('adminPanel').style.display='none'" style="cursor: pointer;">close</span>
+        </div>
+
+        <!-- Tabs Buttons -->
+        <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <button class="tab-button active" onclick="showAdminTab('users')" style="flex: 1; padding: 12px; background: none; border: none; color: white; cursor: pointer;">Users</button>
+            <button class="tab-button" onclick="showAdminTab('products')" style="flex: 1; padding: 12px; background: none; border: none; color: white; cursor: pointer;">Products</button>
+            <button class="tab-button" onclick="showAdminTab('announcement')" style="flex: 1; padding: 12px; background: none; border: none; color: white; cursor: pointer;">Announce</button>
+        </div>
+
+        <!-- Content Area -->
+        <div style="flex: 1; overflow-y: auto; padding: 15px; color: white;">
+            
+            <!-- Users Tab -->
+            <div id="users-tab" class="admin-tab-content">
+                <h3>Pending Approvals</h3>
+                <div id="pendingUsersList" style="margin-bottom: 20px;">Loading...</div>
+                
+                <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+                
+                <h3>All Users</h3>
+                <div id="allUsersList">Loading...</div>
+            </div>
+
+            <!-- Products Tab -->
+            <div id="products-tab" class="admin-tab-content" style="display: none;">
+                <h3 style="margin-bottom: 10px;">Manage Products</h3>
+                <select id="categorySelect" onchange="loadProductsForAdmin()" style="width: 100%; padding: 10px; margin-bottom: 15px; background: #333; color: white; border: 1px solid #555; border-radius: 5px;">
+                    <option value="">-- Select Category --</option>
+                </select>
+                <div id="productManagementList">Select a category...</div>
+            </div>
+
+            <!-- Announcement Tab -->
+            <div id="announcement-tab" class="admin-tab-content" style="display: none;">
+                <h3>Announcement Bar</h3>
+                
+                <div id="announcementStatusContent" style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px;">
+                    Checking status...
+                </div>
+
+                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                    <input type="checkbox" id="announcementEnabled" onchange="toggleAnnouncement()"> Enable Announcement
+                </label>
+
+                <div id="announcementSettings" style="display: none;">
+                    <input type="text" id="announcementText" placeholder="Announcement Text" style="width: 100%; padding: 8px; margin-bottom: 10px; background: #333; border: 1px solid #555; color: white;">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div>
+                            <label style="font-size: 0.8rem;">Start Time</label>
+                            <input type="datetime-local" id="announcementStartTime" style="width: 100%; padding: 5px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem;">End Time</label>
+                            <input type="datetime-local" id="announcementEndTime" style="width: 100%; padding: 5px;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 10px;">
+                        <label>Background Style</label>
+                        <select id="announcementBgType" onchange="toggleBgSettings()" style="width: 100%; padding: 5px;">
+                            <option value="solid">Solid Color</option>
+                            <option value="custom">Custom Gradient</option>
+                            <option value="default">Default (Gradient)</option>
+                        </select>
+                    </div>
+
+                    <div id="solidColorSettings" style="display: none; margin-bottom: 10px;">
+                        <label>Color: </label> <input type="color" id="announcementBgColor" value="#ff0000">
+                    </div>
+
+                    <div id="customGradientSettings" style="display: none; margin-bottom: 10px;">
+                        <label>Start: </label> <input type="color" id="announcementGradientStart" value="#ff6b6b">
+                        <label>End: </label> <input type="color" id="announcementGradientEnd" value="#4ecdc4">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                        <div>
+                            <label style="font-size: 0.8rem;">Text Color</label>
+                            <input type="color" id="announcementTextColor" value="#ffffff" style="width: 100%;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem;">Font Size</label>
+                            <select id="announcementFontSize" style="width: 100%;">
+                                <option value="12px">Small</option>
+                                <option value="14px" selected>Medium</option>
+                                <option value="16px">Large</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8rem;">Speed</label>
+                            <select id="announcementSpeed" style="width: 100%;">
+                                <option value="10s">Fast</option>
+                                <option value="15s" selected>Normal</option>
+                                <option value="20s">Slow</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="border: 1px dashed #555; padding: 10px; margin-bottom: 15px; text-align: center;" id="announcementPreview">
+                        <div>Preview Text Here</div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="previewAnnouncement()" style="flex: 1; padding: 8px; background: #555; border: none; color: white;">Preview</button>
+                        <button onclick="saveAnnouncementSettings()" style="flex: 1; padding: 8px; background: var(--primary-color, #ffd700); border: none; color: black; font-weight: bold;">Save</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- 这是一个 Banner 的容器，放在 body 最顶端，用于显示跑马灯公告 -->
+<div id="announcementBanner" style="display: none; width: 100%; overflow: hidden; position: fixed; top: 0; left: 0; z-index: 2000; padding: 8px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+    <div id="announcementScrollText" style="white-space: nowrap; padding-left: 100%; display: inline-block; animation: marquee 15s linear infinite;">
+        <!-- JS 会填充内容 -->
+    </div>
+</div>
+<style>
+@keyframes marquee {
+    0%   { transform: translate(0, 0); }
+    100% { transform: translate(-100%, 0); }
+}
+/* Admin Panel 内部样式补丁 */
+.user-card, .product-item {
+    background: rgba(255,255,255,0.05);
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.action-button {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-right: 5px;
+}
+.action-button.approve { background: #4caf50; color: white; }
+.action-button.promote { background: #2196f3; color: white; }
+.action-button.demote { background: #ff9800; color: white; }
+.action-button.delete { background: #f44336; color: white; }
+.tab-button.active {
+    border-bottom: 2px solid var(--primary-color, #ffd700) !important;
+    color: var(--primary-color, #ffd700) !important;
+}
+</style>
+
 <body class="dark-mode">
 
     <!-- SPLASH SCREEN -->
