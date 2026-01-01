@@ -212,7 +212,7 @@ window.allProducts = {};
                 { id: 903, name: "Dried mango", unit: 'ctn' }, { id: 904, name: "Coconut milk candy", unit: 'ctn' },
                 { id: 905, name: "Durian milk candy", unit: 'ctn' }, { id: 906, name: "Bird Nest Candy", unit: 'ctn' },
                 { id: 907, name: "Traditional Coconut Candy", unit: 'ctn' }, { id: 908, name: "Kuih Cincin Mini (office)", unit: 'ctn' },
-                { id: 909, name: "Kuih Cincin Besar (office)", unit: 'ctn' }, { id: 910, name: "Kerepek Pisang Manis", unit: 'ctn' },{ id: 911, name: "Kerepek Pisang Masin", unit: 'ctn' }
+                { id: 909, name: "Kuih Cincin Besar (office)", unit: 'ctn' },{ id: 912, name: "Rempeyek", unit: 'ctn' }, { id: 910, name: "Kerepek Pisang Manis", unit: 'ctn' },{ id: 911, name: "Kerepek Pisang Masin", unit: 'ctn' }
             ]
         };
 
