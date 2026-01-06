@@ -1,318 +1,93 @@
-<!-- START OF FILE 2026v2.html -->
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>2026 Celebration Stock</title>
+    <title>Airport Stock Request</title>
     
     <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
-    <!-- PWA相关 -->
-    <meta name="theme-color" content="#050505">
+    <!-- PWA相关标记 -->
+    <meta name="theme-color" content="#1a2035">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./icons/s2.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <!-- 引入外部样式表 -->
     <link rel="stylesheet" href="style.css">
-
-    <style>
-        /* --- 3D 场景专用样式 --- */
-        body {
-            background-color: #050505;
-            overflow-x: hidden;
-        }
-
-        #three-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 100;
-            display: none; 
-            pointer-events: auto;
-        }
-        
-        canvas { display: block; }
-
-        #three-ui {
-            position: absolute;
-            bottom: 100px;
-            width: 100%;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.7);
-            pointer-events: none;
-            z-index: 110;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(0,0,0,0.8);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
-        }
-
-        /* --- 修改：店铺卡片样式 --- */
-        .floating-shop-card {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 210px; 
-            background: rgba(25, 25, 35, 0.85); 
-            backdrop-filter: blur(6px);
-            border: 1px solid rgba(255, 215, 0, 0.5);
-            border-radius: 12px;
-            padding: 8px;
-            text-align: center;
-            cursor: pointer;
-            pointer-events: auto;
-            transform-origin: center center;
-            display: none;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
-            opacity: 0; /* 初始完全透明 */
-            transition: opacity 1.2s ease-out, transform 0.2s;
-            will-change: transform, opacity;
-            z-index: 105;
-        }
-        
-        .floating-shop-card:active {
-            transform: scale(0.95);
-        }
-
-        .floating-shop-card img {
-            width: 100%;
-            height: 135px; 
-            object-fit: contain;
-            margin-bottom: 5px;
-            background: rgba(255,255,255,0.05); 
-            border-radius: 6px;
-        }
-
-        .floating-shop-card .shop-name {
-            font-size: 21px; 
-            color: #ffd700; 
-            font-weight: bold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            margin-top: 2px;
-        }
-
-        .shop-container.original-list { display: none !important; }
-
-        .hide-3d {
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.8s ease;
-        }
-    </style>
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
-<!-- === 把这段代码加入 index.html 的 </body> 之前 === -->
 
-<div id="adminPanel" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; flex-direction: column; align-items: center; justify-content: center;">
-    
-    <div style="width: 90%; max-width: 600px; background: var(--surface-color, #1e1e1e); border-radius: 12px; height: 80%; display: flex; flex-direction: column; border: 1px solid var(--border-color, #333); overflow: hidden;">
-        
-        <!-- Header -->
-        <div style="padding: 15px; background: var(--primary-color, #ffd700); color: black; display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="margin: 0; font-size: 1.2rem;">Admin Panel</h2>
-            <span class="material-icons" onclick="document.getElementById('adminPanel').style.display='none'" style="cursor: pointer;">close</span>
-        </div>
 
-        <!-- Tabs Buttons -->
-        <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.1);">
-            <button class="tab-button active" onclick="showAdminTab('users')" style="flex: 1; padding: 12px; background: none; border: none; color: white; cursor: pointer;">Users</button>
-            <button class="tab-button" onclick="showAdminTab('products')" style="flex: 1; padding: 12px; background: none; border: none; color: white; cursor: pointer;">Products</button>
-            <button class="tab-button" onclick="showAdminTab('announcement')" style="flex: 1; padding: 12px; background: none; border: none; color: white; cursor: pointer;">Announce</button>
-        </div>
+<body class="dark-mode"> <!-- Default to Dark Mode -->
 
-        <!-- Content Area -->
-        <div style="flex: 1; overflow-y: auto; padding: 15px; color: white;">
-            
-            <!-- Users Tab -->
-            <div id="users-tab" class="admin-tab-content">
-                <h3>Pending Approvals</h3>
-                <div id="pendingUsersList" style="margin-bottom: 20px;">Loading...</div>
-                
-                <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
-                
-                <h3>All Users</h3>
-                <div id="allUsersList">Loading...</div>
-            </div>
-
-            <!-- Products Tab -->
-            <div id="products-tab" class="admin-tab-content" style="display: none;">
-                <h3 style="margin-bottom: 10px;">Manage Products</h3>
-                <select id="categorySelect" onchange="loadProductsForAdmin()" style="width: 100%; padding: 10px; margin-bottom: 15px; background: #333; color: white; border: 1px solid #555; border-radius: 5px;">
-                    <option value="">-- Select Category --</option>
-                </select>
-                <div id="productManagementList">Select a category...</div>
-            </div>
-
-            <!-- Announcement Tab -->
-            <div id="announcement-tab" class="admin-tab-content" style="display: none;">
-                <h3>Announcement Bar</h3>
-                
-                <div id="announcementStatusContent" style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px;">
-                    Checking status...
-                </div>
-
-                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                    <input type="checkbox" id="announcementEnabled" onchange="toggleAnnouncement()"> Enable Announcement
-                </label>
-
-                <div id="announcementSettings" style="display: none;">
-                    <input type="text" id="announcementText" placeholder="Announcement Text" style="width: 100%; padding: 8px; margin-bottom: 10px; background: #333; border: 1px solid #555; color: white;">
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                        <div>
-                            <label style="font-size: 0.8rem;">Start Time</label>
-                            <input type="datetime-local" id="announcementStartTime" style="width: 100%; padding: 5px;">
-                        </div>
-                        <div>
-                            <label style="font-size: 0.8rem;">End Time</label>
-                            <input type="datetime-local" id="announcementEndTime" style="width: 100%; padding: 5px;">
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 10px;">
-                        <label>Background Style</label>
-                        <select id="announcementBgType" onchange="toggleBgSettings()" style="width: 100%; padding: 5px;">
-                            <option value="solid">Solid Color</option>
-                            <option value="custom">Custom Gradient</option>
-                            <option value="default">Default (Gradient)</option>
-                        </select>
-                    </div>
-
-                    <div id="solidColorSettings" style="display: none; margin-bottom: 10px;">
-                        <label>Color: </label> <input type="color" id="announcementBgColor" value="#ff0000">
-                    </div>
-
-                    <div id="customGradientSettings" style="display: none; margin-bottom: 10px;">
-                        <label>Start: </label> <input type="color" id="announcementGradientStart" value="#ff6b6b">
-                        <label>End: </label> <input type="color" id="announcementGradientEnd" value="#4ecdc4">
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-                        <div>
-                            <label style="font-size: 0.8rem;">Text Color</label>
-                            <input type="color" id="announcementTextColor" value="#ffffff" style="width: 100%;">
-                        </div>
-                        <div>
-                            <label style="font-size: 0.8rem;">Font Size</label>
-                            <select id="announcementFontSize" style="width: 100%;">
-                                <option value="12px">Small</option>
-                                <option value="14px" selected>Medium</option>
-                                <option value="16px">Large</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="font-size: 0.8rem;">Speed</label>
-                            <select id="announcementSpeed" style="width: 100%;">
-                                <option value="10s">Fast</option>
-                                <option value="15s" selected>Normal</option>
-                                <option value="20s">Slow</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div style="border: 1px dashed #555; padding: 10px; margin-bottom: 15px; text-align: center;" id="announcementPreview">
-                        <div>Preview Text Here</div>
-                    </div>
-
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="previewAnnouncement()" style="flex: 1; padding: 8px; background: #555; border: none; color: white;">Preview</button>
-                        <button onclick="saveAnnouncementSettings()" style="flex: 1; padding: 8px; background: var(--primary-color, #ffd700); border: none; color: black; font-weight: bold;">Save</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<!-- 这是一个 Banner 的容器，放在 body 最顶端，用于显示跑马灯公告 -->
-<div id="announcementBanner" style="display: none; width: 100%; overflow: hidden; position: fixed; top: 0; left: 0; z-index: 2000; padding: 8px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
-    <div id="announcementScrollText" style="white-space: nowrap; padding-left: 100%; display: inline-block; animation: marquee 15s linear infinite;">
-        <!-- JS 会填充内容 -->
-    </div>
-</div>
-<style>
-@keyframes marquee {
-    0%   { transform: translate(0, 0); }
-    100% { transform: translate(-100%, 0); }
-}
-/* Admin Panel 内部样式补丁 */
-.user-card, .product-item {
-    background: rgba(255,255,255,0.05);
-    padding: 10px;
-    margin-bottom: 8px;
-    border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-.action-button {
-    padding: 4px 8px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    margin-right: 5px;
-}
-.action-button.approve { background: #4caf50; color: white; }
-.action-button.promote { background: #2196f3; color: white; }
-.action-button.demote { background: #ff9800; color: white; }
-.action-button.delete { background: #f44336; color: white; }
-.tab-button.active {
-    border-bottom: 2px solid var(--primary-color, #ffd700) !important;
-    color: var(--primary-color, #ffd700) !important;
-}
-</style>
-
-<body class="dark-mode">
-
-    <!-- SPLASH SCREEN -->
+    <!-- SPLASH SCREEN (新添加的开场动画层) -->
     <div id="splashScreen">
         <div class="splash-content">
-            <span class="material-icons-round splash-logo-icon">auto_awesome</span>
-            <h1 class="splash-title">Happy New Year</h1>
-            <div class="splash-subtitle">2026</div>
+            <span class="material-icons-round splash-logo-icon">rocket_launch</span>
+            <h1 class="splash-title">SmartProfits</h1>
+            <div class="splash-subtitle">Stock Request</div>
             <div class="splash-loader"></div>
         </div>
+    </div>
+
+    <!-- 公告横幅 -->
+    <div id="announcementBanner">
+        <div id="announcementScrollText"></div>
     </div>
 
     <!-- 认证容器 -->
     <div id="authContainer" class="auth-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 9999;">
         <div class="auth-box" style="width: 90%; max-width: 400px;">
             <h2 id="authTitle" style="text-align: center;">Welcome Back</h2>
+            
+            <!-- Login Form -->
             <div id="loginForm" class="auth-form">
-                <div style="margin-bottom: 16px;"><input type="email" id="loginEmail" placeholder="Email Address" required></div>
-                <div style="margin-bottom: 20px;"><input type="password" id="loginPassword" placeholder="Password" required></div>
+                <div style="margin-bottom: 16px;">
+                    <input type="email" id="loginEmail" placeholder="Email Address" required>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <input type="password" id="loginPassword" placeholder="Password" required>
+                </div>
                 <button id="loginButton">Login</button>
-                <div class="switch-form" onclick="switchToRegister()" style="text-align: center;">Create an account</div>
+                <div class="switch-form" onclick="switchToRegister()" style="text-align: center;">
+                    Create an account
+                </div>
             </div>
-             <div id="registerForm" class="auth-form" style="display: none;">
-                <div style="margin-bottom: 16px;"><input type="email" id="registerEmail" placeholder="Email Address" required></div>
-                <div style="margin-bottom: 16px;"><input type="password" id="registerPassword" placeholder="Create Password" required></div>
-                <div style="margin-bottom: 20px;"><input type="text" id="registerName" placeholder="Your Name" required></div>
+            
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form" style="display: none;">
+                <div style="margin-bottom: 16px;">
+                    <input type="email" id="registerEmail" placeholder="Email Address" required>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <input type="password" id="registerPassword" placeholder="Create Password" required>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <input type="text" id="registerName" placeholder="Your Name" required>
+                </div>
                 <button id="registerButton">Register</button>
-                <div class="switch-form" onclick="switchToLogin()" style="text-align: center;">Already have an account? Login</div>
+                <div class="switch-form" onclick="switchToLogin()" style="text-align: center;">
+                    Already have an account? Login
+                </div>
             </div>
+            
+            <!-- Pending Form -->
             <div id="pendingForm" class="auth-form" style="display: none; text-align: center;">
                 <div style="font-size: 50px; margin-bottom: 20px;">⏳</div>
                 <h3>Verification Pending</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 0.9rem;">Your account is under review.</p>
+                <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 0.9rem;">Your account is under review by the administrator.</p>
                 <button onclick="backToLogin()" style="background: transparent; color: var(--text-primary); border: 1px solid var(--border-color);">Back to Login</button>
             </div>
         </div>
@@ -324,98 +99,144 @@
         <span id="userRole">User</span>
     </div>
 
-    <!-- === THREE.JS 3D 容器 === -->
-    <div id="three-container">
-        <div id="three-ui">
-            双击屏幕 选择店铺 <br>
-            <span style="font-size:10px; opacity:0.6;">Double Tap to Select Shop</span>
-        </div>
-        <div id="floating-shops-layer"></div>
-    </div>
-
     <!-- 主要内容区域 -->
     <div id="mainAppContent" style="opacity: 0; transition: opacity 0.5s;">
-        <h1 id="mainTitle" style="padding-top: 20px; display: none;">SmartProfits Stock Request</h1>
-        
-<div class="shop-container original-list">
+        <h1 style="padding-top: 20px;">SmartProfits Stock Request</h1>
 
-    <div class="shop-data" data-id="*JKL*" data-name="JKL" data-img="shop/jkl.png">
-        <input type="radio" name="store" value="*JKL*" style="display:none">
-    </div>
-
-    <div class="shop-data" data-id="*TOM*" data-name="TOM" data-img="shop/tom.png">
-        <input type="radio" name="store" value="*TOM*" style="display:none">
-    </div>
-
-    <div class="shop-data" data-id="*Ole-Ole Dalam*" data-name="Ole-Ole Dalam" data-img="shop/dalam.png">
-        <input type="radio" name="store" value="*Ole-Ole Dalam*" style="display:none">
-    </div>
-
-    <div class="shop-data" data-id="*Ole-Ole Luar*" data-name="Ole-Ole Luar" data-img="shop/luar.png">
-        <input type="radio" name="store" value="*Ole-Ole Luar*" style="display:none">
-    </div>
-
-    <div class="shop-data" data-id="*Wrapping(AA)*" data-name="Wrapping(AA)" data-img="shop/Aa.png">
-        <input type="radio" name="store" value="*Wrapping(AA)*" style="display:none">
-    </div>
-
-    <div class="shop-data" data-id="*Wrapping(MAS)*" data-name="Wrapping(MAS)" data-img="shop/Mas.png">
-        <input type="radio" name="store" value="*Wrapping(MAS)*" style="display:none">
-    </div>
-
-    <div class="shop-data" data-id="*Ole-Ole Tawau*" data-name="Ole-Ole Tawau" data-img="shop/tawau.png">
-        <input type="radio" name="store" value="*Ole-Ole Tawau*" style="display:none">
-    </div>
-
-    <div class="shop-data" data-id="*Wisma*" data-name="Wisma" data-img="shop/wisma.png">
-        <input type="radio" name="store" value="*Wisma*" style="display:none">
-    </div>
-
-    <div class="shop-data" data-id="*Tamoi*" data-name="Tamoi" data-img="shop/tamoi.png">
-        <input type="radio" name="store" value="*Tamoi*" style="display:none">
-    </div>
-
-    <div class="shop-data" data-id="*KTSP*" data-name="KTSP" data-img="shop/ktsp.png">
-        <input type="radio" name="store" value="*KTSP*" style="display:none">
-    </div>
-
-</div>
-
-        <div id="after-shop-selection" style="display: none;">
-             <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
-                <h3><span class="material-icons-round" style="color: var(--primary-color)">store</span> Selected: <span id="selectedShopDisplay" style="color: var(--primary-color)"></span></h3>
-                <button onclick="resetToShopSelection()" style="padding: 5px 10px; font-size: 0.8rem;">Change</button>
-            </div>
-            <h3 id="categoryTitle"><span class="material-icons-round" style="color: var(--primary-color)">category</span> Category</h3>
-            <div class="category-container" id="categoryContainer">
-                <div class="category-card" onclick="selectCategory(this, 'BanHeang')"><input type="radio" name="category" value="BanHeang" id="banheang" style="display:none"><span class="category-icon">🍪</span><label>BanHeang</label></div>
-                <div class="category-card" onclick="selectCategory(this, 'HoeHup')"><input type="radio" name="category" value="HoeHup" id="HoeHup" style="display:none"><span class="category-icon">🥮</span><label>HoeHup</label></div>
-                <div class="category-card" onclick="selectCategory(this, 'Chocolate')"><input type="radio" name="category" value="Chocolate" id="chocolate" style="display:none"><span class="category-icon">🍫</span><label>Chocolate</label></div>
-                <div class="category-card" onclick="selectCategory(this, 'Seafood')"><input type="radio" name="category" value="Seafood" id="seafood" style="display:none"><span class="category-icon">🦐</span><label>Seafood</label></div>
-                <div class="category-card" onclick="selectCategory(this, 'Coffee')"><input type="radio" name="category" value="Coffee" id="coffee" style="display:none"><span class="category-icon">☕</span><label>Coffee</label></div>
-                <div class="category-card" onclick="selectCategory(this, 'Amplang')"><input type="radio" name="category" value="Amplang" id="amplang" style="display:none"><span class="category-icon">🌕</span><label>Amplang</label></div>
-                <div class="category-card" onclick="selectCategory(this, 'Other')"><input type="radio" name="category" value="Other" id="other" style="display:none"><span class="category-icon">🎁</span><label>Other</label></div>
-                <div class="category-card" onclick="selectCategory(this, 'Wrapping')"><input type="radio" name="category" value="Wrapping" id="wrapping" style="display:none"><span class="category-icon">🧸</span><label>Wrapping</label></div>
-                <div class="category-card" onclick="selectCategory(this, 'Office')"><input type="radio" name="category" value="Office" id="Office" style="display:none"><span class="category-icon">📦</span><label>Office</label></div>
-            </div>
-            <div class="tools-bar" id="searchContainer">
-                <div style="position: relative; flex: 1;">
-                    <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">search</span>
-                    <input type="text" id="productSearch" placeholder="Search product..." oninput="searchProduct()" autocomplete="off">
-                </div>
-                <div class="view-toggle-group" id="viewToggleContainer">
-                    <button id="listViewBtn" onclick="toggleView('list')" class="view-toggle-btn active"><span class="material-icons">view_list</span></button>
-                    <button id="gridViewBtn" onclick="toggleView('grid')" class="view-toggle-btn"><span class="material-icons">grid_view</span></button>
-                </div>
-            </div>
-            <div id="suggestions" style="background: var(--surface-color); border-radius: 12px; margin-bottom: 10px; overflow: hidden; display: none;"></div>
-            <h3 id="selectItemsTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">list_alt</span> Select Items</h3>
-            <div id="productList" style="display: none;"></div>
+        <!-- 店铺选择 -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
+            <h3><span class="material-icons-round" style="color: var(--primary-color)">store</span> Select Outlet</h3>
         </div>
 
+        <div class="shop-container">
+            <div class="shop-card" onclick="selectShop(this, '*JKL*')">
+                <input type="radio" name="store" value="*JKL*" id="jkl" style="display:none">
+                <img src="shop/jkl.png" alt="JKL" onerror="this.src='https://placehold.co/400x200?text=JKL'">
+                <div class="shop-name">JKL</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*TOM*')">
+                <input type="radio" name="store" value="*TOM*" id="tom" style="display:none">
+                <img src="shop/tom.png" alt="TOM" onerror="this.src='https://placehold.co/400x200?text=TOM'">
+                <div class="shop-name">TOM</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Dalam*')">
+                <input type="radio" name="store" value="*Ole-Ole Dalam*" id="dalam" style="display:none">
+                <img src="shop/dalam.png" alt="Dalam" onerror="this.src='https://placehold.co/400x200?text=Dalam'">
+                <div class="shop-name">Ole-Ole Dalam</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Luar*')">
+                <input type="radio" name="store" value="*Ole-Ole Luar*" id="new" style="display:none">
+                <img src="shop/luar.png" alt="Luar" onerror="this.src='https://placehold.co/400x200?text=Luar'">
+                <div class="shop-name">Ole-Ole Luar</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Wrapping(AA)*')">
+                <input type="radio" name="store" value="*Wrapping(AA)*" id="aa" style="display:none">
+                <img src="shop/Aa.png" alt="AA" onerror="this.src='https://placehold.co/400x200?text=AA'">
+                <div class="shop-name">Wrapping(AA)</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Wrapping(MAS)*')">
+                <input type="radio" name="store" value="*Wrapping(MAS)*" id="mas" style="display:none">
+                <img src="shop/Mas.png" alt="MAS" onerror="this.src='https://placehold.co/400x200?text=MAS'">
+                <div class="shop-name">Wrapping(MAS)</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Ole-Ole Tawau*')">
+                <input type="radio" name="store" value="*Ole-Ole Tawau*" id="twu" style="display:none">
+                <img src="shop/tawau.png" alt="Tawau" onerror="this.src='https://placehold.co/400x200?text=Tawau'">
+                <div class="shop-name">Ole-Ole Tawau</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Wisma*')">
+                <input type="radio" name="store" value="*Wisma*" id="wisma" style="display:none">
+                <img src="shop/wisma.png" alt="Wisma" onerror="this.src='https://placehold.co/400x200?text=Wisma'">
+                <div class="shop-name">Wisma</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*Tamoi*')">
+                <input type="radio" name="store" value="*Tamoia*" id="tamoi" style="display:none">
+                <img src="shop/tamoi.png" alt="Tamoi" onerror="this.src='https://placehold.co/400x200?text=Wisma'">
+                <div class="shop-name">Tamoi</div>
+            </div>
+            <div class="shop-card" onclick="selectShop(this, '*KTSP*')">
+                <input type="radio" name="store" value="*KTSPa*" id="ktsp" style="display:none">
+                <img src="shop/KTSP.png" alt="Wisma" onerror="this.src='https://placehold.co/400x200?text=Wisma'">
+                <div class="shop-name">KTSP</div>
+            </div>
+        </div>
+
+
+        <h3 id="categoryTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">category</span> Category</h3>
+        <div class="category-container" id="categoryContainer" style="display: none;">
+            <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
+                <input type="radio" name="category" value="BanHeang" id="banheang" style="display:none">
+                <span class="category-icon">🍪</span>
+                <label>BanHeang</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'HoeHup')">
+                <input type="radio" name="category" value="HoeHup" id="HoeHup" style="display:none">
+                <span class="category-icon">🥮</span>
+                <label>HoeHup</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Chocolate')">
+                <input type="radio" name="category" value="Chocolate" id="chocolate" style="display:none">
+                <span class="category-icon">🍫</span>
+                <label>Chocolate</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Seafood')">
+                <input type="radio" name="category" value="Sotong" id="seafood" style="display:none">
+                <span class="category-icon">🦐</span>
+                <label>Seafood</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Coffee')">
+                <input type="radio" name="category" value="Coffee" id="coffee" style="display:none">
+                <span class="category-icon">☕</span>
+                <label>Coffee</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Amplang')">
+                <input type="radio" name="category" value="Amplang" id="amplang" style="display:none">
+                <span class="category-icon">🌕</span>
+                <label>Amplang</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Other')">
+                <input type="radio" name="category" value="Other" id="other" style="display:none">
+                <span class="category-icon">🎁</span>
+                <label>Other</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Wrapping')">
+                <input type="radio" name="category" value="Wrapping" id="wrapping" style="display:none">
+                <span class="category-icon">🧸</span>
+                <label>Wrapping</label>
+            </div>
+            <div class="category-card" onclick="selectCategory(this, 'Office')">
+                <input type="radio" name="category" value="Office" id="Office" style="display:none">
+                <span class="category-icon">📦</span>
+                <label>Office</label>
+            </div>
+        </div>
+
+        <!-- Search and View Toggle -->
+        <div class="tools-bar" id="searchContainer" style="display: none;">
+            <div style="position: relative; flex: 1;">
+                <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">search</span>
+                <input type="text" id="productSearch" placeholder="Search product..." oninput="searchProduct()" autocomplete="off">
+            </div>
+            <div class="view-toggle-group" id="viewToggleContainer">
+                <button id="listViewBtn" onclick="toggleView('list')" class="view-toggle-btn active">
+                    <span class="material-icons">view_list</span>
+                </button>
+                <button id="gridViewBtn" onclick="toggleView('grid')" class="view-toggle-btn">
+                    <span class="material-icons">grid_view</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="suggestions" style="background: var(--surface-color); border-radius: 12px; margin-bottom: 10px; overflow: hidden; display: none;"></div>
+        
+        <h3 id="selectItemsTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">list_alt</span> Select Items</h3>
+        <div id="productList" style="display: none;"></div>
+
+        <!-- Bottom Navigation -->
         <div class="bottom-nav">
             <div class="bottom-nav-item" id="menuNavItem" onclick="toggleDashboard()">
-                <span class="material-icons">menu</span><span>Menu</span>
+                <span class="material-icons">menu</span>
+                <span>Menu</span>
             </div>
             <div class="bottom-nav-item" id="previewNavItem" onclick="togglePreview()">
                 <div style="position: relative;">
@@ -425,26 +246,28 @@
                 <span>Order</span>
             </div>
             <div class="bottom-nav-item" id="settingsNavItem" onclick="toggleSettings()">
-                <span class="material-icons">settings</span><span>Setting</span>
+                <span class="material-icons">settings</span>
+                <span>Setting</span>
             </div>
         </div>
-    </div> 
+    </div> <!-- End Main Content -->
 
-    <!-- Preview Bottom Sheet & Modals -->
+    <!-- Image Modal -->
     <div id="imageModal" class="image-modal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; justify-content:center; align-items:center;">
         <span class="close-modal" onclick="closeImageModal()" style="position:absolute; top:20px; right:20px; color:white; font-size:30px; cursor:pointer; z-index: 2001;">&times;</span>
         <div class="modal-content" style="max-width:90%; max-height:80%; position: relative;">
-            <img id="modalImage" src="" style="max-width:100%; max-height:100%; border-radius:8px;">
+            <img id="modalImage" src="" style="max-width:100%; max-height:100%; border-radius:8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
         </div>
     </div>
-    
+
+    <!-- Preview Bottom Sheet -->
     <div id="preview-window">
         <div class="preview-header">
             <div style="display: flex; align-items: center; gap: 10px; font-weight: bold;">
                 <span class="material-icons-round" style="color: var(--primary-color);">receipt_long</span>
                 Order Summary
             </div>
-             <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
                 <label style="display: flex; align-items: center; gap: 6px; font-size: 0.9rem;">
                     <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()" style="width: 16px; height: 16px;">
                     Add On
@@ -459,6 +282,39 @@
         </button>
     </div>
 
+    <!-- Fullscreen Confirm -->
+    <div id="fullscreenConfirm" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: none; padding: 20px; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: var(--text-primary);">Confirm Order</h2>
+            <span class="material-icons-round" onclick="closeFullscreenConfirm()" style="font-size: 28px; cursor: pointer;">close</span>
+        </div>
+        <div id="fullscreen-content" style="background: var(--surface-color); padding: 20px; border-radius: var(--radius-md); margin-bottom: 20px; line-height: 1.6;"></div>
+        <div style="display: flex; gap: 12px;">
+            <button onclick="confirmAndSendWhatsApp()" style="flex: 1; background: var(--success-color); color: white; padding: 15px; border-radius: var(--radius-md);">Confirm</button>
+            <button onclick="closeFullscreenConfirm()" style="flex: 1; background: var(--surface-color); border: 1px solid var(--danger-color); color: var(--danger-color); padding: 15px; border-radius: var(--radius-md);">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settings-panel" style="position: fixed; bottom: 80px; right: 20px; width: 260px; background: var(--surface-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 20px; z-index: 1001; display: none; border: 1px solid var(--border-color);">
+        <h3 style="margin-top: 0;">Settings</h3>
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Appearance</label>
+            <div style="display: flex; gap: 8px;">
+                <button onclick="changeTheme('dark')" style="flex: 1; padding: 8px; background: #333; color: white; border-radius: 6px;">Dark</button>
+                <button onclick="changeTheme('light')" style="flex: 1; padding: 8px; background: #f0f0f0; color: #333; border-radius: 6px;">Light</button>
+            </div>
+        </div>
+        <div>
+            <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Vibration</label>
+            <div style="display: flex; gap: 8px;">
+                <button id="vibration-on-btn" onclick="toggleVibration(true)" style="flex: 1; padding: 8px; border-radius: 6px;">On</button>
+                <button id="vibration-off-btn" onclick="toggleVibration(false)" style="flex: 1; padding: 8px; border-radius: 6px;">Off</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Side Dashboard -->
     <div id="side-dashboard" style="position: fixed; top: 0; left: 0; width: 280px; height: 100%; background: var(--surface-color); z-index: 1500; display: none; flex-direction: column; box-shadow: 2px 0 20px rgba(0,0,0,0.2);">
         <div style="padding: 40px 20px 20px; background: var(--primary-color); color: white;">
             <h2 style="margin-bottom: 5px;">Welcome</h2>
@@ -476,758 +332,87 @@
     </div>
     <div id="dashboard-overlay" onclick="toggleDashboard()" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1499; display: none;"></div>
 
-    <!-- 3D 依赖库 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="auth-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 2000;">
+        <div class="auth-box" style="width: 95%; height: 90vh; max-width: 800px; display: flex; flex-direction: column; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2>Admin Panel</h2>
+                <span onclick="document.getElementById('adminPanel').style.display='none'" style="font-size: 28px; cursor: pointer;">&times;</span>
+            </div>
+            <div class="admin-tabs">
+                <button class="tab-button active" onclick="showAdminTab('users')">Users</button>
+                <button class="tab-button" onclick="showAdminTab('products')">Products</button>
+                <button class="tab-button" onclick="showAdminTab('announcement')">Announce</button>
+            </div>
+            <div style="flex: 1; overflow-y: auto; padding-top: 15px; padding-bottom: 20px;">
+                <!-- User Management -->
+                <div id="users-tab" class="admin-tab-content">
+                    <h3>Pending Users</h3>
+                    <div id="pendingUsersList" class="users-list">Loading...</div>
+                    <h3 style="margin-top: 20px;">All Users</h3>
+                    <div id="allUsersList" class="users-list">Loading...</div>
+                </div>
+                
+                <!-- Product Management -->
+                <div id="products-tab" class="admin-tab-content" style="display: none;">
+                    <select id="categorySelect" onchange="loadProductsForAdmin()" style="margin-bottom: 15px;"></select>
+                    <div id="productManagementList" class="product-management-list"></div>
+                </div>
+                
+                <!-- Announcement Management -->
+                <div id="announcement-tab" class="admin-tab-content" style="display: none;">
+                    <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                        <input type="checkbox" id="announcementEnabled" onchange="toggleAnnouncement()"> Enable Announcement
+                    </label>
+                    <div id="announcementSettings" style="display: none;">
+                        <textarea id="announcementText" rows="3" placeholder="Announcement content..." style="margin-bottom: 10px;"></textarea>
+                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <label style="font-size:0.8rem">Start Time:<input type="datetime-local" id="announcementStartTime"></label>
+                            <label style="font-size:0.8rem">End Time:<input type="datetime-local" id="announcementEndTime"></label>
+                        </div>
+                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <select id="announcementFontSize"><option value="16px">Normal</option><option value="20px">Large</option></select>
+                            <input type="color" id="announcementTextColor" value="#ffffff" style="height: 45px;">
+                        </div>
+                        <select id="announcementBgType" onchange="toggleBgSettings()" style="margin-bottom: 10px;">
+                            <option value="gradient">Gradient</option>
+                            <option value="solid">Solid</option>
+                            <option value="custom">Custom Gradient</option>
+                        </select>
+                        <div id="solidColorSettings" style="display: none; margin-bottom: 10px;">
+                            <input type="color" id="announcementBgColor" value="#4285f4" style="height: 45px;">
+                        </div>
+                         <div id="customGradientSettings" style="display: none; margin-bottom: 10px;">
+                             <input type="color" id="announcementGradientStart" value="#ff6b6b">
+                             <input type="color" id="announcementGradientEnd" value="#4ecdc4">
+                        </div>
+                         <select id="announcementSpeed" style="margin-bottom: 10px;">
+                            <option value="15s">Normal Speed</option>
+                            <option value="10s">Fast</option>
+                        </select>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="previewAnnouncement()" style="flex: 1; padding: 12px; background: var(--primary-color); color: white;">Preview</button>
+                            <button onclick="saveAnnouncementSettings()" style="flex: 1; padding: 12px; background: var(--success-color); color: white;">Save</button>
+                        </div>
+                        
+                        <!-- Preview Area -->
+                         <div style="margin-top: 15px;">
+                            <label>Preview:</label>
+                            <div id="announcementPreview" style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); padding: 10px; border-radius: 8px; overflow: hidden; white-space: nowrap; color: white; margin-top: 5px;">
+                                <div>Announcement Text</div>
+                            </div>
+                         </div>
 
-    <!-- 原始脚本 -->
+                        <div id="currentAnnouncementStatus" style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;">
+                            <div id="announcementStatusContent">Checking...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 引入外部脚本 -->
     <script src="script.js"></script>
-
-    <script>
-        let selectedStore = "";
-        let isTransitioning = false; 
-
-        window.startShopSelection = function(element, storeId) {
-            if (isTransitioning) return; 
-            isTransitioning = true; 
-
-            const radio = document.querySelector(`input[value="${storeId}"]`);
-            if(radio) radio.checked = true;
-            selectedStore = storeId;
-            document.getElementById('selectedShopDisplay').innerText = storeId.replace(/\*/g, '');
-
-            // 1. 隐藏 UI
-            document.querySelectorAll('.floating-shop-card').forEach(el => {
-                el.style.opacity = '0';
-                el.style.pointerEvents = 'none';
-            });
-            document.getElementById('three-ui').innerHTML = "<span style='color:#ffd700; font-size: 18px; font-weight:bold;'>CELEBRATING...</span>";
-
-            // 2. 发射店铺名字专用烟花 (白色粒子)
-            // 提取店铺纯名
-            const cleanName = storeId.replace(/\*/g, '');
-            launchShopNameFirework(cleanName);
-
-            // 3. 过渡到主页面
-            setTimeout(() => {
-                const threeContainer = document.getElementById('three-container');
-                const afterShopSelection = document.getElementById('after-shop-selection');
-                const mainTitle = document.getElementById('mainTitle');
-                
-                threeContainer.classList.add('hide-3d');
-                
-                setTimeout(() => {
-                    threeContainer.style.display = 'none';
-                    afterShopSelection.style.display = 'block';
-                    mainTitle.style.display = 'block';
-                    document.getElementById('categoryTitle').style.display = 'block';
-                    document.getElementById('categoryContainer').style.display = 'grid';
-                    isTransitioning = false; 
-                }, 800);
-            }, 3000); // 维持5秒过渡期，与原逻辑一致，烟花在3.5秒内完成
-        };
-
-        window.resetToShopSelection = function() {
-            const threeContainer = document.getElementById('three-container');
-            const afterShopSelection = document.getElementById('after-shop-selection');
-            const mainTitle = document.getElementById('mainTitle');
-
-            afterShopSelection.style.display = 'none';
-            mainTitle.style.display = 'none';
-            
-            threeContainer.style.display = 'block';
-            void threeContainer.offsetWidth; 
-            threeContainer.classList.remove('hide-3d');
-            
-            isExploded = false;
-            isTransitioning = false;
-            document.getElementById('three-ui').innerHTML = "Double Tap to Select Shop<br><span style='font-size:10px'>Happy New Year</span>";
-            
-            if(material) gsap.to(material.uniforms.uMix, { value: 0.0, duration: 2 });
-            if(innerMaterial) gsap.to(innerMaterial.uniforms.uOpacity, { value: 0.0, duration: 1.5 });
-            
-            document.querySelectorAll('.floating-shop-card').forEach(el => {
-                el.style.display = 'none';
-                el.style.opacity = '0';
-                el.style.pointerEvents = 'auto';
-            });
-        };
-
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                setTimeout(() => {
-                    init3DWorld();
-                    document.getElementById('three-container').style.display = 'block';
-                }, 1000);
-            }
-        });
-
-        // --- 3D 核心代码 ---
-        let scene, camera, renderer, controls, material;
-        let innerMaterial; 
-        let isExploded = false;
-        let activeFireworks = [];
-        let fireworkTexture;
-
-        // --- 修改 1: 更新配置为三行 ---
-        const CONFIG = {
-            particleCount: 10000, 
-            textLine1: "HAPPY",  
-            textLine2: "NEW",    // 修改这里
-            textLine3: "YEAR",   // 新增这里
-            font: "Bold 90px Arial", 
-            innerText: "2026", 
-            innerFont: "Bold 180px Arial", 
-            color1: new THREE.Color(0xffd700),
-            color2: new THREE.Color(0x00ffff),
-            scatterRadius: 300,
-            fireworkChance: 0.03
-        };
-
-        let shopElements = []; 
-
-        function init3DWorld() {
-            const container = document.getElementById('three-container');
-            if(container.querySelector('canvas')) return; 
-
-            scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x050505, 0.002);
-
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 450; 
-
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            container.appendChild(renderer.domElement);
-
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.autoRotate = true;
-            controls.autoRotateSpeed = 1.0;
-            controls.enableZoom = false; 
-
-            fireworkTexture = getFireworkTexture();
-
-            initParticles();       
-            initInnerParticles();  
-            initShopCards();
-            animate();
-
-            let lastTap = 0;
-            container.addEventListener('touchend', (e) => {
-                const currentTime = new Date().getTime();
-                const tapLength = currentTime - lastTap;
-                if (tapLength < 500 && tapLength > 0) {
-                    toggleExplosion();
-                    e.preventDefault();
-                }
-                lastTap = currentTime;
-            });
-            container.addEventListener('dblclick', toggleExplosion);
-
-            window.addEventListener('resize', onWindowResize, false);
-        }
-
-        // --- 新增：专门用于生成白色名字烟花的函数 ---
-        function launchShopNameFirework(text) {
-            // 1. 生成目标文字的坐标点
-            const textCoords = getSmartTextCoordinates(text);
-            const rocketStart = new THREE.Vector3(0, -300, 0);
-            const explosionCenter = new THREE.Vector3(0, 50, 0); // 在屏幕中心偏上爆炸
-
-            // 2. 创建升空的白色粒子 (Rocket)
-            const rocketGeo = new THREE.BufferGeometry().setFromPoints([rocketStart]);
-            const rocketMat = new THREE.PointsMaterial({
-                size: 15,
-                color: 0xffffff, // 纯白
-                map: fireworkTexture,
-                transparent: true,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false
-            });
-            const rocket = new THREE.Points(rocketGeo, rocketMat);
-            scene.add(rocket);
-
-            // 3. 升空动画 (1秒)
-            const rocketPos = { y: rocketStart.y };
-            gsap.to(rocketPos, {
-                y: explosionCenter.y,
-                duration: 1.0,
-                ease: "power2.out",
-                onUpdate: () => {
-                    rocket.geometry.attributes.position.setY(0, rocketPos.y);
-                    rocket.geometry.attributes.position.needsUpdate = true;
-                },
-                onComplete: () => {
-                    // 4. 到达顶部，移除Rocket，生成文字粒子
-                    scene.remove(rocket);
-                    explodeIntoText(textCoords, explosionCenter);
-                }
-            });
-        }
-
-        // --- 新增：文字爆炸逻辑 ---
-        function explodeIntoText(coords, centerPos) {
-            const count = coords.length;
-            const positions = new Float32Array(count * 3);
-            
-            // 初始所有点都在爆炸中心
-            for(let i=0; i<count; i++) {
-                positions[i*3] = centerPos.x;
-                positions[i*3+1] = centerPos.y;
-                positions[i*3+2] = centerPos.z;
-            }
-
-            const geometry = new THREE.BufferGeometry();
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-            const material = new THREE.PointsMaterial({
-                size: 5, // 粒子大小
-                color: 0xffffff, // 纯白
-                map: fireworkTexture,
-                transparent: true,
-                opacity: 1.0,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false
-            });
-
-            const textSystem = new THREE.Points(geometry, material);
-            scene.add(textSystem);
-
-            // 5. 粒子扩散成文字形状 (0.8秒)
-            // 我们不直接用GSAP数组tween，这太慢。我们用一个对象记录进度
-            const anim = { progress: 0 };
-            
-            gsap.to(anim, {
-                progress: 1,
-                duration: 0.8,
-                ease: "back.out(1.2)", // 带一点弹性的爆炸感
-                onUpdate: () => {
-                    const posAttr = textSystem.geometry.attributes.position;
-                    const p = anim.progress;
-                    for(let i=0; i<count; i++) {
-                        const target = coords[i];
-                        // 从中心插值到目标点
-                        const x = centerPos.x + (target.x * p);
-                        const y = centerPos.y + (target.y * p);
-                        const z = centerPos.z + (target.z * p);
-                        posAttr.setXYZ(i, x, y, z);
-                    }
-                    posAttr.needsUpdate = true;
-                },
-                onComplete: () => {
-                    // 6. 停留一小会，然后消失
-                    gsap.to(material, {
-                        opacity: 0,
-                        duration: 1.5, // 慢慢消失
-                        delay: 0.5,    // 停留0.5秒
-                        onComplete: () => {
-                            scene.remove(textSystem);
-                            geometry.dispose();
-                            material.dispose();
-                        }
-                    });
-                }
-            });
-        }
-
-        // --- 新增：智能文字坐标生成 (适应不同长度的店铺名) ---
-        function getSmartTextCoordinates(text) {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const width = 1024;
-            const height = 256;
-            canvas.width = width;
-            canvas.height = height;
-
-            // 根据字数调整字体大小
-            let fontSize = 100;
-            if (text.length > 10) fontSize = 70; 
-            if (text.length > 15) fontSize = 50;
-
-            ctx.font = `Bold ${fontSize}px Arial`;
-            ctx.fillStyle = 'white';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(text, width / 2, height / 2);
-
-            const imageData = ctx.getImageData(0, 0, width, height);
-            const data = imageData.data;
-            const coords = [];
-            const step = 2; // 采样密度，越小越密
-
-            for(let y = 0; y < height; y += step) {
-                for(let x = 0; x < width; x += step) {
-                    if(data[(y * width + x) * 4 + 3] > 128) {
-                        coords.push({
-                            x: (x - width / 2) * 1.5, // 适当放大
-                            y: (height / 2 - y) * 1.5,
-                            z: (Math.random() - 0.5) * 5 // 增加一点点厚度
-                        });
-                    }
-                }
-            }
-            return coords;
-        }
-
-        // --- 修改 2: 更新文字坐标获取逻辑以支持3行 ---
-        function getTextCoordinates(textLines, fontSize) {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const width = 1200;
-            const height = 500; 
-            canvas.width = width; 
-            canvas.height = height; 
-            
-            ctx.font = fontSize || CONFIG.font;
-            ctx.fillStyle = 'white';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            
-            if (textLines.length === 1) {
-                ctx.fillText(textLines[0], width / 2, height / 2);
-            } else if (textLines.length === 2) {
-                ctx.fillText(textLines[0], width / 2, height * 0.35);
-                ctx.fillText(textLines[1], width / 2, height * 0.75);
-            } else {
-                // 三行文字排版
-                ctx.fillText(textLines[0], width / 2, height * 0.22);
-                ctx.fillText(textLines[1], width / 2, height * 0.50);
-                ctx.fillText(textLines[2], width / 2, height * 0.78);
-            }
-            
-            const imageData = ctx.getImageData(0,0,width,height);
-            const data = imageData.data;
-            const coords = [];
-            const step = 4; 
-
-            for(let y=0; y<height; y+=step) {
-                for(let x=0; x<width; x+=step) {
-                    if(data[(y*width+x)*4+3] > 128) {
-                        coords.push({
-                            x: (x - width/2) * 1.0, 
-                            y: (height/2 - y) * 1.0
-                        });
-                    }
-                }
-            }
-            return coords;
-        }
-
-        function initParticles() {
-            // --- 修改 3: 传入三行文字 ---
-            const coords = getTextCoordinates([CONFIG.textLine1, CONFIG.textLine2, CONFIG.textLine3], CONFIG.font); 
-            const totalPoints = CONFIG.particleCount;
-            
-            const positions = new Float32Array(totalPoints * 3);
-            const targets = new Float32Array(totalPoints * 3);
-            const randoms = new Float32Array(totalPoints * 3);
-            const colors = new Float32Array(totalPoints * 3);
-            const sizes = new Float32Array(totalPoints);
-            const randomOffsets = new Float32Array(totalPoints);
-
-            for (let i = 0; i < totalPoints; i++) {
-                const coord = coords[i % coords.length];
-                targets[i*3] = coord.x;
-                targets[i*3+1] = coord.y;
-                targets[i*3+2] = (Math.random() - 0.5) * 50; 
-
-                const phi = Math.acos(-1 + (2 * i) / totalPoints);
-                const theta = Math.sqrt(totalPoints * Math.PI) * phi;
-                const r = CONFIG.scatterRadius * (0.8 + Math.random() * 0.4);
-                
-                randoms[i*3] = r * Math.cos(theta) * Math.sin(phi);
-                randoms[i*3+1] = r * Math.sin(theta) * Math.sin(phi);
-                randoms[i*3+2] = r * Math.cos(phi);
-
-                positions[i*3] = targets[i*3];
-                positions[i*3+1] = targets[i*3+1];
-                positions[i*3+2] = targets[i*3+2];
-
-                const mixedColor = new THREE.Color().lerpColors(CONFIG.color1, CONFIG.color2, Math.random());
-                colors[i*3] = mixedColor.r;
-                colors[i*3+1] = mixedColor.g;
-                colors[i*3+2] = mixedColor.b;
-                sizes[i] = Math.random();
-                randomOffsets[i] = Math.random() * Math.PI;
-            }
-
-            const geometry = new THREE.BufferGeometry();
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('targetPos', new THREE.BufferAttribute(targets, 3));
-            geometry.setAttribute('randomPos', new THREE.BufferAttribute(randoms, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-            geometry.setAttribute('aOffset', new THREE.BufferAttribute(randomOffsets, 1));
-
-            material = new THREE.ShaderMaterial({
-                uniforms: {
-                    uTime: { value: 0 },
-                    uPixelRatio: { value: renderer.getPixelRatio() },
-                    uMix: { value: 0.0 }
-                },
-                vertexShader: `
-                    uniform float uTime;
-                    uniform float uPixelRatio;
-                    uniform float uMix;
-                    attribute vec3 targetPos;
-                    attribute vec3 randomPos;
-                    attribute vec3 color;
-                    attribute float size;
-                    attribute float aOffset;
-                    varying vec3 vColor;
-                    void main() {
-                        vColor = color;
-                        vec3 pos = mix(targetPos, randomPos, uMix);
-                        float wave = sin(uTime * 0.5 + aOffset) * (0.5 + uMix * 5.0);
-                        pos += normalize(pos) * wave;
-                        vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-                        gl_Position = projectionMatrix * mvPosition;
-                        gl_PointSize = (4.0 * size * uPixelRatio) * (300.0 / -mvPosition.z);
-                    }
-                `,
-                fragmentShader: `
-                    varying vec3 vColor;
-                    void main() {
-                        float r = distance(gl_PointCoord, vec2(0.5));
-                        if (r > 0.5) discard;
-                        gl_FragColor = vec4(vColor, 0.8);
-                    }
-                `,
-                transparent: true,
-                depthWrite: false,
-                blending: THREE.AdditiveBlending
-            });
-
-            const particles = new THREE.Points(geometry, material);
-            scene.add(particles);
-        }
-
-        function initInnerParticles() {
-            const coords = getTextCoordinates([CONFIG.innerText], CONFIG.innerFont); 
-            const totalPoints = Math.floor(CONFIG.particleCount * 0.5); 
-            
-            const positions = new Float32Array(totalPoints * 3);
-            const colors = new Float32Array(totalPoints * 3);
-            const sizes = new Float32Array(totalPoints);
-            const randomOffsets = new Float32Array(totalPoints);
-
-            const gold = new THREE.Color(0xffd700);
-            const white = new THREE.Color(0xffffff);
-
-            for (let i = 0; i < totalPoints; i++) {
-                const coord = coords[i % coords.length];
-                
-                const scale = 0.5; 
-                positions[i*3] = coord.x * scale;
-                positions[i*3+1] = coord.y * scale;
-                positions[i*3+2] = (Math.random() - 0.5) * 20;
-
-                const mixedColor = new THREE.Color().lerpColors(gold, white, Math.random() * 0.5);
-                colors[i*3] = mixedColor.r;
-                colors[i*3+1] = mixedColor.g;
-                colors[i*3+2] = mixedColor.b;
-                sizes[i] = Math.random();
-                randomOffsets[i] = Math.random() * Math.PI;
-            }
-
-            const geometry = new THREE.BufferGeometry();
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
-            geometry.setAttribute('aOffset', new THREE.BufferAttribute(randomOffsets, 1));
-
-            innerMaterial = new THREE.ShaderMaterial({
-                uniforms: {
-                    uTime: { value: 0 },
-                    uPixelRatio: { value: renderer.getPixelRatio() },
-                    uOpacity: { value: 0.0 }
-                },
-                vertexShader: `
-                    uniform float uTime;
-                    uniform float uPixelRatio;
-                    attribute vec3 color;
-                    attribute float size;
-                    attribute float aOffset;
-                    varying vec3 vColor;
-                    void main() {
-                        vColor = color;
-                        vec3 pos = position;
-                        pos.y += sin(uTime + aOffset) * 1.5;
-                        vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-                        gl_Position = projectionMatrix * mvPosition;
-                        gl_PointSize = (3.0 * size * uPixelRatio) * (300.0 / -mvPosition.z);
-                    }
-                `,
-                fragmentShader: `
-                    uniform float uOpacity;
-                    varying vec3 vColor;
-                    void main() {
-                        if (uOpacity <= 0.01) discard;
-                        float r = distance(gl_PointCoord, vec2(0.5));
-                        if (r > 0.5) discard;
-                        gl_FragColor = vec4(vColor, uOpacity); 
-                    }
-                `,
-                transparent: true,
-                depthWrite: false,
-                blending: THREE.AdditiveBlending
-            });
-
-            const particles = new THREE.Points(geometry, innerMaterial);
-            scene.add(particles);
-        }
-
-        function getFireworkTexture() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 32; canvas.height = 32;
-            const context = canvas.getContext('2d');
-            const gradient = context.createRadialGradient(16, 16, 0, 16, 16, 16);
-            gradient.addColorStop(0, 'rgba(255,255,255,1)');
-            gradient.addColorStop(0.4, 'rgba(255,255,255,0.4)');
-            gradient.addColorStop(1, 'rgba(0,0,0,0)');
-            context.fillStyle = gradient;
-            context.fillRect(0, 0, 32, 32);
-            return new THREE.Texture(canvas);
-        }
-
-        const gravityVector = new THREE.Vector3(0, -0.08, 0);
-
-        class Firework {
-            constructor(scene) {
-                this.scene = scene;
-                this.isDead = false;
-                this.exploded = false;
-                const startX = (Math.random() - 0.5) * 600;
-                const startZ = (Math.random() - 0.5) * 300;
-                this.position = new THREE.Vector3(startX, -200, startZ);
-                this.targetY = -50 + Math.random() * 200; 
-                this.velocity = new THREE.Vector3(0, 3 + Math.random() * 2, 0);
-                this.color = new THREE.Color();
-                this.color.setHSL(Math.random(), 1, 0.6);
-
-                const rocketGeo = new THREE.BufferGeometry();
-                rocketGeo.setAttribute('position', new THREE.Float32BufferAttribute(this.position.toArray(), 3));
-                const rocketMat = new THREE.PointsMaterial({
-                    size:   15,
-                    color: this.color,
-                    map: fireworkTexture,
-                    transparent: true,
-                    blending: THREE.AdditiveBlending,
-                    depthWrite: false,
-                    opacity: 1
-                });
-                this.rocket = new THREE.Points(rocketGeo, rocketMat);
-                fireworkTexture.needsUpdate = true; 
-                this.scene.add(this.rocket);
-                this.sparks = []; 
-                this.sparkSystem = null; 
-            }
-            update() {
-                if (this.isDead) return;
-                if (!this.exploded) {
-                    this.position.add(this.velocity);
-                    this.rocket.geometry.attributes.position.setXYZ(0, this.position.x, this.position.y, this.position.z);
-                    this.rocket.geometry.attributes.position.needsUpdate = true;
-                    if (this.position.y >= this.targetY || this.velocity.y < 0) this.explode();
-                } else {
-                    if (!this.sparkSystem) return;
-                    const positions = this.sparkSystem.geometry.attributes.position.array;
-                    for (let i = 0; i < this.sparks.length; i++) {
-                        const spark = this.sparks[i];
-                        spark.velocity.add(gravityVector); 
-                        spark.velocity.multiplyScalar(0.96); 
-                        spark.position.add(spark.velocity);
-                        positions[i * 3] = spark.position.x;
-                        positions[i * 3 + 1] = spark.position.y;
-                        positions[i * 3 + 2] = spark.position.z;
-                        spark.life -= 0.015;
-                    }
-                    this.sparkSystem.geometry.attributes.position.needsUpdate = true;
-                    this.sparkSystem.material.opacity -= 0.015;
-                    if (this.sparkSystem.material.opacity <= 0) this.cleanup();
-                }
-            }
-            explode() {
-                this.exploded = true;
-                this.scene.remove(this.rocket);
-                const sparkCount = 40 + Math.floor(Math.random() * 40);
-                const positions = [];
-                for (let i = 0; i < sparkCount; i++) {
-                    const u = Math.random();
-                    const v = Math.random();
-                    const theta = 2 * Math.PI * u;
-                    const phi = Math.acos(2 * v - 1);
-                    const speed = 1.0 + Math.random() * 2.0;
-                    const vx = speed * Math.sin(phi) * Math.cos(theta);
-                    const vy = speed * Math.sin(phi) * Math.sin(theta);
-                    const vz = speed * Math.cos(phi);
-                    this.sparks.push({
-                        position: this.position.clone(),
-                        velocity: new THREE.Vector3(vx, vy, vz),
-                        life: 1.0
-                    });
-                    positions.push(this.position.x, this.position.y, this.position.z);
-                }
-                const sparkGeo = new THREE.BufferGeometry();
-                sparkGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-                const sparkMat = new THREE.PointsMaterial({
-                    size: 4,
-                    color: this.color,
-                    map: fireworkTexture,
-                    transparent: true,
-                    blending: THREE.AdditiveBlending,
-                    depthWrite: false,
-                    opacity: 1.0
-                });
-                this.sparkSystem = new THREE.Points(sparkGeo, sparkMat);
-                this.scene.add(this.sparkSystem);
-            }
-            cleanup() {
-                this.isDead = true;
-                if (this.rocket) {
-                    this.scene.remove(this.rocket);
-                    this.rocket.geometry.dispose();
-                    this.rocket.material.dispose();
-                }
-                if (this.sparkSystem) {
-                    this.scene.remove(this.sparkSystem);
-                    this.sparkSystem.geometry.dispose();
-                    this.sparkSystem.material.dispose();
-                }
-            }
-        }
-
-        function initShopCards() {
-            const layer = document.getElementById('floating-shops-layer');
-            const originalData = document.querySelectorAll('.shop-data');
-            const phi = Math.PI * (3 - Math.sqrt(5)); 
-            const count = originalData.length;
-            const radius = 280; 
-
-            originalData.forEach((data, i) => {
-                const card = document.createElement('div');
-                card.className = 'floating-shop-card';
-                card.innerHTML = `
-                    <img src="${data.dataset.img}" onerror="this.src='https://placehold.co/140x100?text=Shop'">
-                    <div class="shop-name">${data.dataset.name}</div>
-                `;
-                card.onclick = () => startShopSelection(card, data.dataset.id);
-                layer.appendChild(card);
-                const y = 1 - (i / (count - 1)) * 2; 
-                const r = Math.sqrt(1 - y * y); 
-                const theta = phi * i; 
-                const x = Math.cos(theta) * r;
-                const z = Math.sin(theta) * r;
-                const posVector = new THREE.Vector3(x * radius, y * radius * 0.8, z * radius);
-                shopElements.push({ dom: card, pos: posVector });
-            });
-        }
-
-        function toggleExplosion() {
-            if (isTransitioning) return;
-
-            isExploded = !isExploded;
-            
-            gsap.to(material.uniforms.uMix, {
-                value: isExploded ? 1.0 : 0.0,
-                duration: 2.5,
-                ease: "power2.inOut"
-            });
-
-            if (innerMaterial) {
-                gsap.to(innerMaterial.uniforms.uOpacity, {
-                    value: isExploded ? 1.0 : 0.0, 
-                    duration: isExploded ? 3.0 : 1.5,
-                    ease: "power2.inOut"
-                });
-            }
-
-            gsap.to(controls, {
-                autoRotateSpeed: isExploded ? 0.2 : 1.0,
-                duration: 1
-            });
-
-            const cards = document.querySelectorAll('.floating-shop-card');
-            
-            if(isExploded) {
-                // 修改点：延迟2.2秒后，卡片才逐个出现
-                setTimeout(() => {
-                    cards.forEach((card, i) => {
-                        card.style.display = 'block';
-                        // 使用CSS transition配合延时
-                        setTimeout(() => {
-                            card.style.opacity = 1;
-                        }, i * 150); // 逐个出现
-                    });
-                }, 2200);
-            } else {
-                cards.forEach((card) => {
-                    card.style.opacity = 0;
-                    setTimeout(() => card.style.display = 'none', 500);
-                });
-            }
-            
-            document.querySelector('#three-ui').innerHTML = isExploded 
-                ? "Click a Card to Select<br><span style='font-size:10px'>Double tap to Back</span>" 
-                : "Double Tap to Select Shop<br><span style='font-size:10px'>Happy New Year</span>";
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            material.uniforms.uPixelRatio.value = renderer.getPixelRatio();
-            if(innerMaterial) innerMaterial.uniforms.uPixelRatio.value = renderer.getPixelRatio();
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            if(document.getElementById('three-container').style.display === 'none') return;
-            const time = performance.now() * 0.001;
-            
-            if(material) material.uniforms.uTime.value = time;
-            if(innerMaterial) innerMaterial.uniforms.uTime.value = time;
-
-            let chance = CONFIG.fireworkChance;
-            if (isTransitioning) chance = 0.4;
-
-            if (Math.random() < chance) activeFireworks.push(new Firework(scene));
-            
-            for (let i = activeFireworks.length - 1; i >= 0; i--) {
-                const fw = activeFireworks[i];
-                fw.update();
-                if (fw.isDead) activeFireworks.splice(i, 1);
-            }
-
-            controls.update();
-            renderer.render(scene, camera);
-
-            if(isExploded && !isTransitioning) updateShopCardPositions();
-        }
-
-        function updateShopCardPositions() {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            const widthHalf = width / 2;
-            const heightHalf = height / 2;
-            shopElements.forEach(item => {
-                const pos = item.pos.clone();
-                pos.project(camera);
-                if (pos.z < 1) {
-                    const x = (pos.x * widthHalf) + widthHalf;
-                    const y = -(pos.y * heightHalf) + heightHalf;
-                    const scale = Math.max(0.5, 1 - pos.z); 
-                    item.dom.style.transform = `translate(-50%, -50%) translate3d(${x}px, ${y}px, 0) scale(${scale})`;
-                    item.dom.style.zIndex = Math.floor((1 - pos.z) * 100); 
-                    // 这里不做 display 控制，交给 toggleExplosion 的逻辑
-                    // 仅更新位置
-                }
-            });
-        }
-    </script>
 </body>
-
 </html>
