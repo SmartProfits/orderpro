@@ -212,7 +212,7 @@ window.allProducts = {};
                 { id: 903, name: "Dried mango", unit: 'ctn' }, { id: 904, name: "Coconut milk candy", unit: 'ctn' },
                 { id: 905, name: "Durian milk candy", unit: 'ctn' }, { id: 906, name: "Bird Nest Candy", unit: 'ctn' },
                 { id: 907, name: "Traditional Coconut Candy", unit: 'ctn' }, { id: 908, name: "Kuih Cincin Mini (office)", unit: 'ctn' },
-                { id: 909, name: "Kuih Cincin Besar (office)", unit: 'ctn' },{ id: 912, name: "Rempeyek", unit: 'ctn' }, { id: 910, name: "Kerepek Pisang Manis", unit: 'ctn' },{ id: 911, name: "Kerepek Pisang Masin", unit: 'ctn' }
+                { id: 909, name: "Kuih Cincin Besar (office)", unit: 'ctn' }, { id: 910, name: "Kerepek Pisang Manis", unit: 'ctn' },{ id: 911, name: "Kerepek Pisang Masin", unit: 'ctn' }
             ]
         };
 
@@ -775,8 +775,8 @@ function generateText(forWhatsApp) {
         // 去除value中可能自带的星号，防止重复
         let storeName = selectedStore.value.replace(/\*/g, '');
         
-        result += `🎆 *(${storeName})* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
-        result += `🥳 *(${userName})*\n`;
+        result += `🏪 *(${storeName})* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
+        result += `👤 *(${userName})*\n`;
         result += `📅 ${dateStr}\n`;
         result += `🕠 ${timeStr}\n\n`;
     }
@@ -813,7 +813,7 @@ function generateText(forWhatsApp) {
             // 获取对应图标，如果没有则不显示
             const icon = categoryIcons[cat] || '';
             
-            result += `\n✨ ${cat} ${icon} ✨\n`;
+            result += `\n🔹🔸🔹 ${cat} ${icon} 🔹🔸🔹\n`;
             
             items.forEach(item => {
                 const unit = item.unit || 'ctn'; // 默认单位 ctn
@@ -833,7 +833,7 @@ function generateText(forWhatsApp) {
         }
     }
 
-    result += '\n_Happy New Year ２ ０ ２ ６_';
+    result += '\n_App Version 2.2_';
 
     return result;
 }
