@@ -355,49 +355,8 @@
                 
                 <!-- Product Management -->
                 <div id="products-tab" class="admin-tab-content" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <select id="categorySelect" onchange="loadProductsForAdmin()" style="flex: 1; margin-right: 10px;"></select>
-                        <button onclick="showAddProductModal()" class="action-button promote" style="padding: 8px 16px;">
-                            <span class="material-icons-round" style="font-size: 18px; vertical-align: middle;">add</span> Add Product
-                        </button>
-                    </div>
+                    <select id="categorySelect" onchange="loadProductsForAdmin()" style="margin-bottom: 15px;"></select>
                     <div id="productManagementList" class="product-management-list"></div>
-                </div>
-                
-                <!-- Add/Edit Product Modal -->
-                <div id="productModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center;">
-                    <div style="background: var(--surface-color); padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                            <h3 id="productModalTitle">Add Product</h3>
-                            <span onclick="closeProductModal()" style="font-size: 28px; cursor: pointer;">&times;</span>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 15px;">
-                            <div>
-                                <label style="display: block; margin-bottom: 5px;">Category</label>
-                                <select id="productModalCategory" style="width: 100%; padding: 8px;"></select>
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 5px;">Product ID</label>
-                                <input type="number" id="productModalId" style="width: 100%; padding: 8px;" placeholder="e.g., 101">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 5px;">Product Name</label>
-                                <input type="text" id="productModalName" style="width: 100%; padding: 8px;" placeholder="Product name">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 5px;">Unit (optional)</label>
-                                <input type="text" id="productModalUnit" style="width: 100%; padding: 8px;" placeholder="e.g., ctn, pkt, pc, bdl">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 5px;">Default Quantity (optional)</label>
-                                <input type="number" id="productModalDefaultQuantity" style="width: 100%; padding: 8px;" placeholder="1" value="1">
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <button onclick="saveProduct()" class="action-button promote" style="flex: 1; padding: 12px;">Save</button>
-                                <button onclick="closeProductModal()" class="action-button delete" style="flex: 1; padding: 12px;">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 
                 <!-- Announcement Management -->

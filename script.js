@@ -98,8 +98,11 @@ let currentView = localStorage.getItem('view-mode') || 'list';
 let splashShown = false; // Track splash state
 window.allProducts = {};
 
-// Product Categories Data (RESTORED WITH IMAGES)
- const categories = {
+// Product Categories Data - Now loaded from Firebase
+let categories = {};
+
+// Default categories data for initialization (if Firebase is empty)
+const defaultCategoriesData = {
             BanHeang: [
                 { id: 101, name: "BH Tambun Original" }, { id: 102, name: "BH Tambun Pandan" }, { id: 103, name: "BH Tambun White Lotus" },
                 { id: 104, name: "BH Tau Sar Pheah" }, { id: 166, name: "BH Tau Sar Pheah Spicy Shrimp" },
@@ -215,6 +218,44 @@ window.allProducts = {};
                 { id: 909, name: "Kuih Cincin Besar (office)", unit: 'ctn' }, { id: 910, name: "Kerepek Pisang Manis", unit: 'ctn' },{ id: 911, name: "Kerepek Pisang Masin", unit: 'ctn' }
             ]
         };
+
+// ==========================================
+// FIREBASE CATEGORIES MANAGEMENT
+// ==========================================
+
+// Load categories from Firebase
+function loadCategoriesFromFirebase() {
+    return db.ref('categories').once('value').then(snapshot => {
+        if (snapshot.exists()) {
+            categories = snapshot.val();
+            initAllProducts();
+            return true;
+        } else {
+            // Initialize with default data if Firebase is empty
+            return initializeCategoriesToFirebase();
+        }
+    }).catch(error => {
+        console.error("Error loading categories:", error);
+        // Fallback to default data on error
+        categories = defaultCategoriesData;
+        initAllProducts();
+        return false;
+    });
+}
+
+// Initialize categories to Firebase (if empty)
+function initializeCategoriesToFirebase() {
+    return db.ref('categories').set(defaultCategoriesData).then(() => {
+        categories = defaultCategoriesData;
+        initAllProducts();
+        return true;
+    }).catch(error => {
+        console.error("Error initializing categories:", error);
+        categories = defaultCategoriesData;
+        initAllProducts();
+        return false;
+    });
+}
 
 // ==========================================
 // SPLASH SCREEN LOGIC
@@ -353,8 +394,11 @@ function openAdminPanel() {
     playEffect('click');
     document.getElementById('adminPanel').style.display = 'flex';
     loadUsersList();
-    initAdminPanel();
-    showAdminTab('users');
+    // Reload categories to ensure we have latest data
+    loadCategoriesFromFirebase().then(() => {
+        initAdminPanel();
+        showAdminTab('users');
+    });
 }
 
 function showAdminTab(tabName) {
@@ -468,9 +512,12 @@ function deleteUser(uid) {
 function loadProductsForAdmin() {
     const cat = document.getElementById('categorySelect').value;
     const div = document.getElementById('productManagementList');
-    if (!cat) return;
+    if (!cat) {
+        div.innerHTML = '<p>Please select a category</p>';
+        return;
+    }
     
-    const products = categories[cat];
+    const products = categories[cat] || [];
     div.innerHTML = 'Loading...';
 
     Promise.all([
@@ -481,23 +528,33 @@ function loadProductsForAdmin() {
         const boxData = boxSnap.val() || {};
         div.innerHTML = '';
 
+        if (products.length === 0) {
+            div.innerHTML = '<p>No products in this category. Click "Add Product" to add one.</p>';
+            return;
+        }
+
         products.forEach(p => {
             const isNew = newData[p.id];
             const newUntil = isNew ? new Date(isNew.until) : null;
             const isStillNew = isNew && newUntil > new Date();
             const boxCount = boxData[p.id] || 0;
+            const unit = p.unit || 'ctn';
+            const defaultQty = p.defaultQuantity || 1;
 
             div.innerHTML += `
-                <div class="product-item ${isStillNew ? 'new-product' : ''}">
-                    <div style="font-weight:bold; margin-bottom:5px;">${p.name} ${isStillNew ? '🔥' : ''}</div>
-                    <label style="font-size:0.85rem; display:block;">Unit Count: 
-                        <input type="number" value="${boxCount}" onchange="saveProductBoxCount(${p.id}, this.value)" style="width:60px; padding:4px;">
+                <div class="product-item ${isStillNew ? 'new-product' : ''}" style="border: 1px solid var(--border-color); padding: 15px; margin-bottom: 10px; border-radius: 8px;">
+                    <div style="font-weight:bold; margin-bottom:8px;">ID: ${p.id} - ${p.name} ${isStillNew ? '🔥' : ''}</div>
+                    <div style="font-size:0.85rem; margin-bottom:5px; color: var(--text-secondary);">Unit: ${unit}, Default Qty: ${defaultQty}</div>
+                    <label style="font-size:0.85rem; display:block; margin-bottom:8px;">Unit Count: 
+                        <input type="number" value="${boxCount}" onchange="saveProductBoxCount(${p.id}, this.value)" style="width:60px; padding:4px; margin-left:5px;">
                     </label>
-                    <div style="margin-top:8px;">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="action-button promote" onclick="editProduct(${p.id}, '${cat}')" style="padding: 6px 12px; font-size: 0.85rem;">Edit</button>
                         ${isStillNew ? 
-                            `<button class="action-button delete" onclick="toggleNewProduct(${p.id}, false)">Remove New Tag</button>` :
-                            `<button class="action-button promote" onclick="toggleNewProduct(${p.id}, true)">Mark as New</button>`
+                            `<button class="action-button delete" onclick="toggleNewProduct(${p.id}, false)" style="padding: 6px 12px; font-size: 0.85rem;">Remove New Tag</button>` :
+                            `<button class="action-button promote" onclick="toggleNewProduct(${p.id}, true)" style="padding: 6px 12px; font-size: 0.85rem;">Mark as New</button>`
                         }
+                        <button class="action-button delete" onclick="deleteProduct(${p.id}, '${cat}')" style="padding: 6px 12px; font-size: 0.85rem;">Delete</button>
                     </div>
                 </div>
             `;
@@ -517,6 +574,184 @@ function toggleNewProduct(pid, state) {
     } else {
         db.ref(`newProducts/${pid}`).remove().then(() => loadProductsForAdmin());
     }
+}
+
+// Add/Edit Product Functions
+let editingProductId = null;
+let editingCategory = null;
+
+function showAddProductModal() {
+    playEffect('click');
+    editingProductId = null;
+    editingCategory = null;
+    document.getElementById('productModalTitle').textContent = 'Add Product';
+    document.getElementById('productModalId').value = '';
+    document.getElementById('productModalName').value = '';
+    document.getElementById('productModalUnit').value = '';
+    document.getElementById('productModalDefaultQuantity').value = '1';
+    
+    // Populate category select
+    const catSelect = document.getElementById('productModalCategory');
+    catSelect.innerHTML = '<option value="">-- Select Category --</option>';
+    Object.keys(categories).forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        catSelect.appendChild(option);
+    });
+    
+    // Pre-select if category is already selected in admin panel
+    const currentCat = document.getElementById('categorySelect').value;
+    if (currentCat) {
+        catSelect.value = currentCat;
+    }
+    
+    document.getElementById('productModal').style.display = 'flex';
+}
+
+function closeProductModal() {
+    playEffect('click');
+    document.getElementById('productModal').style.display = 'none';
+    editingProductId = null;
+    editingCategory = null;
+}
+
+function editProduct(productId, category) {
+    playEffect('click');
+    editingProductId = productId;
+    editingCategory = category;
+    
+    document.getElementById('productModalId').disabled = false; // Reset disabled state
+    
+    const product = categories[category].find(p => p.id === productId);
+    if (!product) {
+        alert('Product not found');
+        return;
+    }
+    
+    document.getElementById('productModalTitle').textContent = 'Edit Product';
+    document.getElementById('productModalId').value = product.id;
+    document.getElementById('productModalId').disabled = true; // Can't change ID
+    document.getElementById('productModalName').value = product.name;
+    document.getElementById('productModalUnit').value = product.unit || '';
+    document.getElementById('productModalDefaultQuantity').value = product.defaultQuantity || 1;
+    
+    // Populate category select
+    const catSelect = document.getElementById('productModalCategory');
+    catSelect.innerHTML = '<option value="">-- Select Category --</option>';
+    Object.keys(categories).forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        if (cat === category) option.selected = true;
+        catSelect.appendChild(option);
+    });
+    
+    document.getElementById('productModal').style.display = 'flex';
+}
+
+function saveProduct() {
+    playEffect('success');
+    const cat = document.getElementById('productModalCategory').value;
+    const id = parseInt(document.getElementById('productModalId').value);
+    const name = document.getElementById('productModalName').value.trim();
+    const unit = document.getElementById('productModalUnit').value.trim();
+    const defaultQuantity = parseInt(document.getElementById('productModalDefaultQuantity').value) || 1;
+    
+    if (!cat || !id || !name) {
+        alert('Please fill in Category, ID, and Name');
+        return;
+    }
+    
+    const productData = {
+        id: id,
+        name: name
+    };
+    
+    if (unit) productData.unit = unit;
+    if (defaultQuantity !== 1) productData.defaultQuantity = defaultQuantity;
+    
+    if (editingProductId && editingCategory) {
+        // Edit mode
+        const oldIndex = categories[editingCategory].findIndex(p => p.id === editingProductId);
+        if (oldIndex === -1) {
+            alert('Product not found');
+            return;
+        }
+        
+        // Remove from old category if category changed
+        if (editingCategory !== cat) {
+            categories[editingCategory].splice(oldIndex, 1);
+        } else {
+            // Update in place
+            categories[cat][oldIndex] = productData;
+        }
+        
+        // Add to new category if category changed
+        if (editingCategory !== cat) {
+            if (!categories[cat]) categories[cat] = [];
+            categories[cat].push(productData);
+        }
+    } else {
+        // Add mode - check if ID already exists
+        let idExists = false;
+        for (const [catKey, products] of Object.entries(categories)) {
+            if (products.some(p => p.id === id)) {
+                idExists = true;
+                break;
+            }
+        }
+        
+        if (idExists) {
+            alert(`Product ID ${id} already exists. Please use Edit instead.`);
+            return;
+        }
+        
+        // Add new product
+        if (!categories[cat]) categories[cat] = [];
+        categories[cat].push(productData);
+    }
+    
+    // Sort products by ID in the category
+    if (categories[cat]) {
+        categories[cat].sort((a, b) => a.id - b.id);
+    }
+    
+    // Save to Firebase
+    db.ref('categories').set(categories).then(() => {
+        initAllProducts(); // Update allProducts
+        loadProductsForAdmin(); // Refresh admin list
+        closeProductModal();
+        alert('Product saved successfully!');
+    }).catch(error => {
+        alert('Error saving product: ' + error.message);
+    });
+}
+
+function deleteProduct(productId, category) {
+    if (!confirm(`Delete product ID ${productId} from ${category}? This cannot be undone.`)) {
+        return;
+    }
+    
+    playEffect('click');
+    const products = categories[category];
+    const index = products.findIndex(p => p.id === productId);
+    
+    if (index === -1) {
+        alert('Product not found');
+        return;
+    }
+    
+    products.splice(index, 1);
+    
+    // Save to Firebase
+    db.ref('categories').set(categories).then(() => {
+        initAllProducts(); // Update allProducts
+        loadProductsForAdmin(); // Refresh admin list
+        alert('Product deleted successfully!');
+    }).catch(error => {
+        alert('Error deleting product: ' + error.message);
+    });
 }
 
 // --- Announcement Management ---
@@ -1030,6 +1265,9 @@ auth.onAuthStateChanged(user => {
         // User is logged in
         document.getElementById('authContainer').style.display = 'none';
         
+        // Load categories if not already loaded
+        loadCategoriesFromFirebase();
+        
         if (!splashShown) {
             // Play animation if first load
             playOpeningAnimation(() => {
@@ -1161,11 +1399,13 @@ function closeFullscreenConfirm() {
 function toggleItems(){}
 
 window.addEventListener('load', () => {
-    initAllProducts();
-    const savedTheme = localStorage.getItem('dark-mode');
-    if(savedTheme === 'disabled') changeTheme('light');
-    toggleView(currentView);
-    toggleVibration(localStorage.getItem('vibration-enabled') !== 'disabled');
+    // Load categories from Firebase first
+    loadCategoriesFromFirebase().then(() => {
+        const savedTheme = localStorage.getItem('dark-mode');
+        if(savedTheme === 'disabled') changeTheme('light');
+        toggleView(currentView);
+        toggleVibration(localStorage.getItem('vibration-enabled') !== 'disabled');
+    });
     
     db.ref('announcement').on('value', snap => {
         const data = snap.val();
