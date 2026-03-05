@@ -1007,13 +1007,16 @@ function generateText(forWhatsApp) {
 
     // 构建头部信息
     if (selectedStore) {
-        // 去除value中可能自带的星号，防止重复
         let storeName = selectedStore.value.replace(/\*/g, '');
-        
-        result += `🏪 *(${storeName})* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
-        result += `👤 *(${userName})*\n`;
+
+        //result += `🌙✨ *Selamat Hari Raya Aidilfitri* ✨🌙\n`;
+        result += `🪔 *Stock Request* 🪔\n`;
+        result += `━━━━━━━━━━━━━━━━━━━━\n`;
+        result += `🕌 *(${storeName})* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
+        result += `👳‍♀️ *(${userName})*\n`;
         result += `📅 ${dateStr}\n`;
-        result += `🕠 ${timeStr}\n\n`;
+        result += `🕠 ${timeStr}\n`;
+        result += `━━━━━━━━━━━━━━━━━━━━\n\n`;
     }
 
     // 处理商品分类和计数
@@ -1048,7 +1051,7 @@ function generateText(forWhatsApp) {
             // 获取对应图标，如果没有则不显示
             const icon = categoryIcons[cat] || '';
             
-            result += `\n🔹🔸🔹 ${cat} ${icon} 🔹🔸🔹\n`;
+        result += `\n⭐ ${cat} ${icon} 🌙\n`;
             
             items.forEach(item => {
                 const unit = item.unit || 'ctn'; // 默认单位 ctn
@@ -1068,7 +1071,7 @@ function generateText(forWhatsApp) {
         }
     }
 
-    result += '\n_App Version 2.2_';
+    result += `\n━━━━━━━━━━━━━━━━━━━━\n_App Version 2.2_`;
 
     return result;
 }
