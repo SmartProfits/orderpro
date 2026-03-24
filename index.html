@@ -5,32 +5,25 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <meta charset="UTF-8" />
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Airport Stock Request</title>
-
-    <!-- Google Material Icons -->
+    
+    <!-- Font and Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <!-- Poppins Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Matter.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-
+    
     <!-- PWA相关标记 -->
-    <meta name="theme-color" content="#C8973A">
+    <meta name="theme-color" content="#1a2035">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./icons/s2.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+    
     <!-- 引入外部样式表 -->
     <link rel="stylesheet" href="style.css">
-
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -40,71 +33,9 @@
 
 <body class="dark-mode"> <!-- Default to Dark Mode -->
 
-    <!-- EID TOP BANNER -->
-    <div id="eid-top-banner"></div>
-
-    <!-- THREE.JS CANVAS -->
-    <canvas id="eid-three-canvas"></canvas>
-
-    <!-- EID SVG CORNER DECORATIONS -->
-    <!-- Top-left arabesque -->
-    <svg class="eid-svg-decoration top-left" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <g fill="none" stroke="#C8973A" stroke-width="1.5">
-            <path d="M10,10 Q60,10 60,60 Q60,10 110,10" opacity="0.8" />
-            <path d="M10,30 Q50,30 50,70 Q50,30 90,30" opacity="0.6" />
-            <path d="M10,50 Q40,50 40,90" opacity="0.4" />
-            <circle cx="10" cy="10" r="5" fill="#C8973A" opacity="0.6" />
-            <circle cx="110" cy="10" r="3" fill="#E8B95A" opacity="0.5" />
-            <path d="M20,0 Q20,40 60,40 Q20,40 20,80" opacity="0.5" />
-            <!-- Geometric star -->
-            <path d="M50,5 L55,18 L70,18 L58,27 L63,40 L50,31 L37,40 L42,27 L30,18 L45,18 Z"
-                fill="rgba(200,151,58,0.15)" stroke="#C8973A" stroke-width="1" />
-        </g>
-    </svg>
-    <!-- Top-right arabesque -->
-    <svg class="eid-svg-decoration top-right" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <g fill="none" stroke="#4A9B6F" stroke-width="1.5">
-            <path d="M190,10 Q140,10 140,60 Q140,10 90,10" opacity="0.8" />
-            <path d="M190,30 Q150,30 150,70 Q150,30 110,30" opacity="0.6" />
-            <path d="M190,50 Q160,50 160,90" opacity="0.4" />
-            <circle cx="190" cy="10" r="5" fill="#4A9B6F" opacity="0.6" />
-            <circle cx="90" cy="10" r="3" fill="#E8B95A" opacity="0.5" />
-            <!-- Crescent moon -->
-            <path d="M155,15 a20,20 0 1,1 18,18 a14,14 0 1,0 -18,-18" fill="rgba(74,155,111,0.2)" stroke="#4A9B6F"
-                stroke-width="1" />
-        </g>
-    </svg>
-
-    <!-- SPLASH SCREEN -->
+    <!-- SPLASH SCREEN (新添加的开场动画层) -->
     <div id="splashScreen">
-        <!-- Decorative SVGs -->
-        <svg class="eid-splash-deco" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-            <g fill="none" stroke="#C8973A" stroke-width="2">
-                <!-- Crescent -->
-                <path d="M60,20 a40,40 0 1,1 28,68 a30,30 0 1,0 -28,-68" stroke-width="3" />
-                <!-- Stars -->
-                <path d="M95,25 L98,32 L105,32 L99,37 L101,44 L95,39 L89,44 L91,37 L85,32 L92,32 Z"
-                    fill="rgba(200,151,58,0.5)" />
-                <path d="M30,70 L32,76 L38,76 L33,79 L35,85 L30,82 L25,85 L27,79 L22,76 L28,76 Z"
-                    fill="rgba(74,155,111,0.4)" />
-                <!-- Geometric rings -->
-                <circle cx="60" cy="60" r="50" stroke-dasharray="6 10" opacity="0.4" />
-                <circle cx="60" cy="60" r="40" stroke-dasharray="4 8" opacity="0.3" />
-            </g>
-        </svg>
-        <svg class="eid-splash-deco-left" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <g fill="none" stroke="#4A9B6F" stroke-width="2">
-                <!-- Ketupat (diamond) -->
-                <path d="M50,5 L95,50 L50,95 L5,50 Z" stroke-width="2.5" />
-                <path d="M50,20 L80,50 L50,80 L20,50 Z" opacity="0.6" />
-                <path d="M50,35 L65,50 L50,65 L35,50 Z" opacity="0.4" />
-                <!-- Cross lines inside ketupat -->
-                <line x1="50" y1="5" x2="50" y2="95" opacity="0.2" />
-                <line x1="5" y1="50" x2="95" y2="50" opacity="0.2" />
-            </g>
-        </svg>
         <div class="splash-content">
-            <div class="splash-eid-greeting">Selamat Hari Raya</div>
             <span class="material-icons-round splash-logo-icon">rocket_launch</span>
             <h1 class="splash-title">SmartProfits</h1>
             <div class="splash-subtitle">Stock Request</div>
@@ -118,11 +49,10 @@
     </div>
 
     <!-- 认证容器 -->
-    <div id="authContainer" class="auth-container"
-        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 9999;">
+    <div id="authContainer" class="auth-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 9999;">
         <div class="auth-box" style="width: 90%; max-width: 400px;">
             <h2 id="authTitle" style="text-align: center;">Welcome Back</h2>
-
+            
             <!-- Login Form -->
             <div id="loginForm" class="auth-form">
                 <div style="margin-bottom: 16px;">
@@ -136,7 +66,7 @@
                     Create an account
                 </div>
             </div>
-
+            
             <!-- Register Form -->
             <div id="registerForm" class="auth-form" style="display: none;">
                 <div style="margin-bottom: 16px;">
@@ -153,16 +83,13 @@
                     Already have an account? Login
                 </div>
             </div>
-
+            
             <!-- Pending Form -->
             <div id="pendingForm" class="auth-form" style="display: none; text-align: center;">
                 <div style="font-size: 50px; margin-bottom: 20px;">⏳</div>
                 <h3>Verification Pending</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 0.9rem;">Your account is under
-                    review by the administrator.</p>
-                <button onclick="backToLogin()"
-                    style="background: transparent; color: var(--text-primary); border: 1px solid var(--border-color);">Back
-                    to Login</button>
+                <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 0.9rem;">Your account is under review by the administrator.</p>
+                <button onclick="backToLogin()" style="background: transparent; color: var(--text-primary); border: 1px solid var(--border-color);">Back to Login</button>
             </div>
         </div>
     </div>
@@ -236,8 +163,7 @@
         </div>
 
 
-        <h3 id="categoryTitle" style="display: none;"><span class="material-icons-round"
-                style="color: var(--primary-color)">category</span> Category</h3>
+        <h3 id="categoryTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">category</span> Category</h3>
         <div class="category-container" id="categoryContainer" style="display: none;">
             <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
                 <input type="radio" name="category" value="BanHeang" id="banheang" style="display:none">
@@ -289,10 +215,8 @@
         <!-- Search and View Toggle -->
         <div class="tools-bar" id="searchContainer" style="display: none;">
             <div style="position: relative; flex: 1;">
-                <span class="material-icons"
-                    style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">search</span>
-                <input type="text" id="productSearch" placeholder="Search product..." oninput="searchProduct()"
-                    autocomplete="off">
+                <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">search</span>
+                <input type="text" id="productSearch" placeholder="Search product..." oninput="searchProduct()" autocomplete="off">
             </div>
             <div class="view-toggle-group" id="viewToggleContainer">
                 <button id="listViewBtn" onclick="toggleView('list')" class="view-toggle-btn active">
@@ -304,12 +228,9 @@
             </div>
         </div>
 
-        <div id="suggestions"
-            style="background: var(--surface-color); border-radius: 12px; margin-bottom: 10px; overflow: hidden; display: none;">
-        </div>
-
-        <h3 id="selectItemsTitle" style="display: none;"><span class="material-icons-round"
-                style="color: var(--primary-color)">list_alt</span> Select Items</h3>
+        <div id="suggestions" style="background: var(--surface-color); border-radius: 12px; margin-bottom: 10px; overflow: hidden; display: none;"></div>
+        
+        <h3 id="selectItemsTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">list_alt</span> Select Items</h3>
         <div id="productList" style="display: none;"></div>
 
         <!-- Bottom Navigation -->
@@ -333,13 +254,10 @@
     </div> <!-- End Main Content -->
 
     <!-- Image Modal -->
-    <div id="imageModal" class="image-modal"
-        style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; justify-content:center; align-items:center;">
-        <span class="close-modal" onclick="closeImageModal()"
-            style="position:absolute; top:20px; right:20px; color:white; font-size:30px; cursor:pointer; z-index: 2001;">&times;</span>
+    <div id="imageModal" class="image-modal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; justify-content:center; align-items:center;">
+        <span class="close-modal" onclick="closeImageModal()" style="position:absolute; top:20px; right:20px; color:white; font-size:30px; cursor:pointer; z-index: 2001;">&times;</span>
         <div class="modal-content" style="max-width:90%; max-height:80%; position: relative;">
-            <img id="modalImage" src=""
-                style="max-width:100%; max-height:100%; border-radius:8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+            <img id="modalImage" src="" style="max-width:100%; max-height:100%; border-radius:8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
         </div>
     </div>
 
@@ -352,16 +270,13 @@
             </div>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <label style="display: flex; align-items: center; gap: 6px; font-size: 0.9rem;">
-                    <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()"
-                        style="width: 16px; height: 16px;">
+                    <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()" style="width: 16px; height: 16px;">
                     Add On
                 </label>
-                <span class="material-icons-round" onclick="togglePreview()"
-                    style="cursor: pointer; color: var(--text-secondary);">close</span>
+                <span class="material-icons-round" onclick="togglePreview()" style="cursor: pointer; color: var(--text-secondary);">close</span>
             </div>
         </div>
-        <div id="preview-content" style="font-size: 0.9rem; line-height: 1.6; max-height: 40vh; overflow-y: auto;">
-        </div>
+        <div id="preview-content" style="font-size: 0.9rem; line-height: 1.6; max-height: 40vh; overflow-y: auto;"></div>
         <button class="whatsapp-button" onclick="copyAndSendWhatsApp()">
             <span class="material-icons-round" style="margin-right: 8px;">whatsapp</span>
             Send to WhatsApp
@@ -369,80 +284,61 @@
     </div>
 
     <!-- Fullscreen Confirm -->
-    <div id="fullscreenConfirm"
-        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: none; padding: 20px; overflow-y: auto;">
+    <div id="fullscreenConfirm" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: none; padding: 20px; overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2 style="color: var(--text-primary);">Confirm Order</h2>
-            <span class="material-icons-round" onclick="closeFullscreenConfirm()"
-                style="font-size: 28px; cursor: pointer;">close</span>
+            <span class="material-icons-round" onclick="closeFullscreenConfirm()" style="font-size: 28px; cursor: pointer;">close</span>
         </div>
-        <div id="fullscreen-content"
-            style="background: var(--surface-color); padding: 20px; border-radius: var(--radius-md); margin-bottom: 20px; line-height: 1.6;">
-        </div>
+        <div id="fullscreen-content" style="background: var(--surface-color); padding: 20px; border-radius: var(--radius-md); margin-bottom: 20px; line-height: 1.6;"></div>
         <div style="display: flex; gap: 12px;">
-            <button onclick="confirmAndSendWhatsApp()"
-                style="flex: 1; background: var(--success-color); color: white; padding: 15px; border-radius: var(--radius-md);">Confirm</button>
-            <button onclick="closeFullscreenConfirm()"
-                style="flex: 1; background: var(--surface-color); border: 1px solid var(--danger-color); color: var(--danger-color); padding: 15px; border-radius: var(--radius-md);">Cancel</button>
+            <button onclick="confirmAndSendWhatsApp()" style="flex: 1; background: var(--success-color); color: white; padding: 15px; border-radius: var(--radius-md);">Confirm</button>
+            <button onclick="closeFullscreenConfirm()" style="flex: 1; background: var(--surface-color); border: 1px solid var(--danger-color); color: var(--danger-color); padding: 15px; border-radius: var(--radius-md);">Cancel</button>
         </div>
     </div>
 
     <!-- Settings Panel -->
-    <div id="settings-panel"
-        style="position: fixed; bottom: 80px; right: 20px; width: 260px; background: var(--surface-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 20px; z-index: 1001; display: none; border: 1px solid var(--border-color);">
+    <div id="settings-panel" style="position: fixed; bottom: 80px; right: 20px; width: 260px; background: var(--surface-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 20px; z-index: 1001; display: none; border: 1px solid var(--border-color);">
         <h3 style="margin-top: 0;">Settings</h3>
         <div style="margin-bottom: 15px;">
             <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Appearance</label>
             <div style="display: flex; gap: 8px;">
-                <button onclick="changeTheme('dark')"
-                    style="flex: 1; padding: 8px; background: #333; color: white; border-radius: 6px;">Dark</button>
-                <button onclick="changeTheme('light')"
-                    style="flex: 1; padding: 8px; background: #f0f0f0; color: #333; border-radius: 6px;">Light</button>
+                <button onclick="changeTheme('dark')" style="flex: 1; padding: 8px; background: #333; color: white; border-radius: 6px;">Dark</button>
+                <button onclick="changeTheme('light')" style="flex: 1; padding: 8px; background: #f0f0f0; color: #333; border-radius: 6px;">Light</button>
             </div>
         </div>
         <div>
             <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Vibration</label>
             <div style="display: flex; gap: 8px;">
-                <button id="vibration-on-btn" onclick="toggleVibration(true)"
-                    style="flex: 1; padding: 8px; border-radius: 6px;">On</button>
-                <button id="vibration-off-btn" onclick="toggleVibration(false)"
-                    style="flex: 1; padding: 8px; border-radius: 6px;">Off</button>
+                <button id="vibration-on-btn" onclick="toggleVibration(true)" style="flex: 1; padding: 8px; border-radius: 6px;">On</button>
+                <button id="vibration-off-btn" onclick="toggleVibration(false)" style="flex: 1; padding: 8px; border-radius: 6px;">Off</button>
             </div>
         </div>
     </div>
 
     <!-- Side Dashboard -->
-    <div id="side-dashboard"
-        style="position: fixed; top: 0; left: 0; width: 280px; height: 100%; background: var(--surface-color); z-index: 1500; display: none; flex-direction: column; box-shadow: 2px 0 20px rgba(0,0,0,0.2);">
+    <div id="side-dashboard" style="position: fixed; top: 0; left: 0; width: 280px; height: 100%; background: var(--surface-color); z-index: 1500; display: none; flex-direction: column; box-shadow: 2px 0 20px rgba(0,0,0,0.2);">
         <div style="padding: 40px 20px 20px; background: var(--primary-color); color: white;">
             <h2 style="margin-bottom: 5px;">Welcome</h2>
             <div id="dashboardUserName" style="font-size: 1.1rem;">Guest</div>
             <div id="dashboardUserRole" style="font-size: 0.8rem; opacity: 0.8;">User</div>
         </div>
         <div style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
-            <button id="dashboardAdminButton" onclick="openAdminPanel(); toggleDashboard();"
-                style="background: var(--bg-color); color: var(--text-primary); padding: 12px; justify-content: flex-start; border: 1px solid var(--border-color); border-radius: var(--radius-md); display: none;">
+             <button id="dashboardAdminButton" onclick="openAdminPanel(); toggleDashboard();" style="background: var(--bg-color); color: var(--text-primary); padding: 12px; justify-content: flex-start; border: 1px solid var(--border-color); border-radius: var(--radius-md); display: none;">
                 <span class="material-icons" style="margin-right: 10px;">admin_panel_settings</span> Admin Panel
             </button>
-            <button onclick="logout()"
-                style="background: rgba(255, 68, 68, 0.1); color: var(--danger-color); padding: 12px; justify-content: flex-start; border: 1px solid var(--danger-color); border-radius: var(--radius-md);">
+            <button onclick="logout()" style="background: rgba(255, 68, 68, 0.1); color: var(--danger-color); padding: 12px; justify-content: flex-start; border: 1px solid var(--danger-color); border-radius: var(--radius-md);">
                 <span class="material-icons" style="margin-right: 10px;">logout</span> Logout
             </button>
         </div>
     </div>
-    <div id="dashboard-overlay" onclick="toggleDashboard()"
-        style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1499; display: none;">
-    </div>
+    <div id="dashboard-overlay" onclick="toggleDashboard()" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1499; display: none;"></div>
 
     <!-- Admin Panel -->
-    <div id="adminPanel" class="auth-container"
-        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 2000;">
-        <div class="auth-box"
-            style="width: 95%; height: 90vh; max-width: 800px; display: flex; flex-direction: column; overflow: hidden;">
+    <div id="adminPanel" class="auth-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 2000;">
+        <div class="auth-box" style="width: 95%; height: 90vh; max-width: 800px; display: flex; flex-direction: column; overflow: hidden;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h2>Admin Panel</h2>
-                <span onclick="document.getElementById('adminPanel').style.display='none'"
-                    style="font-size: 28px; cursor: pointer;">&times;</span>
+                <span onclick="document.getElementById('adminPanel').style.display='none'" style="font-size: 28px; cursor: pointer;">&times;</span>
             </div>
             <div class="admin-tabs">
                 <button class="tab-button active" onclick="showAdminTab('users')">Users</button>
@@ -457,29 +353,22 @@
                     <h3 style="margin-top: 20px;">All Users</h3>
                     <div id="allUsersList" class="users-list">Loading...</div>
                 </div>
-
+                
                 <!-- Product Management -->
                 <div id="products-tab" class="admin-tab-content" style="display: none;">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <select id="categorySelect" onchange="loadProductsForAdmin()"
-                            style="flex: 1; margin-right: 10px;"></select>
-                        <button onclick="showAddProductModal()" class="action-button promote"
-                            style="padding: 8px 16px;">
-                            <span class="material-icons-round"
-                                style="font-size: 18px; vertical-align: middle;">add</span> Add Product
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <select id="categorySelect" onchange="loadProductsForAdmin()" style="flex: 1; margin-right: 10px;"></select>
+                        <button onclick="showAddProductModal()" class="action-button promote" style="padding: 8px 16px;">
+                            <span class="material-icons-round" style="font-size: 18px; vertical-align: middle;">add</span> Add Product
                         </button>
                     </div>
                     <div id="productManagementList" class="product-management-list"></div>
                 </div>
-
+                
                 <!-- Add/Edit Product Modal -->
-                <div id="productModal"
-                    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center;">
-                    <div
-                        style="background: var(--surface-color); padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div id="productModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center;">
+                    <div style="background: var(--surface-color); padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                             <h3 id="productModalTitle">Add Product</h3>
                             <span onclick="closeProductModal()" style="font-size: 28px; cursor: pointer;">&times;</span>
                         </div>
@@ -490,54 +379,41 @@
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 5px;">Product ID</label>
-                                <input type="number" id="productModalId" style="width: 100%; padding: 8px;"
-                                    placeholder="e.g., 101">
+                                <input type="number" id="productModalId" style="width: 100%; padding: 8px;" placeholder="e.g., 101">
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 5px;">Product Name</label>
-                                <input type="text" id="productModalName" style="width: 100%; padding: 8px;"
-                                    placeholder="Product name">
+                                <input type="text" id="productModalName" style="width: 100%; padding: 8px;" placeholder="Product name">
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 5px;">Unit (optional)</label>
-                                <input type="text" id="productModalUnit" style="width: 100%; padding: 8px;"
-                                    placeholder="e.g., ctn, pkt, pc, bdl">
+                                <input type="text" id="productModalUnit" style="width: 100%; padding: 8px;" placeholder="e.g., ctn, pkt, pc, bdl">
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 5px;">Default Quantity (optional)</label>
-                                <input type="number" id="productModalDefaultQuantity" style="width: 100%; padding: 8px;"
-                                    placeholder="1" value="1">
+                                <input type="number" id="productModalDefaultQuantity" style="width: 100%; padding: 8px;" placeholder="1" value="1">
                             </div>
                             <div style="display: flex; gap: 10px;">
-                                <button onclick="saveProduct()" class="action-button promote"
-                                    style="flex: 1; padding: 12px;">Save</button>
-                                <button onclick="closeProductModal()" class="action-button delete"
-                                    style="flex: 1; padding: 12px;">Cancel</button>
+                                <button onclick="saveProduct()" class="action-button promote" style="flex: 1; padding: 12px;">Save</button>
+                                <button onclick="closeProductModal()" class="action-button delete" style="flex: 1; padding: 12px;">Cancel</button>
                             </div>
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Announcement Management -->
                 <div id="announcement-tab" class="admin-tab-content" style="display: none;">
                     <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                        <input type="checkbox" id="announcementEnabled" onchange="toggleAnnouncement()"> Enable
-                        Announcement
+                        <input type="checkbox" id="announcementEnabled" onchange="toggleAnnouncement()"> Enable Announcement
                     </label>
                     <div id="announcementSettings" style="display: none;">
-                        <textarea id="announcementText" rows="3" placeholder="Announcement content..."
-                            style="margin-bottom: 10px;"></textarea>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                            <label style="font-size:0.8rem">Start Time:<input type="datetime-local"
-                                    id="announcementStartTime"></label>
-                            <label style="font-size:0.8rem">End Time:<input type="datetime-local"
-                                    id="announcementEndTime"></label>
+                        <textarea id="announcementText" rows="3" placeholder="Announcement content..." style="margin-bottom: 10px;"></textarea>
+                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <label style="font-size:0.8rem">Start Time:<input type="datetime-local" id="announcementStartTime"></label>
+                            <label style="font-size:0.8rem">End Time:<input type="datetime-local" id="announcementEndTime"></label>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                            <select id="announcementFontSize">
-                                <option value="16px">Normal</option>
-                                <option value="20px">Large</option>
-                            </select>
+                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <select id="announcementFontSize"><option value="16px">Normal</option><option value="20px">Large</option></select>
                             <input type="color" id="announcementTextColor" value="#ffffff" style="height: 45px;">
                         </div>
                         <select id="announcementBgType" onchange="toggleBgSettings()" style="margin-bottom: 10px;">
@@ -548,32 +424,28 @@
                         <div id="solidColorSettings" style="display: none; margin-bottom: 10px;">
                             <input type="color" id="announcementBgColor" value="#4285f4" style="height: 45px;">
                         </div>
-                        <div id="customGradientSettings" style="display: none; margin-bottom: 10px;">
-                            <input type="color" id="announcementGradientStart" value="#ff6b6b">
-                            <input type="color" id="announcementGradientEnd" value="#4ecdc4">
+                         <div id="customGradientSettings" style="display: none; margin-bottom: 10px;">
+                             <input type="color" id="announcementGradientStart" value="#ff6b6b">
+                             <input type="color" id="announcementGradientEnd" value="#4ecdc4">
                         </div>
-                        <select id="announcementSpeed" style="margin-bottom: 10px;">
+                         <select id="announcementSpeed" style="margin-bottom: 10px;">
                             <option value="15s">Normal Speed</option>
                             <option value="10s">Fast</option>
                         </select>
                         <div style="display: flex; gap: 10px;">
-                            <button onclick="previewAnnouncement()"
-                                style="flex: 1; padding: 12px; background: var(--primary-color); color: white;">Preview</button>
-                            <button onclick="saveAnnouncementSettings()"
-                                style="flex: 1; padding: 12px; background: var(--success-color); color: white;">Save</button>
+                            <button onclick="previewAnnouncement()" style="flex: 1; padding: 12px; background: var(--primary-color); color: white;">Preview</button>
+                            <button onclick="saveAnnouncementSettings()" style="flex: 1; padding: 12px; background: var(--success-color); color: white;">Save</button>
                         </div>
-
+                        
                         <!-- Preview Area -->
-                        <div style="margin-top: 15px;">
+                         <div style="margin-top: 15px;">
                             <label>Preview:</label>
-                            <div id="announcementPreview"
-                                style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); padding: 10px; border-radius: 8px; overflow: hidden; white-space: nowrap; color: white; margin-top: 5px;">
+                            <div id="announcementPreview" style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); padding: 10px; border-radius: 8px; overflow: hidden; white-space: nowrap; color: white; margin-top: 5px;">
                                 <div>Announcement Text</div>
                             </div>
-                        </div>
+                         </div>
 
-                        <div id="currentAnnouncementStatus"
-                            style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;">
+                        <div id="currentAnnouncementStatus" style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;">
                             <div id="announcementStatusContent">Checking...</div>
                         </div>
                     </div>
@@ -581,334 +453,9 @@
             </div>
         </div>
     </div>
-
+    
     <!-- 引入外部脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
-
-    <!-- ============================================
-         EID AL-FITR VISUAL ENHANCEMENTS
-         ============================================ -->
-    <script>
-        (function () {
-            'use strict';
-
-            // ─── THREE.JS: Firefly / Star particles ───────────────────────────
-            (function initThree() {
-                const canvas = document.getElementById('eid-three-canvas');
-                if (!canvas || typeof THREE === 'undefined') return;
-
-                const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-                renderer.setClearColor(0x000000, 0);
-                renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-                const scene = new THREE.Scene();
-                const camera = new THREE.OrthographicCamera(
-                    -window.innerWidth / 2, window.innerWidth / 2,
-                    window.innerHeight / 2, -window.innerHeight / 2,
-                    0.1, 1000
-                );
-                camera.position.z = 10;
-
-                function resize() {
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                    camera.left = -window.innerWidth / 2;
-                    camera.right = window.innerWidth / 2;
-                    camera.top = window.innerHeight / 2;
-                    camera.bottom = -window.innerHeight / 2;
-                    camera.updateProjectionMatrix();
-                }
-                resize();
-                window.addEventListener('resize', resize);
-
-                // Create particles
-                const COUNT = 80;
-                const positions = new Float32Array(COUNT * 3);
-                const sizes = new Float32Array(COUNT);
-                const colors = new Float32Array(COUNT * 3);
-                const velocities = [];
-
-                const goldColor = new THREE.Color('#E8B95A');
-                const greenColor = new THREE.Color('#4A9B6F');
-                const whiteColor = new THREE.Color('#FFFFFF');
-                const palette = [goldColor, goldColor, goldColor, greenColor, whiteColor];
-
-                for (let i = 0; i < COUNT; i++) {
-                    positions[i * 3] = (Math.random() - 0.5) * window.innerWidth;
-                    positions[i * 3 + 1] = (Math.random() - 0.5) * window.innerHeight;
-                    positions[i * 3 + 2] = 0;
-                    sizes[i] = Math.random() * 4 + 1.5;
-                    const c = palette[Math.floor(Math.random() * palette.length)];
-                    colors[i * 3] = c.r;
-                    colors[i * 3 + 1] = c.g;
-                    colors[i * 3 + 2] = c.b;
-                    velocities.push({
-                        x: (Math.random() - 0.5) * 0.3,
-                        y: (Math.random() - 0.5) * 0.3,
-                        twinkle: Math.random() * Math.PI * 2,
-                        twinkleSpeed: Math.random() * 0.02 + 0.01
-                    });
-                }
-
-                const geo = new THREE.BufferGeometry();
-                geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                geo.setAttribute('customSize', new THREE.BufferAttribute(sizes, 1));
-                geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-                const mat = new THREE.PointsMaterial({
-                    size: 4,
-                    vertexColors: true,
-                    transparent: true,
-                    opacity: 0.75,
-                    sizeAttenuation: false
-                });
-
-                const particles = new THREE.Points(geo, mat);
-                scene.add(particles);
-
-                let frame = 0;
-                function animateThree() {
-                    requestAnimationFrame(animateThree);
-                    frame++;
-                    const posAttr = geo.getAttribute('position');
-                    for (let i = 0; i < COUNT; i++) {
-                        posAttr.array[i * 3] += velocities[i].x;
-                        posAttr.array[i * 3 + 1] += velocities[i].y;
-                        // Wrap around screen edges
-                        if (posAttr.array[i * 3] > window.innerWidth / 2) posAttr.array[i * 3] = -window.innerWidth / 2;
-                        if (posAttr.array[i * 3] < -window.innerWidth / 2) posAttr.array[i * 3] = window.innerWidth / 2;
-                        if (posAttr.array[i * 3 + 1] > window.innerHeight / 2) posAttr.array[i * 3 + 1] = -window.innerHeight / 2;
-                        if (posAttr.array[i * 3 + 1] < -window.innerHeight / 2) posAttr.array[i * 3 + 1] = window.innerHeight / 2;
-                        velocities[i].twinkle += velocities[i].twinkleSpeed;
-                    }
-                    posAttr.needsUpdate = true;
-                    // Twinkle opacity
-                    mat.opacity = 0.5 + 0.25 * Math.sin(frame * 0.015);
-                    renderer.render(scene, camera);
-                }
-                animateThree();
-            })();
-
-            // ─── MATTER.JS: Floating Ketupat ────────────────────────────────
-            (function initLanterns() {
-                if (typeof Matter === 'undefined') return;
-
-                const { Engine, Render, Runner, Bodies, World, Body, Events } = Matter;
-
-                // Use a dedicated canvas for lanterns
-                const canvas2d = document.createElement('canvas');
-                canvas2d.id = 'eid-lanterns-canvas';
-                canvas2d.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;';
-                document.body.appendChild(canvas2d);
-
-                const W = window.innerWidth;
-                const H = window.innerHeight;
-                canvas2d.width = W;
-                canvas2d.height = H;
-                const ctx2d = canvas2d.getContext('2d');
-
-                // Ketupat data
-                const KETUPAT_COUNT = 7;
-                const ketupats = [];
-
-                // Green-only colour palette
-                const ketupatColors = [
-                    { body: '#2E7D50', weave: '#1A5C35', border: '#4DBF80', glow: 'rgba(46,125,80,0.28)', tassel: '#6DE0A0' },
-                    { body: '#3AAD6B', weave: '#237A48', border: '#70E0A0', glow: 'rgba(58,173,107,0.25)', tassel: '#A8F0C8' },
-                    { body: '#1F6640', weave: '#0F4028', border: '#3DB870', glow: 'rgba(31,102,64,0.28)', tassel: '#5CD090' },
-                    { body: '#4A9B6F', weave: '#2E6B4A', border: '#7DDBA8', glow: 'rgba(74,155,111,0.25)', tassel: '#B0EDD0' },
-                ];
-
-                for (let i = 0; i < KETUPAT_COUNT; i++) {
-                    ketupats.push({
-                        x: Math.random() * W,
-                        y: -(100 + Math.random() * 400),   // start above viewport
-                        size: 22 + Math.random() * 16,
-                        rot: Math.random() * Math.PI * 2,
-                        rotSpeed: (Math.random() - 0.5) * 0.008,
-                        speedY: 0.4 + Math.random() * 0.5,  // positive = fall downward
-                        speedX: (Math.random() - 0.5) * 0.35,
-                        sway: Math.random() * Math.PI * 2,
-                        swaySpeed: 0.007 + Math.random() * 0.01,
-                        color: ketupatColors[i % ketupatColors.length],
-                        pulse: Math.random() * Math.PI * 2,
-                        opacity: 0.6 + Math.random() * 0.3,
-                    });
-                }
-
-                function drawKetupat(ctx, x, y, size, rot, color, pulse, opacity) {
-                    ctx.save();
-                    ctx.globalAlpha = opacity;
-                    ctx.translate(x, y);
-                    ctx.rotate(rot);
-
-                    const s = size * (0.95 + 0.05 * Math.sin(pulse));
-
-                    // ─ Soft glow behind ketupat ─
-                    const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 2);
-                    grd.addColorStop(0, color.glow);
-                    grd.addColorStop(1, 'rgba(0,0,0,0)');
-                    ctx.fillStyle = grd;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, s * 2, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // ─ Clip to diamond shape ─
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.moveTo(0, -s);
-                    ctx.lineTo(s, 0);
-                    ctx.lineTo(0, s);
-                    ctx.lineTo(-s, 0);
-                    ctx.closePath();
-                    ctx.clip();
-
-                    // Fill body
-                    ctx.fillStyle = color.body;
-                    ctx.shadowColor = color.border;
-                    ctx.shadowBlur = 6;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-
-                    // ─ Woven cross-hatch pattern (diagonal grid) ─
-                    ctx.globalAlpha = opacity * 0.45;
-                    const step = s * 0.22;
-                    const lineW = step * 0.45;
-
-                    // Diagonal lines: top-left to bottom-right
-                    ctx.strokeStyle = color.weave;
-                    ctx.lineWidth = lineW;
-                    ctx.lineCap = 'square';
-                    for (let d = -s * 2; d < s * 2; d += step) {
-                        ctx.beginPath();
-                        ctx.moveTo(d - s, -s);
-                        ctx.lineTo(d + s, s);
-                        ctx.stroke();
-                    }
-                    // Alternate lighter diagonal: top-right to bottom-left
-                    ctx.strokeStyle = color.border;
-                    ctx.lineWidth = lineW * 0.5;
-                    ctx.globalAlpha = opacity * 0.2;
-                    for (let d = -s * 2; d < s * 2; d += step) {
-                        ctx.beginPath();
-                        ctx.moveTo(d + s, -s);
-                        ctx.lineTo(d - s, s);
-                        ctx.stroke();
-                    }
-
-                    ctx.restore(); // end clip
-
-                    // ─ Diamond border ─
-                    ctx.globalAlpha = opacity;
-                    ctx.beginPath();
-                    ctx.moveTo(0, -s);
-                    ctx.lineTo(s, 0);
-                    ctx.lineTo(0, s);
-                    ctx.lineTo(-s, 0);
-                    ctx.closePath();
-                    ctx.strokeStyle = color.border;
-                    ctx.lineWidth = s * 0.1;
-                    ctx.shadowColor = color.border;
-                    ctx.shadowBlur = 4;
-                    ctx.stroke();
-                    ctx.shadowBlur = 0;
-
-                    // ─ Highlight shimmer (top-left facet) ─
-                    ctx.globalAlpha = opacity * 0.35;
-                    ctx.beginPath();
-                    ctx.moveTo(0, -s * 0.98);
-                    ctx.lineTo(-s * 0.98, 0);
-                    ctx.lineTo(-s * 0.55, 0);
-                    ctx.lineTo(0, -s * 0.55);
-                    ctx.closePath();
-                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                    ctx.fill();
-
-                    ctx.globalAlpha = opacity;
-
-                    // ─ Hanging string (top) ─
-                    ctx.beginPath();
-                    ctx.moveTo(0, -s);
-                    ctx.lineTo(0, -s * 1.5);
-                    ctx.strokeStyle = color.tassel;
-                    ctx.lineWidth = 1.2;
-                    ctx.stroke();
-
-                    // ─ Tassel (bottom - three small lines) ─
-                    const tasselY = s + s * 0.1;
-                    const tasselLen = s * 0.45;
-                    ctx.strokeStyle = color.tassel;
-                    ctx.lineWidth = 1;
-                    ctx.globalAlpha = opacity * 0.8;
-                    for (let t = -1; t <= 1; t++) {
-                        ctx.beginPath();
-                        ctx.moveTo(t * s * 0.12, tasselY);
-                        ctx.lineTo(t * s * 0.18, tasselY + tasselLen);
-                        ctx.stroke();
-                    }
-
-                    ctx.restore();
-                }
-
-                function animateKetupat() {
-                    requestAnimationFrame(animateKetupat);
-                    ctx2d.clearRect(0, 0, W, H);
-
-                    for (const k of ketupats) {
-                        k.sway += k.swaySpeed;
-                        k.pulse += 0.03;
-                        k.rot += k.rotSpeed;
-                        k.x += k.speedX + Math.sin(k.sway) * 0.5;
-                        k.y += k.speedY;
-
-                        // Reset to top when it exits the bottom
-                        if (k.y > H + 150) {
-                            k.y = -(100 + Math.random() * 300);
-                            k.x = Math.random() * W;
-                        }
-
-                        drawKetupat(ctx2d, k.x, k.y, k.size, k.rot, k.color, k.pulse, k.opacity);
-                    }
-                }
-                animateKetupat();
-
-                window.addEventListener('resize', () => {
-                    canvas2d.width = window.innerWidth;
-                    canvas2d.height = window.innerHeight;
-                });
-            })();
-
-            // ─── CSS Ketupat floaters ───────────────────────────────────────
-            (function spawnKetupat() {
-                const ketupatSVGs = [
-                    // Ketupat (diamond)
-                    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><g fill='none' stroke='%23C8973A' stroke-width='2'><path d='M20,3 L37,20 L20,37 L3,20 Z'/><path d='M20,10 L30,20 L20,30 L10,20 Z' opacity='0.5'/></g></svg>`,
-                    // Star
-                    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M20,3 L23,14 L35,14 L25,21 L29,32 L20,25 L11,32 L15,21 L5,14 L17,14 Z' fill='none' stroke='%23E8B95A' stroke-width='1.5'/></svg>`,
-                    // Crescent
-                    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M20,5 a15,15 0 1,1 10,26 a11,11 0 1,0 -10,-26' fill='none' stroke='%234A9B6F' stroke-width='2'/></svg>`,
-                ];
-
-                for (let i = 0; i < 8; i++) {
-                    setTimeout(() => {
-                        const el = document.createElement('div');
-                        el.classList.add('ketupat-float');
-                        const sz = 20 + Math.random() * 25;
-                        el.style.cssText = `
-                        left: ${Math.random() * 100}%;
-                        width: ${sz}px;
-                        height: ${sz}px;
-                        animation-duration: ${12 + Math.random() * 10}s;
-                        animation-delay: ${Math.random() * 5}s;
-                    `;
-                        const svg = ketupatSVGs[Math.floor(Math.random() * ketupatSVGs.length)];
-                        el.innerHTML = `<img src="data:image/svg+xml,${svg}" style="width:100%;height:100%;" alt=""/>`;
-                        document.body.appendChild(el);
-                    }, i * 800);
-                }
-            })();
-
-        })();
-    </script>
 </body>
-
 </html>

@@ -292,6 +292,42 @@ function initAllProducts() {
     });
 }
 
+// Intersection Observer for fade-in
+const fadeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('fade-visible');
+            fadeObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.1 });
+
+// Touch Ripple Effect for Native App Feel
+document.addEventListener('click', function(e) {
+    const target = e.target.closest('.shop-card, .category-card, button, .bottom-nav-item');
+    if (!target) return;
+    
+    const circle = document.createElement('span');
+    const diameter = Math.max(target.clientWidth, target.clientHeight);
+    const radius = diameter / 2;
+    
+    const rect = target.getBoundingClientRect();
+    const x = e.clientX - rect.left - radius;
+    const y = e.clientY - rect.top - radius;
+    
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${x}px`;
+    circle.style.top = `${y}px`;
+    circle.classList.add('ripple');
+    
+    const oldPosition = getComputedStyle(target).position;
+    if (oldPosition === 'static') target.style.position = 'relative';
+    if(target.tagName === 'BUTTON') target.style.overflow = 'hidden';
+
+    target.appendChild(circle);
+    setTimeout(() => circle.remove(), 600);
+});
+
 // Render Products with Image Support
 function loadProducts(products) {
     const productList = document.getElementById('productList');
@@ -377,7 +413,9 @@ function loadProducts(products) {
                     </div>
                 `;
             }
+            div.classList.add('fade-up-item');
             productList.appendChild(div);
+            fadeObserver.observe(div);
         });
         
         // Trigger stock update to fill in numbers
@@ -908,6 +946,27 @@ function toggleVibration(enable) {
 
 function selectShop(element, value) {
     playEffect('select');
+    
+    // Angelic magic dust
+    if (typeof confetti === 'function') {
+        const rect = element.getBoundingClientRect();
+        const originX = (rect.left + rect.width / 2) / window.innerWidth;
+        const originY = (rect.top + rect.height / 2) / window.innerHeight;
+        
+        confetti({
+            particleCount: 60,
+            spread: 120,
+            origin: { x: originX, y: originY },
+            colors: ['#ffffff', '#fde047', '#fef08a'], // White & Gold
+            ticks: 200,
+            gravity: -0.1, // Float upwards magically
+            startVelocity: 15,
+            shapes: ['circle'],
+            scalar: 0.8,
+            zIndex: 9999
+        });
+    }
+
     document.querySelectorAll('.shop-card').forEach(card => card.classList.remove('selected'));
     element.classList.add('selected');
     element.querySelector('input[type="radio"]').checked = true;
@@ -1007,16 +1066,13 @@ function generateText(forWhatsApp) {
 
     // 构建头部信息
     if (selectedStore) {
+        // 去除value中可能自带的星号，防止重复
         let storeName = selectedStore.value.replace(/\*/g, '');
-
-        //result += `🌙✨ *Selamat Hari Raya Aidilfitri* ✨🌙\n`;
-        result += `🪔 *Stock Request* 🪔\n`;
-        result += `━━━━━━━━━━━━━━━━━━━━\n`;
-        result += `🕌 *(${storeName})* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
-        result += `👳‍♀️ *(${userName})*\n`;
+        
+        result += `🏪 *(${storeName})* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
+        result += `👤 *(${userName})*\n`;
         result += `📅 ${dateStr}\n`;
-        result += `🕠 ${timeStr}\n`;
-        result += `━━━━━━━━━━━━━━━━━━━━\n\n`;
+        result += `🕠 ${timeStr}\n\n`;
     }
 
     // 处理商品分类和计数
@@ -1051,7 +1107,7 @@ function generateText(forWhatsApp) {
             // 获取对应图标，如果没有则不显示
             const icon = categoryIcons[cat] || '';
             
-        result += `\n⭐ ${cat} ${icon} 🌙\n`;
+            result += `\n🔹🔸🔹 ${cat} ${icon} 🔹🔸🔹\n`;
             
             items.forEach(item => {
                 const unit = item.unit || 'ctn'; // 默认单位 ctn
@@ -1071,7 +1127,7 @@ function generateText(forWhatsApp) {
         }
     }
 
-    result += `\n━━━━━━━━━━━━━━━━━━━━\n_App Version 2.2_`;
+    result += '\n_App Version 2.3_';
 
     return result;
 }
@@ -1384,9 +1440,20 @@ function backToLogin() { logout(); }
 
 function copyAndSendWhatsApp() {
     playEffect('success');
+    
+    if (typeof confetti === 'function') {
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#6366f1', '#10b981', '#14b8a6', '#f59e0b'],
+            zIndex: 10000
+        });
+    }
+
     const text = generateText(true);
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
+    setTimeout(() => { window.open(url, '_blank'); }, 800);
 }
 
 function confirmAndSendWhatsApp() {
