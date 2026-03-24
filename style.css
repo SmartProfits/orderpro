@@ -613,45 +613,138 @@ input:focus, select:focus, textarea:focus {
 
 .auth-form .switch-form { color: var(--primary-color); margin-top: 25px; font-weight: 600; cursor: pointer; }
 
-/* Enhanced Splash Screen */
+/* PREMIUM SPLASH SCREEN */
 #splashScreen {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
     background: var(--bg-color); 
+    z-index: 20000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
 }
-#splashScreen::before {
-    background: radial-gradient(circle at center, rgba(99, 102, 241, 0.2) 0%, rgba(0,0,0,0) 70%);
+
+.splash-blob {
+    position: absolute;
+    width: 350px;
+    height: 350px;
+    background: var(--primary-gradient);
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    filter: blur(70px);
+    opacity: 0.4;
+    animation: morphBlob 8s ease-in-out infinite alternate, spinBlob 10s linear infinite;
+    z-index: 0;
 }
+
+@keyframes morphBlob {
+    0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; transform: scale(1); }
+    100% { border-radius: 60% 40% 30% 70% / 50% 60% 40% 60%; transform: scale(1.2); }
+}
+@keyframes spinBlob {
+    100% { transform: rotate(360deg); }
+}
+
+.splash-content {
+    text-align: center;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.splash-icon-container {
+    width: 100px;
+    height: 100px;
+    background: var(--surface-color-transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 15px 35px rgba(99, 102, 241, 0.2);
+    border: 1px solid var(--glass-border);
+    margin-bottom: 24px;
+    animation: floatIcon 4s ease-in-out infinite;
+}
+
 .splash-logo-icon {
-    font-size: 5rem;
+    font-size: 4rem !important;
     background: var(--primary-gradient);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 10px 20px rgba(99,102,241,0.3));
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
+
 .splash-title {
     font-size: 2.8rem;
-    font-weight: 900;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -1px;
     background: linear-gradient(90deg, var(--text-primary), var(--primary-color), var(--accent-color));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     background-size: 200% auto;
-    animation: shine 3s linear infinite;
+    animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards, shine 3s linear infinite;
+    opacity: 0;
+}
+
+.splash-subtitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-top: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+    opacity: 0;
+}
+
+.modern-loader {
+    display: flex;
+    gap: 10px;
+    margin-top: 40px;
+    animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+    opacity: 0;
+}
+
+.modern-loader span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    animation: pulseDots 1.2s infinite ease-in-out both;
+}
+.modern-loader span:nth-child(1) { animation-delay: -0.32s; background: var(--primary-color); }
+.modern-loader span:nth-child(2) { animation-delay: -0.16s; background: var(--accent-color); }
+.modern-loader span:nth-child(3) { background: var(--success-color); }
+
+@keyframes pulseDots {
+    0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-12px) rotate(4deg); }
 }
 
 /* Utilities & Badges */
 .product-unit-badge {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    background: var(--accent-color);
-    color: #fff;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+    padding: 2px 10px;
+    border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 700;
-    padding: 4px 8px;
-    border-radius: 8px;
-    z-index: 2;
-    box-shadow: 0 4px 10px rgba(20, 184, 166, 0.3);
+    align-items: center;
+    justify-content: center;
+    box-shadow: none;
+    margin-right: 4px;
 }
 
 .new-product-glow {

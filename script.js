@@ -267,16 +267,17 @@ function playOpeningAnimation(callback) {
     splash.style.display = 'flex';
     mainContent.style.opacity = '0';
     
-    // 持续时间：2.5秒，既不卡顿又能展示动画
     setTimeout(() => {
+        splash.style.transform = 'scale(1.05)';
         splash.style.opacity = '0';
         setTimeout(() => {
             splash.style.display = 'none';
-            splash.style.opacity = '1'; // Reset for next time if needed
+            splash.style.opacity = '1'; 
+            splash.style.transform = 'scale(1)';
             mainContent.style.opacity = '1';
             if (callback) callback();
-        }, 500); // Fade out duration
-    }, 2500);
+        }, 600);
+    }, 2800);
 }
 
 // ==========================================
@@ -374,7 +375,6 @@ function loadProducts(products) {
                 
                 div.innerHTML = `
                     <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
-                    <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
                     ${isStillNew ? '<span style="position:absolute; top:5px; left:5px; background:red; color:white; font-size:10px; padding:2px 4px; border-radius:4px; z-index:5">NEW</span>' : ''}
                     ${imageHTML}
                     <span class="product-name" onclick="document.getElementById('item${product.id}').click()">${product.name}</span>
@@ -383,6 +383,9 @@ function loadProducts(products) {
                         <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)"><span class="material-icons-round">add</span></button>
                         <input type="number" id="quantity${product.id}" min="1" value="${currentQuantity}" readonly>
                         <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)"><span class="material-icons-round">remove</span></button>
+                    </div>
+                    <div style="width:100%; display:flex; justify-content:center; margin-top:6px;">
+                        <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
                     </div>
                 `;
             } else {
@@ -404,7 +407,7 @@ function loadProducts(products) {
                             <span id="stock${product.id}" style="font-size:0.8rem; color: var(--accent-color);">Checking...</span>
                         </label>
                     </div>
-                    <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
+                    
                     <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
                         <div class="quantity-controls-wrapper">
                                 <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)"><span class="material-icons-round">remove</span></button>
@@ -412,6 +415,7 @@ function loadProducts(products) {
                                 <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)"><span class="material-icons-round">add</span></button>
                         </div>
                         <div class="image-btn-container" style="width:100%; display:flex; justify-content:flex-end;">
+                            <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
                             ${viewImageButton}
                         </div>
                     </div>
@@ -1199,8 +1203,8 @@ function updateProductBoxDisplay() {
             const badge = document.getElementById(`unitBadge${pid}`);
             if(badge) {
                 if(boxData[pid] > 0) {
-                    badge.style.display = 'block';
-                    badge.textContent = `Unit: ${boxData[pid]}`;
+                    badge.style.display = 'inline-flex';
+                    badge.innerHTML = `<span class="material-icons-outlined" style="font-size:14px; margin-right:2px;">inventory_2</span> Unit: ${boxData[pid]}`;
                 } else {
                     badge.style.display = 'none';
                 }
