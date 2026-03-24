@@ -395,21 +395,25 @@ function loadProducts(products) {
                 const newBadge = isStillNew ? '<span style="background:red; color:white; font-size:10px; padding:1px 4px; border-radius:4px; margin-left:5px;">NEW</span>' : '';
 
                 div.innerHTML = `
-                    <div style="display:flex; align-items:center; flex:1;">
+                    <div style="display:flex; align-items:flex-start; flex:1; overflow:hidden; padding-right:8px;">
                         <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
-                        <label for="item${product.id}">
-                            <div style="display:flex; align-items:center;">
+                        <label for="item${product.id}" style="overflow:hidden; cursor:pointer; flex: 1; display:flex; flex-direction:column; justify-content:center; min-height:40px;">
+                            <div class="product-name-text" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; font-weight:600; line-height:1.3; margin-bottom:4px; white-space:normal; padding-right:4px;">
                                 ${product.name} ${newBadge}
-                                ${viewImageButton}
                             </div>
                             <span id="stock${product.id}" style="font-size:0.8rem; color: var(--accent-color);">Checking...</span>
                         </label>
                     </div>
                     <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
-                    <div class="quantity-controls-wrapper">
-                            <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)"><span class="material-icons-round">remove</span></button>
-                            <input type="number" id="quantity${product.id}" min="1" value="${currentQuantity}" readonly>
-                            <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)"><span class="material-icons-round">add</span></button>
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+                        <div class="quantity-controls-wrapper">
+                                <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)"><span class="material-icons-round">remove</span></button>
+                                <input type="number" id="quantity${product.id}" min="1" value="${currentQuantity}" readonly>
+                                <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)"><span class="material-icons-round">add</span></button>
+                        </div>
+                        <div class="image-btn-container" style="width:100%; display:flex; justify-content:flex-end;">
+                            ${viewImageButton}
+                        </div>
                     </div>
                 `;
             }
@@ -1173,9 +1177,9 @@ function updateProductImageInDOM(id, url) {
     } 
     // Handle List View
     else {
-        const label = document.querySelector(`label[for="item${id}"]`);
-        if (label) {
-            const container = label.querySelector('div'); // The flex container inside label
+        const productCard = document.querySelector(`div[data-product-id="${id}"]`);
+        if (productCard) {
+            const container = productCard.querySelector('.image-btn-container');
             if (container && !container.querySelector('.view-image-btn')) {
                     const btn = document.createElement('button');
                     btn.className = 'view-image-btn';
