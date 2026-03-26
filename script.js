@@ -358,15 +358,7 @@ function loadProducts(products) {
             const isNew = newProductsData[product.id];
             const newUntil = isNew ? new Date(isNew.until) : null;
             const isStillNew = isNew && newUntil && newUntil > new Date();
-            if (isStillNew) {
-                div.classList.add('new-product-glow');
-                // 启动 JS 星点闪烁特效
-                setInterval(() => {
-                    if (document.contains(div)) {
-                        createSparkle(div);
-                    }
-                }, 1500 + Math.random() * 2000);
-            }
+            if (isStillNew) div.classList.add('new-product-glow');
 
             const isChecked = selectedItems[product.id] ? 'checked' : '';
             const defaultQuantity = product.defaultQuantity || 1;
@@ -1237,6 +1229,11 @@ function updateStockDisplay() {
             else if(id <= 605) stock = Math.floor(stock/30);
             else if([606,609,610,611,612].includes(parseInt(id))) stock = Math.floor(stock/80);
             else stock = Math.floor(stock/70);
+        } else {
+            // Apply formatting for all other products if they have decimals
+            if (typeof stock === 'number' && stock % 1 !== 0) {
+                stock = Number(stock).toFixed(2);
+            }
         }
         const stockEl = document.getElementById(`stock${id}`);
         if (stockEl) {
@@ -1538,22 +1535,3 @@ window.addEventListener('load', () => {
         });
     }, 3600000); // Check every hour
 });
-
-function createSparkle(parent) {
-    const sparkle = document.createElement('div');
-    sparkle.className = 'product-sparkle';
-    
-    // 随机位置
-    const x = Math.random() * 100;
-    const y = Math.random() * 100;
-    
-    sparkle.style.left = x + '%';
-    sparkle.style.top = y + '%';
-    
-    parent.appendChild(sparkle);
-    
-    // 动画结束后移除元素
-    setTimeout(() => {
-        sparkle.remove();
-    }, 1200);
-}
