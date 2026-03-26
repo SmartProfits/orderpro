@@ -358,11 +358,20 @@ function loadProducts(products) {
             const isNew = newProductsData[product.id];
             const newUntil = isNew ? new Date(isNew.until) : null;
             const isStillNew = isNew && newUntil && newUntil > new Date();
-            if (isStillNew) div.classList.add('new-product-glow');
+            if (isStillNew) {
+                div.classList.add('new-product-glow');
+                // 启动 JS 星点闪烁特效
+                setInterval(() => {
+                    if (document.contains(div)) {
+                        createSparkle(div);
+                    }
+                }, 1500 + Math.random() * 2000);
+            }
 
             const isChecked = selectedItems[product.id] ? 'checked' : '';
             const defaultQuantity = product.defaultQuantity || 1;
             const currentQuantity = selectedItems[product.id] || defaultQuantity;
+            const newBadge = isStillNew ? `<span class="product-new-badge">NEW</span>` : '';
             
             if (currentView === 'grid') {
                 // Grid View with Image Support
@@ -375,17 +384,17 @@ function loadProducts(products) {
                 
                 div.innerHTML = `
                     <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
-                    ${isStillNew ? '<span style="position:absolute; top:5px; left:5px; background:red; color:white; font-size:10px; padding:2px 4px; border-radius:4px; z-index:5">NEW</span>' : ''}
                     ${imageHTML}
                     <span class="product-name" onclick="document.getElementById('item${product.id}').click()">${product.name}</span>
-                    <span class="stock-info" id="stock${product.id}" style="font-size:0.8rem; color: var(--accent-color); margin-bottom:6px;">Checking...</span>
+                    <div class="product-meta-row" style="justify-content:center; margin-bottom: 8px;">
+                        ${newBadge}
+                        <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
+                    </div>
+                    <div id="stock${product.id}" class="stock-info" style="color: var(--accent-color); font-size: 0.8rem; margin-bottom: 10px;">Checking...</div>
                     <div class="quantity-controls-wrapper">
                         <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)"><span class="material-icons-round">add</span></button>
                         <input type="number" id="quantity${product.id}" min="1" value="${currentQuantity}" readonly>
                         <button class="quantity-btn" onclick="changeQuantity(${product.id}, -1)"><span class="material-icons-round">remove</span></button>
-                    </div>
-                    <div style="width:100%; display:flex; justify-content:center; margin-top:6px;">
-                        <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
                     </div>
                 `;
             } else {
@@ -394,17 +403,20 @@ function loadProducts(products) {
                     `<button class="view-image-btn" onclick="showImage('${product.imageUrl}', '${product.name}'); event.stopPropagation();">
                         <span class="material-icons-outlined" style="font-size: 14px; margin-right: 2px;">image</span> View
                     </button>` : '';
-                
-                const newBadge = isStillNew ? '<span style="background:red; color:white; font-size:10px; padding:1px 4px; border-radius:4px; margin-left:5px;">NEW</span>' : '';
 
                 div.innerHTML = `
-                    <div style="display:flex; align-items:flex-start; flex:1; overflow:hidden; padding-right:8px;">
-                        <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')">
-                        <label for="item${product.id}" style="overflow:hidden; cursor:pointer; flex: 1; display:flex; flex-direction:column; justify-content:center; min-height:40px;">
-                            <div class="product-name-text" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis; font-weight:600; line-height:1.3; margin-bottom:4px; white-space:normal; padding-right:4px;">
-                                ${product.name} ${newBadge}
+                    <div style="display:flex; align-items:flex-start; flex:1;">
+                        <div style="display:flex; flex-direction:column; align-items:center; margin-right:12px; flex-shrink:0; padding-top:2px;">
+                            <input type="checkbox" id="item${product.id}" ${isChecked} onchange="saveItem(${product.id}, '${product.name}')" style="margin-right:0; margin-bottom:6px;">
+                            ${newBadge ? newBadge.replace('product-new-badge', 'product-new-badge small-badge') : ''}
+                        </div>
+                        <label for="item${product.id}" style="flex:1;">
+                            <div class="product-name-text">
+                                ${product.name}
                             </div>
-                            <span id="stock${product.id}" style="font-size:0.8rem; color: var(--accent-color);">Checking...</span>
+                            <div class="product-meta-row">
+                                <span id="stock${product.id}" class="stock-info" style="color: var(--accent-color);">Checking...</span>
+                            </div>
                         </label>
                     </div>
                     
@@ -414,9 +426,13 @@ function loadProducts(products) {
                                 <input type="number" id="quantity${product.id}" min="1" value="${currentQuantity}" readonly>
                                 <button class="quantity-btn" onclick="changeQuantity(${product.id}, 1)"><span class="material-icons-round">add</span></button>
                         </div>
-                        <div class="image-btn-container" style="width:100%; display:flex; justify-content:flex-end;">
-                            <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
-                            ${viewImageButton}
+                        <div class="action-btn-row">
+                            <div class="unit-slot">
+                                <span class="product-unit-badge" id="unitBadge${product.id}" style="display: none;"></span>
+                            </div>
+                            <div class="view-slot">
+                                ${viewImageButton}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1522,3 +1538,22 @@ window.addEventListener('load', () => {
         });
     }, 3600000); // Check every hour
 });
+
+function createSparkle(parent) {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'product-sparkle';
+    
+    // 随机位置
+    const x = Math.random() * 100;
+    const y = Math.random() * 100;
+    
+    sparkle.style.left = x + '%';
+    sparkle.style.top = y + '%';
+    
+    parent.appendChild(sparkle);
+    
+    // 动画结束后移除元素
+    setTimeout(() => {
+        sparkle.remove();
+    }, 1200);
+}

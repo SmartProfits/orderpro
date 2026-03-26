@@ -5,25 +5,27 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Airport Stock Request</title>
-    
+
     <!-- Font and Material Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    
+
     <!-- PWA相关标记 -->
     <meta name="theme-color" content="#1a2035">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./icons/s2.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
+
     <!-- 引入外部样式表 -->
     <link rel="stylesheet" href="style.css">
-    
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -54,10 +56,11 @@
     </div>
 
     <!-- 认证容器 -->
-    <div id="authContainer" class="auth-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 9999;">
+    <div id="authContainer" class="auth-container"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 9999;">
         <div class="auth-box" style="width: 90%; max-width: 400px;">
             <h2 id="authTitle" style="text-align: center;">Welcome Back</h2>
-            
+
             <!-- Login Form -->
             <div id="loginForm" class="auth-form">
                 <div style="margin-bottom: 16px;">
@@ -71,7 +74,7 @@
                     Create an account
                 </div>
             </div>
-            
+
             <!-- Register Form -->
             <div id="registerForm" class="auth-form" style="display: none;">
                 <div style="margin-bottom: 16px;">
@@ -88,13 +91,16 @@
                     Already have an account? Login
                 </div>
             </div>
-            
+
             <!-- Pending Form -->
             <div id="pendingForm" class="auth-form" style="display: none; text-align: center;">
                 <div style="font-size: 50px; margin-bottom: 20px;">⏳</div>
                 <h3>Verification Pending</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 0.9rem;">Your account is under review by the administrator.</p>
-                <button onclick="backToLogin()" style="background: transparent; color: var(--text-primary); border: 1px solid var(--border-color);">Back to Login</button>
+                <p style="color: var(--text-secondary); margin-bottom: 25px; font-size: 0.9rem;">Your account is under
+                    review by the administrator.</p>
+                <button onclick="backToLogin()"
+                    style="background: transparent; color: var(--text-primary); border: 1px solid var(--border-color);">Back
+                    to Login</button>
             </div>
         </div>
     </div>
@@ -168,7 +174,8 @@
         </div>
 
 
-        <h3 id="categoryTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">category</span> Category</h3>
+        <h3 id="categoryTitle" style="display: none;"><span class="material-icons-round"
+                style="color: var(--primary-color)">category</span> Category</h3>
         <div class="category-container" id="categoryContainer" style="display: none;">
             <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
                 <input type="radio" name="category" value="BanHeang" id="banheang" style="display:none">
@@ -220,8 +227,10 @@
         <!-- Search and View Toggle -->
         <div class="tools-bar" id="searchContainer" style="display: none;">
             <div style="position: relative; flex: 1;">
-                <span class="material-icons" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">search</span>
-                <input type="text" id="productSearch" placeholder="Search product..." oninput="searchProduct()" autocomplete="off">
+                <span class="material-icons"
+                    style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">search</span>
+                <input type="text" id="productSearch" placeholder="Search product..." oninput="searchProduct()"
+                    autocomplete="off">
             </div>
             <div class="view-toggle-group" id="viewToggleContainer">
                 <button id="listViewBtn" onclick="toggleView('list')" class="view-toggle-btn active">
@@ -233,9 +242,12 @@
             </div>
         </div>
 
-        <div id="suggestions" style="background: var(--surface-color); border-radius: 12px; margin-bottom: 10px; overflow: hidden; display: none;"></div>
-        
-        <h3 id="selectItemsTitle" style="display: none;"><span class="material-icons-round" style="color: var(--primary-color)">list_alt</span> Select Items</h3>
+        <div id="suggestions"
+            style="background: var(--surface-color); border-radius: 12px; margin-bottom: 10px; overflow: hidden; display: none;">
+        </div>
+
+        <h3 id="selectItemsTitle" style="display: none;"><span class="material-icons-round"
+                style="color: var(--primary-color)">list_alt</span> Select Items</h3>
         <div id="productList" style="display: none;"></div>
 
         <!-- Bottom Navigation -->
@@ -259,10 +271,13 @@
     </div> <!-- End Main Content -->
 
     <!-- Image Modal -->
-    <div id="imageModal" class="image-modal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; justify-content:center; align-items:center;">
-        <span class="close-modal" onclick="closeImageModal()" style="position:absolute; top:20px; right:20px; color:white; font-size:30px; cursor:pointer; z-index: 2001;">&times;</span>
+    <div id="imageModal" class="image-modal"
+        style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; justify-content:center; align-items:center;">
+        <span class="close-modal" onclick="closeImageModal()"
+            style="position:absolute; top:20px; right:20px; color:white; font-size:30px; cursor:pointer; z-index: 2001;">&times;</span>
         <div class="modal-content" style="max-width:90%; max-height:80%; position: relative;">
-            <img id="modalImage" src="" style="max-width:100%; max-height:100%; border-radius:8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+            <img id="modalImage" src=""
+                style="max-width:100%; max-height:100%; border-radius:8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
         </div>
     </div>
 
@@ -275,13 +290,16 @@
             </div>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <label style="display: flex; align-items: center; gap: 6px; font-size: 0.9rem;">
-                    <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()" style="width: 16px; height: 16px;">
+                    <input type="checkbox" id="addOnCheckbox" onchange="updatePreview()"
+                        style="width: 16px; height: 16px;">
                     Add On
                 </label>
-                <span class="material-icons-round" onclick="togglePreview()" style="cursor: pointer; color: var(--text-secondary);">close</span>
+                <span class="material-icons-round" onclick="togglePreview()"
+                    style="cursor: pointer; color: var(--text-secondary);">close</span>
             </div>
         </div>
-        <div id="preview-content" style="font-size: 0.9rem; line-height: 1.6; max-height: 40vh; overflow-y: auto;"></div>
+        <div id="preview-content" style="font-size: 0.9rem; line-height: 1.6; max-height: 40vh; overflow-y: auto;">
+        </div>
         <button class="whatsapp-button" onclick="copyAndSendWhatsApp()">
             <span class="material-icons-round" style="margin-right: 8px;">whatsapp</span>
             Send to WhatsApp
@@ -289,61 +307,80 @@
     </div>
 
     <!-- Fullscreen Confirm -->
-    <div id="fullscreenConfirm" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: none; padding: 20px; overflow-y: auto;">
+    <div id="fullscreenConfirm"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 9999; display: none; padding: 20px; overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2 style="color: var(--text-primary);">Confirm Order</h2>
-            <span class="material-icons-round" onclick="closeFullscreenConfirm()" style="font-size: 28px; cursor: pointer;">close</span>
+            <span class="material-icons-round" onclick="closeFullscreenConfirm()"
+                style="font-size: 28px; cursor: pointer;">close</span>
         </div>
-        <div id="fullscreen-content" style="background: var(--surface-color); padding: 20px; border-radius: var(--radius-md); margin-bottom: 20px; line-height: 1.6;"></div>
+        <div id="fullscreen-content"
+            style="background: var(--surface-color); padding: 20px; border-radius: var(--radius-md); margin-bottom: 20px; line-height: 1.6;">
+        </div>
         <div style="display: flex; gap: 12px;">
-            <button onclick="confirmAndSendWhatsApp()" style="flex: 1; background: var(--success-color); color: white; padding: 15px; border-radius: var(--radius-md);">Confirm</button>
-            <button onclick="closeFullscreenConfirm()" style="flex: 1; background: var(--surface-color); border: 1px solid var(--danger-color); color: var(--danger-color); padding: 15px; border-radius: var(--radius-md);">Cancel</button>
+            <button onclick="confirmAndSendWhatsApp()"
+                style="flex: 1; background: var(--success-color); color: white; padding: 15px; border-radius: var(--radius-md);">Confirm</button>
+            <button onclick="closeFullscreenConfirm()"
+                style="flex: 1; background: var(--surface-color); border: 1px solid var(--danger-color); color: var(--danger-color); padding: 15px; border-radius: var(--radius-md);">Cancel</button>
         </div>
     </div>
 
     <!-- Settings Panel -->
-    <div id="settings-panel" style="position: fixed; bottom: 80px; right: 20px; width: 260px; background: var(--surface-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 20px; z-index: 1001; display: none; border: 1px solid var(--border-color);">
+    <div id="settings-panel"
+        style="position: fixed; bottom: 80px; right: 20px; width: 260px; background: var(--surface-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 20px; z-index: 1001; display: none; border: 1px solid var(--border-color);">
         <h3 style="margin-top: 0;">Settings</h3>
         <div style="margin-bottom: 15px;">
             <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Appearance</label>
             <div style="display: flex; gap: 8px;">
-                <button onclick="changeTheme('dark')" style="flex: 1; padding: 8px; background: #333; color: white; border-radius: 6px;">Dark</button>
-                <button onclick="changeTheme('light')" style="flex: 1; padding: 8px; background: #f0f0f0; color: #333; border-radius: 6px;">Light</button>
+                <button onclick="changeTheme('dark')"
+                    style="flex: 1; padding: 8px; background: #333; color: white; border-radius: 6px;">Dark</button>
+                <button onclick="changeTheme('light')"
+                    style="flex: 1; padding: 8px; background: #f0f0f0; color: #333; border-radius: 6px;">Light</button>
             </div>
         </div>
         <div>
             <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Vibration</label>
             <div style="display: flex; gap: 8px;">
-                <button id="vibration-on-btn" onclick="toggleVibration(true)" style="flex: 1; padding: 8px; border-radius: 6px;">On</button>
-                <button id="vibration-off-btn" onclick="toggleVibration(false)" style="flex: 1; padding: 8px; border-radius: 6px;">Off</button>
+                <button id="vibration-on-btn" onclick="toggleVibration(true)"
+                    style="flex: 1; padding: 8px; border-radius: 6px;">On</button>
+                <button id="vibration-off-btn" onclick="toggleVibration(false)"
+                    style="flex: 1; padding: 8px; border-radius: 6px;">Off</button>
             </div>
         </div>
     </div>
 
     <!-- Side Dashboard -->
-    <div id="side-dashboard" style="position: fixed; top: 0; left: 0; width: 280px; height: 100%; background: var(--surface-color); z-index: 1500; display: none; flex-direction: column; box-shadow: 2px 0 20px rgba(0,0,0,0.2);">
+    <div id="side-dashboard"
+        style="position: fixed; top: 0; left: 0; width: 280px; height: 100%; background: var(--surface-color); z-index: 1500; display: none; flex-direction: column; box-shadow: 2px 0 20px rgba(0,0,0,0.2);">
         <div style="padding: 40px 20px 20px; background: var(--primary-color); color: white;">
             <h2 style="margin-bottom: 5px;">Welcome</h2>
             <div id="dashboardUserName" style="font-size: 1.1rem;">Guest</div>
             <div id="dashboardUserRole" style="font-size: 0.8rem; opacity: 0.8;">User</div>
         </div>
         <div style="padding: 20px; display: flex; flex-direction: column; gap: 15px;">
-             <button id="dashboardAdminButton" onclick="openAdminPanel(); toggleDashboard();" style="background: var(--bg-color); color: var(--text-primary); padding: 12px; justify-content: flex-start; border: 1px solid var(--border-color); border-radius: var(--radius-md); display: none;">
+            <button id="dashboardAdminButton" onclick="openAdminPanel(); toggleDashboard();"
+                style="background: var(--bg-color); color: var(--text-primary); padding: 12px; justify-content: flex-start; border: 1px solid var(--border-color); border-radius: var(--radius-md); display: none;">
                 <span class="material-icons" style="margin-right: 10px;">admin_panel_settings</span> Admin Panel
             </button>
-            <button onclick="logout()" style="background: rgba(255, 68, 68, 0.1); color: var(--danger-color); padding: 12px; justify-content: flex-start; border: 1px solid var(--danger-color); border-radius: var(--radius-md);">
+            <button onclick="logout()"
+                style="background: rgba(255, 68, 68, 0.1); color: var(--danger-color); padding: 12px; justify-content: flex-start; border: 1px solid var(--danger-color); border-radius: var(--radius-md);">
                 <span class="material-icons" style="margin-right: 10px;">logout</span> Logout
             </button>
         </div>
     </div>
-    <div id="dashboard-overlay" onclick="toggleDashboard()" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1499; display: none;"></div>
+    <div id="dashboard-overlay" onclick="toggleDashboard()"
+        style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1499; display: none;">
+    </div>
 
     <!-- Admin Panel -->
-    <div id="adminPanel" class="auth-container" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 2000;">
-        <div class="auth-box" style="width: 95%; height: 90vh; max-width: 800px; display: flex; flex-direction: column; overflow: hidden;">
+    <div id="adminPanel" class="auth-container"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: none; justify-content: center; align-items: center; z-index: 2000;">
+        <div class="auth-box"
+            style="width: 95%; height: 90vh; max-width: 800px; display: flex; flex-direction: column; overflow: hidden;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <h2>Admin Panel</h2>
-                <span onclick="document.getElementById('adminPanel').style.display='none'" style="font-size: 28px; cursor: pointer;">&times;</span>
+                <span onclick="document.getElementById('adminPanel').style.display='none'"
+                    style="font-size: 28px; cursor: pointer;">&times;</span>
             </div>
             <div class="admin-tabs">
                 <button class="tab-button active" onclick="showAdminTab('users')">Users</button>
@@ -358,22 +395,29 @@
                     <h3 style="margin-top: 20px;">All Users</h3>
                     <div id="allUsersList" class="users-list">Loading...</div>
                 </div>
-                
+
                 <!-- Product Management -->
                 <div id="products-tab" class="admin-tab-content" style="display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <select id="categorySelect" onchange="loadProductsForAdmin()" style="flex: 1; margin-right: 10px;"></select>
-                        <button onclick="showAddProductModal()" class="action-button promote" style="padding: 8px 16px;">
-                            <span class="material-icons-round" style="font-size: 18px; vertical-align: middle;">add</span> Add Product
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <select id="categorySelect" onchange="loadProductsForAdmin()"
+                            style="flex: 1; margin-right: 10px;"></select>
+                        <button onclick="showAddProductModal()" class="action-button promote"
+                            style="padding: 8px 16px;">
+                            <span class="material-icons-round"
+                                style="font-size: 18px; vertical-align: middle;">add</span> Add Product
                         </button>
                     </div>
                     <div id="productManagementList" class="product-management-list"></div>
                 </div>
-                
+
                 <!-- Add/Edit Product Modal -->
-                <div id="productModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center;">
-                    <div style="background: var(--surface-color); padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div id="productModal"
+                    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 3000; justify-content: center; align-items: center;">
+                    <div
+                        style="background: var(--surface-color); padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                             <h3 id="productModalTitle">Add Product</h3>
                             <span onclick="closeProductModal()" style="font-size: 28px; cursor: pointer;">&times;</span>
                         </div>
@@ -384,41 +428,54 @@
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 5px;">Product ID</label>
-                                <input type="number" id="productModalId" style="width: 100%; padding: 8px;" placeholder="e.g., 101">
+                                <input type="number" id="productModalId" style="width: 100%; padding: 8px;"
+                                    placeholder="e.g., 101">
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 5px;">Product Name</label>
-                                <input type="text" id="productModalName" style="width: 100%; padding: 8px;" placeholder="Product name">
+                                <input type="text" id="productModalName" style="width: 100%; padding: 8px;"
+                                    placeholder="Product name">
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 5px;">Unit (optional)</label>
-                                <input type="text" id="productModalUnit" style="width: 100%; padding: 8px;" placeholder="e.g., ctn, pkt, pc, bdl">
+                                <input type="text" id="productModalUnit" style="width: 100%; padding: 8px;"
+                                    placeholder="e.g., ctn, pkt, pc, bdl">
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 5px;">Default Quantity (optional)</label>
-                                <input type="number" id="productModalDefaultQuantity" style="width: 100%; padding: 8px;" placeholder="1" value="1">
+                                <input type="number" id="productModalDefaultQuantity" style="width: 100%; padding: 8px;"
+                                    placeholder="1" value="1">
                             </div>
                             <div style="display: flex; gap: 10px;">
-                                <button onclick="saveProduct()" class="action-button promote" style="flex: 1; padding: 12px;">Save</button>
-                                <button onclick="closeProductModal()" class="action-button delete" style="flex: 1; padding: 12px;">Cancel</button>
+                                <button onclick="saveProduct()" class="action-button promote"
+                                    style="flex: 1; padding: 12px;">Save</button>
+                                <button onclick="closeProductModal()" class="action-button delete"
+                                    style="flex: 1; padding: 12px;">Cancel</button>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Announcement Management -->
                 <div id="announcement-tab" class="admin-tab-content" style="display: none;">
                     <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                        <input type="checkbox" id="announcementEnabled" onchange="toggleAnnouncement()"> Enable Announcement
+                        <input type="checkbox" id="announcementEnabled" onchange="toggleAnnouncement()"> Enable
+                        Announcement
                     </label>
                     <div id="announcementSettings" style="display: none;">
-                        <textarea id="announcementText" rows="3" placeholder="Announcement content..." style="margin-bottom: 10px;"></textarea>
-                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                            <label style="font-size:0.8rem">Start Time:<input type="datetime-local" id="announcementStartTime"></label>
-                            <label style="font-size:0.8rem">End Time:<input type="datetime-local" id="announcementEndTime"></label>
+                        <textarea id="announcementText" rows="3" placeholder="Announcement content..."
+                            style="margin-bottom: 10px;"></textarea>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <label style="font-size:0.8rem">Start Time:<input type="datetime-local"
+                                    id="announcementStartTime"></label>
+                            <label style="font-size:0.8rem">End Time:<input type="datetime-local"
+                                    id="announcementEndTime"></label>
                         </div>
-                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                            <select id="announcementFontSize"><option value="16px">Normal</option><option value="20px">Large</option></select>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <select id="announcementFontSize">
+                                <option value="16px">Normal</option>
+                                <option value="20px">Large</option>
+                            </select>
                             <input type="color" id="announcementTextColor" value="#ffffff" style="height: 45px;">
                         </div>
                         <select id="announcementBgType" onchange="toggleBgSettings()" style="margin-bottom: 10px;">
@@ -429,28 +486,32 @@
                         <div id="solidColorSettings" style="display: none; margin-bottom: 10px;">
                             <input type="color" id="announcementBgColor" value="#4285f4" style="height: 45px;">
                         </div>
-                         <div id="customGradientSettings" style="display: none; margin-bottom: 10px;">
-                             <input type="color" id="announcementGradientStart" value="#ff6b6b">
-                             <input type="color" id="announcementGradientEnd" value="#4ecdc4">
+                        <div id="customGradientSettings" style="display: none; margin-bottom: 10px;">
+                            <input type="color" id="announcementGradientStart" value="#ff6b6b">
+                            <input type="color" id="announcementGradientEnd" value="#4ecdc4">
                         </div>
-                         <select id="announcementSpeed" style="margin-bottom: 10px;">
+                        <select id="announcementSpeed" style="margin-bottom: 10px;">
                             <option value="15s">Normal Speed</option>
                             <option value="10s">Fast</option>
                         </select>
                         <div style="display: flex; gap: 10px;">
-                            <button onclick="previewAnnouncement()" style="flex: 1; padding: 12px; background: var(--primary-color); color: white;">Preview</button>
-                            <button onclick="saveAnnouncementSettings()" style="flex: 1; padding: 12px; background: var(--success-color); color: white;">Save</button>
+                            <button onclick="previewAnnouncement()"
+                                style="flex: 1; padding: 12px; background: var(--primary-color); color: white;">Preview</button>
+                            <button onclick="saveAnnouncementSettings()"
+                                style="flex: 1; padding: 12px; background: var(--success-color); color: white;">Save</button>
                         </div>
-                        
+
                         <!-- Preview Area -->
-                         <div style="margin-top: 15px;">
+                        <div style="margin-top: 15px;">
                             <label>Preview:</label>
-                            <div id="announcementPreview" style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); padding: 10px; border-radius: 8px; overflow: hidden; white-space: nowrap; color: white; margin-top: 5px;">
+                            <div id="announcementPreview"
+                                style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); padding: 10px; border-radius: 8px; overflow: hidden; white-space: nowrap; color: white; margin-top: 5px;">
                                 <div>Announcement Text</div>
                             </div>
-                         </div>
+                        </div>
 
-                        <div id="currentAnnouncementStatus" style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;">
+                        <div id="currentAnnouncementStatus"
+                            style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;">
                             <div id="announcementStatusContent">Checking...</div>
                         </div>
                     </div>
@@ -458,9 +519,10 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 引入外部脚本 -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
