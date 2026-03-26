@@ -820,6 +820,208 @@ input:focus, select:focus, textarea:focus {
     animation: shimmer 2s infinite;
 }
 
+/* Announcement Banner */
+#announcementBanner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 38px;
+    z-index: 10001; /* Above navigation but below splash/modals */
+    overflow: hidden;
+    display: none;
+    align-items: center;
+    background: var(--primary-gradient);
+    color: white;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#announcementScrollText {
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 100%;
+    animation: marquee linear infinite;
+    font-size: 0.95rem;
+    line-height: 38px;
+    will-change: transform;
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+
+/* Premium Admin Panel UI */
+#adminPanel .auth-box {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-xl);
+    background: var(--bg-color); /* Use background color for the container */
+    overflow: hidden;
+}
+
+.admin-header {
+    background: var(--surface-color);
+    padding: 24px 24px 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-header h2 {
+    margin: 0;
+    font-size: 1.6rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.admin-tabs {
+    display: flex;
+    padding: 10px 20px;
+    background: var(--surface-color);
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab-button {
+    flex: 1;
+    padding: 10px 15px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tab-button:hover {
+    background: var(--border-color);
+    transform: translateY(-2px);
+}
+
+.tab-button.active {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.admin-tab-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: var(--bg-color);
+}
+
+/* User Management Stylings */
+.users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.user-card {
+    background: var(--surface-color);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.user-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.user-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.user-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+    margin-bottom: 15px;
+}
+
+.user-status span {
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+/* Action Buttons for Admin */
+.action-button {
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-right: 8px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.approve { background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid var(--success-color); }
+.promote { background: rgba(99, 102, 241, 0.1); color: var(--primary-color); border: 1px solid var(--primary-color); }
+.demote { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); border: 1px solid var(--warning-color); }
+.delete { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); border: 1px solid var(--danger-color); }
+
+.action-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+/* Product Management Stylings */
+.product-management-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.product-item {
+    background: var(--surface-color);
+    padding: 18px !important;
+    border-radius: var(--radius-md) !important;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.product-item:hover {
+    border-color: var(--primary-color);
+}
+
+.product-item.new-product {
+    border: 1px solid var(--danger-color) !important;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+}
+
+/* Announcement Management Stylings */
+#announcement-tab textarea {
+    min-height: 100px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+#announcementStatusContent {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    border-radius: var(--radius-md);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
 /* Keyframes */
 @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 @keyframes slideUpFade { from { transform: translateY(15px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -845,10 +1047,6 @@ input:focus, select:focus, textarea:focus {
 #side-dashboard { border-right: 1px solid var(--border-color); }
 #side-dashboard > div:first-child { background: var(--primary-gradient); padding: 50px 24px 24px; }
 #dashboardAdminButton, #side-dashboard button { border-radius: var(--radius-lg); font-weight: 600; }
-.admin-tabs { gap: 12px; }
-.tab-button { padding: 10px 20px; font-weight: 600; }
-.user-card { background: var(--surface-color); box-shadow: var(--shadow-sm); padding: 16px; border-radius: var(--radius-lg); }
-.product-item { background: var(--surface-color); box-shadow: var(--shadow-sm); border-radius: var(--radius-lg); }
 
 /* Responsive */
 @media (max-width: 380px) {

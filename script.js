@@ -484,8 +484,8 @@ function initAdminPanel() {
 
 // --- User Management ---
 function loadUsersList() {
-    document.getElementById('pendingUsersList').innerHTML = 'Loading...';
-    document.getElementById('allUsersList').innerHTML = 'Loading...';
+    document.getElementById('pendingUsersList').innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-secondary);">Loading...</div>';
+    document.getElementById('allUsersList').innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-secondary);">Loading...</div>';
 
     db.ref('users').once('value').then(snapshot => {
         const pendingDiv = document.getElementById('pendingUsersList');
@@ -494,8 +494,8 @@ function loadUsersList() {
         allDiv.innerHTML = '';
 
         if (!snapshot.exists()) {
-            pendingDiv.innerHTML = '<p>No pending users.</p>';
-            allDiv.innerHTML = '<p>No users found.</p>';
+            pendingDiv.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-secondary);">No pending users.</p>';
+            allDiv.innerHTML = '<p style="text-align:center; padding:20px; color:var(--text-secondary);">No users found.</p>';
             return;
         }
 
@@ -507,9 +507,12 @@ function loadUsersList() {
             if (user.status === 'pending') {
                 pendingDiv.innerHTML += `
                     <div class="user-card">
-                        <div class="user-name">${user.name} (${user.email})</div>
-                        <div style="margin-top:5px;">
-                            <button class="action-button approve" onclick="approveUser('${uid}')">Approve</button>
+                        <div class="user-name">${user.name}</div>
+                        <div style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">${user.email}</div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="action-button approve" onclick="approveUser('${uid}')">
+                                <span class="material-icons-round" style="font-size:16px; margin-right:4px;">check_circle</span>Approve
+                            </button>
                         </div>
                     </div>
                 `;
@@ -520,26 +523,31 @@ function loadUsersList() {
 
             let actions = '';
             if (userRole === 'SAdmin' && uid !== currentUser.uid) {
-                if (user.role === 'User') actions += `<button class="action-button promote" onclick="changeUserRole('${uid}','User','Admin')">Make Admin</button>`;
-                if (user.role === 'Admin') actions += `<button class="action-button demote" onclick="changeUserRole('${uid}','Admin','User')">Demote</button>`;
-                actions += `<button class="action-button delete" onclick="deleteUser('${uid}')">Delete</button>`;
+                if (user.role === 'User') actions += `<button class="action-button promote" onclick="changeUserRole('${uid}','User','Admin')"><span class="material-icons-round" style="font-size:16px; margin-right:4px;">admin_panel_settings</span>Admin</button>`;
+                if (user.role === 'Admin') actions += `<button class="action-button demote" onclick="changeUserRole('${uid}','Admin','User')"><span class="material-icons-round" style="font-size:16px; margin-right:4px;">person</span>User</button>`;
+                actions += `<button class="action-button delete" onclick="deleteUser('${uid}')"><span class="material-icons-round" style="font-size:16px; margin-right:4px;">delete</span>Delete</button>`;
             }
-            if (user.status === 'pending') actions = `<button class="action-button approve" onclick="approveUser('${uid}')">Activate</button>` + actions;
+            if (user.status === 'pending') actions = `<button class="action-button approve" onclick="approveUser('${uid}')"><span class="material-icons-round" style="font-size:16px; margin-right:4px;">check_circle</span>Activate</button>` + actions;
 
             const statusColor = user.status === 'active' ? 'var(--success-color)' : 'orange';
+            const statusBg = user.status === 'active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)';
+            
             allDiv.innerHTML += `
                 <div class="user-card">
-                    <div class="user-name">${user.name}</div>
-                    <div class="user-status">
-                        <span style="color:${statusColor}">● ${user.status}</span>
-                        <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">${user.role}</span>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div class="user-name">${user.name}</div>
+                        <span style="font-size:0.7rem; color:var(--text-secondary); opacity:0.6;">${uid.substring(0,6)}</span>
                     </div>
-                    <div style="margin-top:8px;">${actions}</div>
+                    <div class="user-status">
+                        <span style="color:${statusColor}; background:${statusBg}">● ${user.status.toUpperCase()}</span>
+                        <span style="background:var(--bg-color); color:var(--text-secondary); border:1px solid var(--border-color);">${user.role.toUpperCase()}</span>
+                    </div>
+                    <div style="display:flex; flex-wrap:wrap; gap:4px;">${actions}</div>
                 </div>
             `;
         });
 
-        if (pendingDiv.innerHTML === '') pendingDiv.innerHTML = '<p style="color:var(--text-secondary)">No pending users.</p>';
+        if (pendingDiv.innerHTML === '') pendingDiv.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">No pending users.</div>';
     });
 }
 
@@ -567,12 +575,12 @@ function loadProductsForAdmin() {
     const cat = document.getElementById('categorySelect').value;
     const div = document.getElementById('productManagementList');
     if (!cat) {
-        div.innerHTML = '<p>Please select a category</p>';
+        div.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-secondary);"><span class="material-icons-round" style="font-size:48px; display:block; margin-bottom:12px; opacity:0.3;">category</span>Please select a category</div>';
         return;
     }
     
     const products = categories[cat] || [];
-    div.innerHTML = 'Loading...';
+    div.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-secondary);">Loading products...</div>';
 
     Promise.all([
         db.ref('newProducts').once('value'),
@@ -583,7 +591,7 @@ function loadProductsForAdmin() {
         div.innerHTML = '';
 
         if (products.length === 0) {
-            div.innerHTML = '<p>No products in this category. Click "Add Product" to add one.</p>';
+            div.innerHTML = '<div style="padding:40px; text-align:center; color:var(--text-secondary);">No products in this category. Click "Add Product" to add one.</div>';
             return;
         }
 
@@ -596,25 +604,44 @@ function loadProductsForAdmin() {
             const defaultQty = p.defaultQuantity || 1;
 
             div.innerHTML += `
-                <div class="product-item ${isStillNew ? 'new-product' : ''}" style="border: 1px solid var(--border-color); padding: 15px; margin-bottom: 10px; border-radius: 8px;">
-                    <div style="font-weight:bold; margin-bottom:8px;">ID: ${p.id} - ${p.name} ${isStillNew ? '🔥' : ''}</div>
-                    <div style="font-size:0.85rem; margin-bottom:5px; color: var(--text-secondary);">Unit: ${unit}, Default Qty: ${defaultQty}</div>
-                    <label style="font-size:0.85rem; display:block; margin-bottom:8px;">Unit Count: 
-                        <input type="number" value="${boxCount}" onchange="saveProductBoxCount(${p.id}, this.value)" style="width:60px; padding:4px; margin-left:5px;">
-                    </label>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <button class="action-button promote" onclick="editProduct(${p.id}, '${cat}')" style="padding: 6px 12px; font-size: 0.85rem;">Edit</button>
+                <div class="product-item ${isStillNew ? 'new-product' : ''}">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                        <div>
+                            <div style="font-weight:800; color:var(--text-primary); margin-bottom:4px;">${p.name}</div>
+                            <div style="font-size:0.75rem; color:var(--text-secondary);">ID: <span style="color:var(--primary-color);font-weight:700;">${p.id}</span> | Unit: ${unit} | Default: ${defaultQty}</div>
+                        </div>
+                        ${isStillNew ? '<span style="background:var(--danger-color); color:white; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:800; box-shadow:0 0 10px rgba(239, 68, 68, 0.3);">NEW</span>' : ''}
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; background: var(--bg-color); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
+                        <span class="material-icons-round" style="font-size:20px; color:var(--text-secondary);">inventory_2</span>
+                        <label style="font-size:0.85rem; font-weight:600; flex:1;">Unit Count </label>
+                        <input type="number" value="${boxCount}" onchange="saveProductBoxCount(${p.id}, this.value)" 
+                            style="width:70px; background:var(--surface-color); border:1px solid var(--border-color); padding:6px 10px; border-radius:8px; text-align:center; font-weight:700;">
+                    </div>
+
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <button class="action-button promote" onclick="editProduct(${p.id}, '${cat}')" style="margin:0;">
+                            <span class="material-icons-round" style="font-size:16px; margin-right:4px;">edit</span>Edit
+                        </button>
                         ${isStillNew ? 
-                            `<button class="action-button delete" onclick="toggleNewProduct(${p.id}, false)" style="padding: 6px 12px; font-size: 0.85rem;">Remove New Tag</button>` :
-                            `<button class="action-button promote" onclick="toggleNewProduct(${p.id}, true)" style="padding: 6px 12px; font-size: 0.85rem;">Mark as New</button>`
+                            `<button class="action-button delete" onclick="toggleNewProduct(${p.id}, false)" style="margin:0;">
+                                <span class="material-icons-round" style="font-size:16px; margin-right:4px;">star_outline</span>Unmark
+                             </button>` :
+                            `<button class="action-button promote" onclick="toggleNewProduct(${p.id}, true)" style="margin:0;">
+                                <span class="material-icons-round" style="font-size:16px; margin-right:4px;">stars</span>Mark New
+                             </button>`
                         }
-                        <button class="action-button delete" onclick="deleteProduct(${p.id}, '${cat}')" style="padding: 6px 12px; font-size: 0.85rem;">Delete</button>
+                        <button class="action-button delete" onclick="deleteProduct(${p.id}, '${cat}')" style="margin:0;">
+                            <span class="material-icons-round" style="font-size:16px; margin-right:4px;">delete_forever</span>Delete
+                        </button>
                     </div>
                 </div>
             `;
         });
     });
 }
+
 
 function saveProductBoxCount(pid, val) {
     db.ref(`productBoxes/${pid}`).set(parseInt(val)).then(() => console.log('Box count saved'));
@@ -839,12 +866,14 @@ function loadAnnouncementSettings() {
             if (now < data.startTime) { status = 'Pending'; color = 'orange'; }
             else if (now <= data.endTime) { status = 'Active'; color = 'green'; }
             
-            statusDiv.innerHTML = `<b style="color:${color}">${status}</b><br>Text: ${data.text}<br><button onclick="cancelCurrentAnnouncement()" class="action-button delete" style="margin-top:5px;">Cancel</button>`;
+            const creator = data.createdByName ? `<br>By: ${data.createdByName}` : '';
+            statusDiv.innerHTML = `<b style="color:${color}">${status}</b><br>Text: ${data.text}${creator}<br><button onclick="cancelCurrentAnnouncement()" class="action-button delete" style="margin-top:5px;">Cancel</button>`;
         } else {
             document.getElementById('announcementEnabled').checked = false;
             document.getElementById('announcementSettings').style.display = 'none';
             statusDiv.innerHTML = 'No active announcement.';
         }
+
     });
 }
 
@@ -855,6 +884,9 @@ function saveAnnouncementSettings() {
         db.ref('announcement').set({ enabled: false }).then(() => alert('Announcement disabled'));
         return;
     }
+    
+    // Get creator name from dashboard or user object
+    const creatorName = document.getElementById('dashboardUserName').textContent || "Admin";
     
     const data = {
         enabled: true,
@@ -870,7 +902,8 @@ function saveAnnouncementSettings() {
             startColor: document.getElementById('announcementGradientStart').value,
             endColor: document.getElementById('announcementGradientEnd').value
         },
-        createdBy: currentUser.uid
+        createdBy: currentUser.uid,
+        createdByName: creatorName // Store the name
     };
     
     db.ref('announcement').set(data).then(() => { alert('Saved'); loadAnnouncementSettings(); });
@@ -883,16 +916,29 @@ function cancelCurrentAnnouncement() {
 function previewAnnouncement() {
     playEffect('click');
     const text = document.getElementById('announcementText').value;
+    const creatorName = document.getElementById('dashboardUserName').textContent || "Admin";
     const prev = document.getElementById('announcementPreview');
-    prev.querySelector('div').textContent = text;
+    const inner = prev.querySelector('div');
+    inner.textContent = `[${creatorName}]: ${text}`;
     
     const bgType = document.getElementById('announcementBgType').value;
     if(bgType === 'solid') prev.style.background = document.getElementById('announcementBgColor').value;
     else if(bgType === 'custom') prev.style.background = `linear-gradient(45deg, ${document.getElementById('announcementGradientStart').value}, ${document.getElementById('announcementGradientEnd').value})`;
-    else prev.style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4)';
+    else prev.style.background = 'linear-gradient(90deg, #6366f1, #a855f7)';
     
     prev.style.color = document.getElementById('announcementTextColor').value;
+    prev.style.fontSize = document.getElementById('announcementFontSize').value;
+    
+    // Add marquee to preview too
+    inner.style.animation = 'none';
+    inner.offsetHeight; /* reflow */
+    inner.style.display = 'inline-block';
+    inner.style.paddingLeft = '100%';
+    inner.style.whiteSpace = 'nowrap';
+    inner.style.animation = `marquee ${document.getElementById('announcementSpeed').value || '15s'} linear infinite`;
 }
+
+
 
 // ==========================================
 // STANDARD LOGIC
@@ -1504,26 +1550,33 @@ window.addEventListener('load', () => {
         const textEl = document.getElementById('announcementScrollText');
         
         if(data && data.enabled) {
-            // Simply show if enabled
-            // Ensure text is set
             if(data.text) {
-                textEl.textContent = data.text; // Fix: ensure text is assigned
-                banner.style.display = 'block';
+                const name = data.createdByName ? `[${data.createdByName}]: ` : '';
+                textEl.textContent = name + data.text;
+                banner.style.display = 'flex';
+                document.body.style.paddingTop = '62px'; // 38px banner + 24px normal padding
+
                 
                 // Apply styles
                 banner.style.background = data.background && data.background.color ? data.background.color : 
                     (data.background && data.background.type === 'custom' ? 
                     `linear-gradient(45deg, ${data.background.startColor}, ${data.background.endColor})` : 
-                    'linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1)');
+                    'linear-gradient(45deg, #6366f1, #a855f7)');
                     
                 banner.style.fontSize = data.fontSize || '14px';
                 banner.style.color = data.textColor || 'white';
-                textEl.style.animationDuration = data.speed || '15s';
+                
+                // Reset animation
+                textEl.style.animation = 'none';
+                textEl.offsetHeight; // trigger reflow
+                textEl.style.animation = `marquee ${data.speed || '15s'} linear infinite`;
             }
         } else {
             banner.style.display = 'none';
+            document.body.style.paddingTop = '24px'; // Reset to default
         }
     });
+
     
     // Periodic check for new product expiration
         setInterval(() => {
