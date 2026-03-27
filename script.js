@@ -468,6 +468,7 @@ function showAdminTab(tabName) {
     }
     if (tabName === 'announcement') {
         loadAnnouncementSettings();
+        loadRestDays();
     }
 }
 
@@ -651,7 +652,9 @@ function toggleNewProduct(pid, state) {
     if(state) {
         const until = new Date();
         until.setDate(until.getDate() + 7);
-        db.ref(`newProducts/${pid}`).set({ markedAt: Date.now(), until: until.getTime() }).then(() => loadProductsForAdmin());
+        db.ref(`newProducts/${pid}`).set({ markedAt: Date.now(), until: until.getTime() }).then(() => {
+            loadProductsForAdmin();
+        });
     } else {
         db.ref(`newProducts/${pid}`).remove().then(() => loadProductsForAdmin());
     }
@@ -935,7 +938,226 @@ function previewAnnouncement() {
     inner.style.display = 'inline-block';
     inner.style.paddingLeft = '100%';
     inner.style.whiteSpace = 'nowrap';
-    inner.style.animation = `marquee ${document.getElementById('announcementSpeed').value || '15s'} linear infinite`;
+    prev.style.animation = `marquee ${document.getElementById('announcementSpeed').value || '15s'} linear infinite`;
+}
+
+// --- Bulletin Board & Rest Days Logic ---
+
+function loadRestDays() {
+    db.ref('restDays').once('value').then(snap => {
+        const val = snap.val();
+        if (val) {
+            document.getElementById('restDaysText').value = val;
+            renderRestDayBanner(val);
+        }
+    });
+}
+
+function saveRestDays() {
+    playEffect('success');
+    const val = document.getElementById('restDaysText').value.trim();
+    db.ref('restDays').set(val).then(() => {
+        alert('Rest days updated!');
+        renderRestDayBanner(val);
+    });
+}
+
+function renderRestDayBanner(text) {
+    const mainContent = document.getElementById('mainAppContent');
+    let banner = document.getElementById('restDayBanner');
+    
+    if (!text) {
+        if (banner) banner.remove();
+        return;
+    }
+
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'restDayBanner';
+        banner.className = 'rest-day-banner fade-up-item';
+        // Insert after H1
+        const h1 = mainContent.querySelector('h1');
+        h1.parentNode.insertBefore(banner, h1.nextSibling);
+    }
+    
+    banner.innerHTML = `
+        <span class="material-icons-round">info</span>
+        <div><b>Warehouse Rest Day:</b> ${text}</div>
+    `;
+    banner.classList.add('fade-visible');
+}
+
+function loadNewArrivals() {
+    const listDiv = document.getElementById('bulletinList');
+    
+    db.ref('newProducts').on('value', snap => {
+        if (!snap.exists()) {
+            listDiv.innerHTML = '<div class="bulletin-empty">No new products today</div>';
+            return;
+        }
+
+        const newItems = [];
+        snap.forEach(child => {
+            const pid = child.key;
+            const data = child.val();
+            const product = window.allProducts[pid];
+            if (product) {
+                newItems.push({
+                    name: product.name,
+                    id: product.id,
+                    markedAt: data.markedAt,
+                    dateStr: new Date(data.markedAt).toLocaleDateString('en-GB')
+                });
+            }
+        });
+
+        // Sort by most recent
+        newItems.sort((a, b) => b.markedAt - a.markedAt);
+
+        listDiv.innerHTML = '';
+        if (newItems.length === 0) {
+            listDiv.innerHTML = '<div class="bulletin-empty">No updates yet</div>';
+            return;
+        }
+
+        newItems.slice(0, 10).forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'bulletin-item';
+            div.onclick = () => openNewArrivalsModal();
+            div.style.cursor = 'pointer';
+            
+            div.innerHTML = `
+                <div class="bulletin-item-header">
+                    <div class="bulletin-item-title">
+                        <span class="material-icons-round" style="font-size:16px; color:var(--primary-color)">new_releases</span>
+                        ${item.name}
+                    </div>
+                </div>
+                <div style="margin: 4px 0 0 0; font-size: 0.75rem; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
+                    Added: <b>${item.dateStr}</b>
+                </div>
+            `;
+            listDiv.appendChild(div);
+        });
+    });
+}
+
+function openNewArrivalsModal() {
+    playEffect('click');
+    document.getElementById('newArrivalsModal').style.display = 'flex';
+    toggleDashboard(); // Close sidebar
+    loadNewArrivalsModalContent(); // Refresh list in modal
+}
+
+function closeNewArrivalsModal() {
+    playEffect('click');
+    document.getElementById('newArrivalsModal').style.display = 'none';
+}
+
+function loadNewArrivalsModalContent() {
+    const listDiv = document.getElementById('newArrivalsModalList');
+    listDiv.innerHTML = '<div style="text-align:center; padding: 20px;">Loading list...</div>';
+    
+    db.ref('newProducts').once('value').then(snap => {
+        if (!snap.exists()) {
+            listDiv.innerHTML = '<div class="bulletin-empty">No products marked as NEW right now.</div>';
+            return;
+        }
+
+        const newItems = [];
+        snap.forEach(child => {
+            const pid = child.key;
+            const data = child.val();
+            const product = window.allProducts[pid];
+            if (product) {
+                newItems.push({
+                    name: product.name,
+                    id: product.id,
+                    markedAt: data.markedAt,
+                    dateStr: new Date(data.markedAt).toLocaleDateString('en-GB'),
+                    imageUrl: product.imageUrl || ''
+                });
+            }
+        });
+
+        // Sort by most recent
+        newItems.sort((a, b) => b.markedAt - a.markedAt);
+
+        listDiv.innerHTML = '';
+        newItems.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'user-card'; // Reuse admin styling for cards
+            div.style.padding = '12px';
+            
+            const isInCart = selectedItems[item.id] !== undefined;
+            const btnText = isInCart ? 'Update' : 'Add';
+            const btnIcon = isInCart ? 'refresh' : 'add_shopping_cart';
+
+            div.innerHTML = `
+                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                    ${item.imageUrl ? `<img src="${item.imageUrl}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">` : `<div style="width: 60px; height: 60px; background: var(--bg-color); display: flex; align-items: center; justify-content: center; border-radius: 8px;"><span class="material-icons" style="font-size: 24px; color: var(--text-secondary);">campaign</span></div>`}
+                    <div style="flex: 1;">
+                        <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;">${item.name}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px;">Added on: <b>${item.dateStr}</b></div>
+                        
+                        <div style="display: flex; gap: 10px; align-items: center; justify-content: flex-end;">
+                            <div class="quantity-controls-wrapper" style="margin:0; padding:2px; background:var(--bg-color); height:32px; display:flex; align-items:center; justify-content:center; border:1px solid var(--border-color); border-radius:8px; width:100px;">
+                                <button class="quantity-btn" onclick="changeQuantityFromModal(${item.id}, -1)" style="flex:1; width:28px; height:28px; min-width:28px; padding:0; background:transparent; display:flex; align-items:center; justify-content:center;"><span class="material-icons-round" style="font-size:16px;">remove</span></button>
+                                <input type="number" id="modalQty${item.id}" value="${selectedItems[item.id] || 1}" readonly style="flex:1; width:34px; font-size:1rem; border:none; background:transparent; text-align:center; padding:0; margin:0; outline:none; color:var(--text-primary); font-weight:700; line-height:32px; -webkit-appearance:none; -moz-appearance:textfield;">
+                                <button class="quantity-btn" onclick="changeQuantityFromModal(${item.id}, 1)" style="flex:1; width:28px; height:28px; min-width:28px; padding:0; background:transparent; display:flex; align-items:center; justify-content:center;"><span class="material-icons-round" style="font-size:16px;">add</span></button>
+                            </div>
+                            <button id="modalAddBtn${item.id}" onclick="addFromModal(${item.id})" class="action-button promote" style="margin:0; padding:6px 15px; font-size:0.8rem; height:32px; min-width:80px;">
+                                <span class="material-icons" style="font-size:16px; margin-right:4px;">${btnIcon}</span>${btnText}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            listDiv.appendChild(div);
+        });
+    });
+}
+
+function changeQuantityFromModal(pid, change) {
+    const input = document.getElementById(`modalQty${pid}`);
+    if(!input) return;
+    let val = parseInt(input.value) || 1;
+    val = Math.max(1, val + change);
+    input.value = val;
+    playEffect(change > 0 ? 'add' : 'remove');
+    
+    // Auto-update if already in cart
+    if (selectedItems[pid] !== undefined) {
+        selectedItems[pid] = val;
+        updatePreview();
+        const mainQty = document.getElementById(`quantity${pid}`);
+        if(mainQty) mainQty.value = val;
+    }
+}
+
+function addFromModal(pid) {
+    const input = document.getElementById(`modalQty${pid}`);
+    if(!input) return;
+    const val = parseInt(input.value) || 1;
+    
+    selectedItems[pid] = val;
+    updatePreview();
+    playEffect('success');
+
+    const btn = document.getElementById(`modalAddBtn${pid}`);
+    if(btn) {
+        btn.innerHTML = '<span class="material-icons" style="font-size:16px; margin-right:4px;">done</span>Added';
+        btn.style.background = 'var(--success-color)';
+        setTimeout(() => {
+            btn.innerHTML = '<span class="material-icons" style="font-size:16px; margin-right:4px;">refresh</span>Update';
+            btn.style.background = '';
+        }, 2000);
+    }
+
+    const mainCheck = document.getElementById(`item${pid}`);
+    if(mainCheck) mainCheck.checked = true;
+    const mainQty = document.getElementById(`quantity${pid}`);
+    if(mainQty) mainQty.value = val;
 }
 
 
@@ -1420,6 +1642,8 @@ auth.onAuthStateChanged(user => {
             }
         });
         loadQuantitiesFromFirebase();
+        loadRestDays();
+        loadNewArrivals();
     } else {
         // User Not Logged In
         document.getElementById('authContainer').style.display = 'flex';

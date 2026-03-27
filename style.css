@@ -1048,6 +1048,126 @@ input:focus, select:focus, textarea:focus {
 #side-dashboard > div:first-child { background: var(--primary-gradient); padding: 50px 24px 24px; }
 #dashboardAdminButton, #side-dashboard button { border-radius: var(--radius-lg); font-weight: 600; }
 
+/* Bulletin Board Styles */
+.bulletin-container {
+    background: rgba(var(--primary-rgb), 0.05);
+    border-radius: 16px;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bulletin-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--primary-color);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.bulletin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.bulletin-item {
+    background: var(--bg-color);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: fadeInScale 0.3s ease-out;
+}
+
+.bulletin-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.bulletin-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.bulletin-item-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.bulletin-item-date {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+.bulletin-item-content {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+.bulletin-empty {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+    font-style: italic;
+    font-size: 0.85rem;
+}
+
+.badge-new-item {
+    background: var(--danger-color);
+    color: white;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 800;
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Custom Scrollbar for Bulletin */
+.bulletin-list::-webkit-scrollbar {
+    width: 4px;
+}
+.bulletin-list::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
+/* Rest Day Styles */
+.rest-day-banner {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--danger-color);
+    color: var(--danger-color);
+    padding: 10px 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
 /* Responsive */
 @media (max-width: 380px) {
     .shop-card .shop-name { font-size: 0.8rem; padding: 10px 4px 5px; }
@@ -1074,4 +1194,18 @@ body.dark-mode .ripple {
         transform: scale(4);
         opacity: 0;
     }
+}
+
+.system-modal {
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
