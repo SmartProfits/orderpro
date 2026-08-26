@@ -173,7 +173,7 @@ const defaultCategoriesData = {
                 { id: 311, name: "AD Chocolate Soursup", unit: 'pc', defaultQuantity: 50 }, { id: 312, name: "AD Chocolate Coconut", unit: 'pc', defaultQuantity: 50 },
                 { id: 313, name: "AD Chocolate Mangosteen", unit: 'pc', defaultQuantity: 50 }
             ],
-            Seafood: [
+            Oriental: [
                 { id: 401, name: "Tiger Prawn 3/7" }, { id: 402, name: "Flower Prawn 7/12" }, { id: 403, name: "Flower Prawn 12/18" },
                 { id: 404, name: "Flower Prawn 18/25" }, { id: 405, name: "Flower Prawn 25/35" }, { id: 406, name: "Yellow Prawn 10/20" },
                 { id: 407, name: "Yellow Prawn 26/35" }, { id: 408, name: "Sunoh" }, { id: 409, name: "Hoi Tai Kai" },
