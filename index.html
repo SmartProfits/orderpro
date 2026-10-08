@@ -176,53 +176,7 @@
 
         <h3 id="categoryTitle" style="display: none;"><span class="material-icons-round"
                 style="color: var(--primary-color)">category</span> Category</h3>
-        <div class="category-container" id="categoryContainer" style="display: none;">
-            <div class="category-card" onclick="selectCategory(this, 'BanHeang')">
-                <input type="radio" name="category" value="BanHeang" id="banheang" style="display:none">
-                <span class="category-icon">🍪</span>
-                <label>BanHeang</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'HoeHup')">
-                <input type="radio" name="category" value="HoeHup" id="HoeHup" style="display:none">
-                <span class="category-icon">🥮</span>
-                <label>HoeHup</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Chocolate')">
-                <input type="radio" name="category" value="Chocolate" id="chocolate" style="display:none">
-                <span class="category-icon">🍫</span>
-                <label>Chocolate</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Oriental')">
-                <input type="radio" name="category" value="Oriental" id="Oriental" style="display:none">
-                <span class="category-icon">🍵</span>
-                <label>Oriental</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Coffee')">
-                <input type="radio" name="category" value="Coffee" id="coffee" style="display:none">
-                <span class="category-icon">☕</span>
-                <label>Coffee</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Amplang')">
-                <input type="radio" name="category" value="Amplang" id="amplang" style="display:none">
-                <span class="category-icon">🌕</span>
-                <label>Amplang</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Other')">
-                <input type="radio" name="category" value="Other" id="other" style="display:none">
-                <span class="category-icon">🎁</span>
-                <label>Other</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Wrapping')">
-                <input type="radio" name="category" value="Wrapping" id="wrapping" style="display:none">
-                <span class="category-icon">🧸</span>
-                <label>Wrapping</label>
-            </div>
-            <div class="category-card" onclick="selectCategory(this, 'Office')">
-                <input type="radio" name="category" value="Office" id="Office" style="display:none">
-                <span class="category-icon">📦</span>
-                <label>Office</label>
-            </div>
-        </div>
+        <div class="category-container" id="categoryContainer" style="display: none;"></div>
 
         <!-- Search and View Toggle -->
         <div class="tools-bar" id="searchContainer" style="display: none;">
@@ -415,6 +369,9 @@
                 <button class="tab-button active" onclick="showAdminTab('users')">
                     <span class="material-icons-round" style="font-size: 18px; margin-right: 6px;">people</span>Users
                 </button>
+                <button class="tab-button" onclick="showAdminTab('categories')">
+                    <span class="material-icons-round" style="font-size: 18px; margin-right: 6px;">category</span>Categories
+                </button>
                 <button class="tab-button" onclick="showAdminTab('products')">
                     <span class="material-icons-round" style="font-size: 18px; margin-right: 6px;">inventory_2</span>Products
                 </button>
@@ -431,6 +388,18 @@
                     <h3 style="margin-top: 20px;">All Users</h3>
                     <div id="allUsersList" class="users-list">Loading...</div>
                 </div>
+
+                <!-- Category Management (3 per row custom arrangement) -->
+                <div id="categories-tab" class="admin-tab-content" style="display: none;">
+                    <div style="margin-bottom: 15px;">
+                        <h3 style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 6px;">
+                            <span class="material-icons-round" style="color: var(--primary-color);">grid_view</span> Category Arrangement
+                        </h3>
+                        <p style="margin: 4px 0 0; font-size: 0.75rem; color: var(--text-secondary);">3 per row (matches home screen). Click ◀ / ▶ or drag cards to reorder.</p>
+                    </div>
+                    <div id="categoryManagementGrid" class="admin-category-grid"></div>
+                </div>
+
 
                 <!-- Product Management -->
                 <div id="products-tab" class="admin-tab-content" style="display: none;">

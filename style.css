@@ -1209,3 +1209,141 @@ body.dark-mode .ripple {
     width: 100%;
     height: 100%;
 }
+
+/* Admin Category Arrangement (3 per row) */
+.admin-category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+@media (max-width: 500px) {
+    .admin-category-grid {
+        gap: 8px;
+    }
+}
+
+.admin-cat-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 10px 6px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    user-select: none;
+    cursor: grab;
+}
+.admin-cat-card:active {
+    cursor: grabbing;
+}
+.admin-cat-card.dragging {
+    opacity: 0.35;
+    border: 2px dashed var(--primary-color);
+    transform: scale(0.95);
+}
+.admin-cat-card.drag-over {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+    transform: translateY(-2px);
+}
+
+.cat-rank-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    padding: 1px 5px;
+    line-height: 1.2;
+}
+
+.admin-cat-icon {
+    font-size: 2rem;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    line-height: 1;
+}
+
+.admin-cat-name {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    text-align: center;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.admin-cat-count {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.admin-cat-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 6px;
+    border-top: 1px solid var(--border-color);
+}
+
+.cat-btn {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    padding: 0;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.cat-btn:hover:not(:disabled) {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+.cat-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+.cat-btn.delete-btn:hover:not(:disabled) {
+    background: var(--danger-color);
+    border-color: var(--danger-color);
+    color: white;
+}
+
+.emoji-chip {
+    font-size: 1.3rem;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--surface-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s, background-color 0.15s;
+}
+.emoji-chip:hover {
+    background: var(--bg-color);
+    transform: scale(1.15);
+}
