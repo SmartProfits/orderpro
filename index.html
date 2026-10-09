@@ -23,11 +23,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- 自动清理旧版缓存与强制更新（解决iOS用户停留在旧版的问题） -->
+    <!-- 自动注销旧版 Service Worker 与顽固缓存 -->
     <script>
         (function() {
-            var CURRENT_VERSION = '2.5';
-            // 1. 注销所有旧版 Service Worker
+            // 1. 注销所有旧版 Service Worke
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(regs) {
                     for (var i = 0; i < regs.length; i++) {
@@ -43,17 +42,6 @@
                     });
                 });
             }
-            // 3. 检查是否需要无感刷新至最新版本
-            var savedVer = localStorage.getItem('app_installed_ver');
-            if (savedVer !== CURRENT_VERSION) {
-                localStorage.setItem('app_installed_ver', CURRENT_VERSION);
-                // 仅在首次检测到旧版本时刷新一次
-                if (savedVer) {
-                    setTimeout(function() {
-                        window.location.reload(true);
-                    }, 100);
-                }
-            }
         })();
     </script>
 
@@ -68,6 +56,32 @@
 
 
 <body class="dark-mode"> <!-- Default to Dark Mode -->
+
+    <!-- Mandatory System Update Modal (Only Update button available, English UI) -->
+    <div id="appUpdateOverlay" class="update-overlay" style="display: none;">
+        <div class="update-card">
+            <div class="update-icon-wrapper">
+                <span class="material-icons-round update-icon-spin" id="updateModalIcon">system_update</span>
+                <div class="update-glow"></div>
+            </div>
+            <h2 class="update-title" id="updateTitleText">Update Available</h2>
+            <p class="update-subtitle" id="updateVersionText">A new update has been released. Please update now to continue using the app.</p>
+            
+            <!-- 2-Second Progress Bar Area (Revealed on click) -->
+            <div id="updateProgressArea" style="display: none; width: 100%; margin-bottom: 8px;">
+                <div class="update-progress-container">
+                    <div class="update-progress-bar" id="updateProgressBar"></div>
+                </div>
+                <div class="update-countdown" id="updateCountdownText">Updating resources (2s)...</div>
+            </div>
+
+            <!-- Single Action Button (Only Option) -->
+            <button id="btnUpdateNow" class="update-btn-action" onclick="confirmAndUpdateApp()">
+                <span class="material-icons-round" style="font-size: 22px;">cloud_download</span>
+                <span id="btnUpdateText">Update Now</span>
+            </button>
+        </div>
+    </div>
 
     <!-- PREMIUM SPLASH SCREEN -->
     <div id="splashScreen">
@@ -566,6 +580,21 @@
                                 style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;">
                                 <div id="announcementStatusContent">Checking...</div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- System Version & Broadcast Update Section -->
+                    <div style="background: rgba(var(--primary-rgb), 0.05); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 20px;">
+                        <h4 style="margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px;">
+                            <span class="material-icons-round" style="color: var(--primary-color);">system_update</span>
+                            System Version & Force Update
+                        </h4>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+                            Current Client Version: <b id="currentClientVerDisplay" style="color: var(--primary-color); font-size: 1rem;">2.5.0</b>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="testUpdateAnimation()" class="action-button" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.08); color: white;">Test 2s Animation</button>
+                            <button onclick="broadcastSystemUpdate()" class="action-button approve" style="flex: 1; padding: 10px;">Broadcast Update</button>
                         </div>
                     </div>
                 </div>

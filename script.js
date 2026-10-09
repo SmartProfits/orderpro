@@ -1956,4 +1956,223 @@ window.addEventListener('load', () => {
             });
         });
     }, 3600000); // Check every hour
+
+    // 启动系统自动更新检测与监听
+    if (typeof initSystemUpdateListener === 'function') {
+        initSystemUpdateListener();
+    }
 });
+
+// ==========================================================
+// MANDATORY SYSTEM UPDATE MODAL (ENGLISH UI & 2S ANIMATION)
+// ==========================================================
+const CURRENT_APP_VERSION = '2.5.0';
+let isAppUpdating = false;
+let updateTestMode = false;
+
+// 弹出更新模态窗口（全英文，仅有Update Now按钮）
+function openUpdateModal(newVersion, isTest) {
+    if (isAppUpdating) return;
+    updateTestMode = !!isTest;
+
+    const overlay = document.getElementById('appUpdateOverlay');
+    const versionText = document.getElementById('updateVersionText');
+    const btn = document.getElementById('btnUpdateNow');
+    const btnText = document.getElementById('btnUpdateText');
+    const progressArea = document.getElementById('updateProgressArea');
+    const progressBar = document.getElementById('updateProgressBar');
+
+    if (versionText) {
+        versionText.textContent = newVersion ? 
+            `A new update (${newVersion}) is available. Tap below to update now.` : 
+            `A new update is available. Please tap update to continue.`;
+    }
+
+    if (btn) {
+        btn.disabled = false;
+        btn.style.display = 'flex';
+        if (btnText) btnText.textContent = "Update Now";
+    }
+
+    if (progressArea) {
+        progressArea.style.display = 'none';
+    }
+    if (progressBar) {
+        progressBar.style.transition = 'none';
+        progressBar.style.width = '0%';
+    }
+
+    if (overlay) {
+        overlay.style.display = 'flex';
+    }
+}
+
+// 兼容别名
+function triggerAppUpdate(newVersion, isTest) {
+    openUpdateModal(newVersion, isTest);
+}
+
+// 用户点击唯一的 "Update Now" 按钮
+function confirmAndUpdateApp() {
+    if (isAppUpdating) return;
+    isAppUpdating = true;
+
+    const btn = document.getElementById('btnUpdateNow');
+    const btnText = document.getElementById('btnUpdateText');
+    const progressArea = document.getElementById('updateProgressArea');
+    const progressBar = document.getElementById('updateProgressBar');
+
+    if (btn) {
+        btn.disabled = true;
+        if (btnText) btnText.textContent = "Updating...";
+    }
+
+    if (progressArea) {
+        progressArea.style.display = 'block';
+    }
+
+    try { playEffect('success'); } catch (e) {}
+
+    // 触发 2 秒平滑进度条
+    if (progressBar) {
+        progressBar.style.transition = 'none';
+        progressBar.style.width = '0%';
+        void progressBar.offsetWidth; // 触发 reflow
+        progressBar.style.transition = 'width 2s linear';
+        progressBar.style.width = '100%';
+    }
+
+    setTimeout(() => {
+        if (updateTestMode) {
+            // 测试模式：动画结束后关闭弹窗
+            const overlay = document.getElementById('appUpdateOverlay');
+            if (overlay) overlay.style.display = 'none';
+            if (progressArea) progressArea.style.display = 'none';
+            if (btn) {
+                btn.disabled = false;
+                if (btnText) btnText.textContent = "Update Now";
+            }
+            isAppUpdating = false;
+            updateTestMode = false;
+            alert('Update animation test completed! In production, this will clear all cache and reload.');
+            return;
+        }
+
+        // 真实更新：抹除全部 CacheStorage 缓存并强制刷新
+        if ('caches' in window) {
+            caches.keys().then(names => Promise.all(names.map(n => caches.delete(n))))
+                .finally(() => {
+                    window.location.reload(true);
+                });
+        } else {
+            window.location.reload(true);
+        }
+    }, 2000);
+}
+
+
+// ==========================================================
+// 全自动文件改动指纹检测（无需手动改版本号，改代码即可触发）
+// ==========================================================
+let currentFileFingerprint = sessionStorage.getItem('app_current_fingerprint') || '';
+
+function calculateSimpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+    }
+    return 'h_' + Math.abs(hash);
+}
+
+// 自动检查 index.html 是否有任何改动
+function checkForAppUpdates() {
+    const checkUrl = './index.html?_nocache=' + Date.now();
+
+    // 优先使用轻量级 HEAD 请求检查 ETag / Last-Modified
+    fetch(checkUrl, { method: 'HEAD', cache: 'no-store' })
+        .then(response => {
+            const etag = response.headers.get('etag');
+            const lastMod = response.headers.get('last-modified');
+            const headerFingerprint = etag || lastMod;
+
+            if (headerFingerprint) {
+                return headerFingerprint;
+            }
+
+            // 备用方案：如果 CDN 未暴露响应头，直接抓取文本比对哈希
+            return fetch(checkUrl, { cache: 'no-store' })
+                .then(r => r.text())
+                .then(text => calculateSimpleHash(text));
+        })
+        .then(latestFingerprint => {
+            if (!latestFingerprint) return;
+
+            // 首次启动时记录指纹
+            if (!currentFileFingerprint) {
+                currentFileFingerprint = latestFingerprint;
+                sessionStorage.setItem('app_current_fingerprint', latestFingerprint);
+                return;
+            }
+
+            // 只要发现指纹变了（代表你修改了 index.html 或重新 push 了代码）
+            if (latestFingerprint !== currentFileFingerprint) {
+                console.log('[AutoDetect] 检测到代码更新！旧指纹:', currentFileFingerprint, '新指纹:', latestFingerprint);
+                currentFileFingerprint = latestFingerprint;
+                sessionStorage.setItem('app_current_fingerprint', latestFingerprint);
+
+                // 立即弹出 2 秒炫酷升级动画并自动重启
+                triggerAppUpdate('最新版', false);
+            }
+        })
+        .catch(err => {
+            // 静默处理离线情况
+        });
+}
+
+// 启动更新监听系统
+function initSystemUpdateListener() {
+    // 1. 实时监听 Firebase 云端广播 (无论用户是否刷新，随时随地热推)
+    if (typeof db !== 'undefined' && db) {
+        db.ref('system_version').on('value', snap => {
+            const remoteVer = snap.val();
+            if (remoteVer && remoteVer !== CURRENT_APP_VERSION) {
+                console.log('[FirebaseUpdate] 收到云端版本更新信号:', remoteVer);
+                triggerAppUpdate(remoteVer, false);
+            }
+        });
+    }
+
+    // 2. 页面可见性改变（从后台切回前台 / 老人唤醒手机）时立即检测
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            checkForAppUpdates();
+        }
+    });
+
+    // 3. 启动时立即检测一次静态版本
+    checkForAppUpdates();
+
+    // 4. 每隔 2 分钟轮询一次
+    setInterval(checkForAppUpdates, 2 * 60 * 1000);
+}
+
+// 管理员面板：测试 2 秒升级动画
+function testUpdateAnimation() {
+    triggerAppUpdate('2.5.1 (Preview)', true);
+}
+
+// 管理员面板：一键广播全员升级
+function broadcastSystemUpdate() {
+    const nextVer = prompt('Enter the new version to broadcast to all users (e.g. 2.5.1):', '2.5.1');
+    if (!nextVer) return;
+
+    if (confirm(`Broadcast update [${nextVer}] to all active devices?\nAll users will see the update popup with the Update Now button and reload automatically.`)) {
+        db.ref('system_version').set(nextVer).then(() => {
+            alert('Broadcast sent! Active devices will now show the update prompt.');
+        }).catch(err => {
+            alert('Broadcast failed: ' + err.message);
+        });
+    }
+}
+
