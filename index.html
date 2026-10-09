@@ -23,8 +23,42 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <!-- 引入外部样式表 -->
-    <link rel="stylesheet" href="style.css">
+    <!-- 自动清理旧版缓存与强制更新（解决iOS用户停留在旧版的问题） -->
+    <script>
+        (function() {
+            var CURRENT_VERSION = '2.5';
+            // 1. 注销所有旧版 Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(regs) {
+                    for (var i = 0; i < regs.length; i++) {
+                        regs[i].unregister();
+                    }
+                });
+            }
+            // 2. 清理所有旧版 CacheStorage 缓存
+            if ('caches' in window) {
+                caches.keys().then(function(keys) {
+                    keys.forEach(function(key) {
+                        caches.delete(key);
+                    });
+                });
+            }
+            // 3. 检查是否需要无感刷新至最新版本
+            var savedVer = localStorage.getItem('app_installed_ver');
+            if (savedVer !== CURRENT_VERSION) {
+                localStorage.setItem('app_installed_ver', CURRENT_VERSION);
+                // 仅在首次检测到旧版本时刷新一次
+                if (savedVer) {
+                    setTimeout(function() {
+                        window.location.reload(true);
+                    }, 100);
+                }
+            }
+        })();
+    </script>
+
+    <!-- 引入外部样式表（带版本号防缓存） -->
+    <link rel="stylesheet" href="style.css?v=2.5">
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -541,9 +575,9 @@
         </div>
     </div>
 
-    <!-- 引入外部脚本 -->
+    <!-- 引入外部脚本（带版本号防缓存） -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="script.js"></script>
+    <script src="script.js?v=2.5"></script>
 </body>
 
 </html>
