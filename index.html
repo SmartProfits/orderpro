@@ -9,7 +9,7 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Airport Stock Request</title>
 
-    <!-- Font ands Material Icons -->
+    <!-- Font and Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -98,7 +98,7 @@
         </div>
     </div>
 
-    <!-- 公告横幅 -->
+    <!-- 公告横幅 --_>
     <div id="announcementBanner">
         <div id="announcementScrollText"></div>
     </div>
@@ -567,7 +567,7 @@
                                     style="flex: 1; padding: 12px; background: var(--success-color); color: white;">Save</button>
                             </div>
 
-                            <!-- Preview Area！ -->
+                            <!-- Preview Area -->
                             <div style="margin-top: 15px;">
                                 <label>Preview:</label>
                                 <div id="announcementPreview"
@@ -583,7 +583,7 @@
                         </div>
                     </div>
 
-                    <!-- System Version & Broadcast Update Section -->
+                    <!-- System Version &Broadcast Update Section -->
                     <div style="background: rgba(var(--primary-rgb), 0.05); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 20px;">
                         <h4 style="margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px;">
                             <span class="material-icons-round" style="color: var(--primary-color);">system_update</span>
@@ -592,9 +592,10 @@
                         <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
                             Current Client Version: <b id="currentClientVerDisplay" style="color: var(--primary-color); font-size: 1rem;">2.5.0</b>
                         </div>
-                        <div style="display: flex; gap: 10px;">
+                        <div style="display: flex; gap: 8px;">
                             <button onclick="testUpdateAnimation()" class="action-button" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.08); color: white;">Test 2s Animation</button>
                             <button onclick="broadcastSystemUpdate()" class="action-button approve" style="flex: 1; padding: 10px;">Broadcast Update</button>
+                            <button onclick="clearAllBroadcasts()" class="action-button delete" style="padding: 10px 14px;" title="Clear Broadcast Signals">Clear</button>
                         </div>
                     </div>
                 </div>

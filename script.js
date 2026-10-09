@@ -1553,7 +1553,7 @@ function generateText(forWhatsApp) {
         }
     }
 
-    result += '\n_App Version 2.5_';
+    result += '\n_App Version 2.6_';
 
     return result;
 }
@@ -1966,14 +1966,16 @@ window.addEventListener('load', () => {
 // ==========================================================
 // MANDATORY SYSTEM UPDATE MODAL (ENGLISH UI & 2S ANIMATION)
 // ==========================================================
-const CURRENT_APP_VERSION = '2.5.0';
 let isAppUpdating = false;
 let updateTestMode = false;
+let pendingUpdateFingerprint = '';
+const appSessionStartTime = Date.now(); // 记录本次页面打开时间
 
 // 弹出更新模态窗口（全英文，仅有Update Now按钮）
-function openUpdateModal(newVersion, isTest) {
+function openUpdateModal(newVersion, isTest, fingerprint) {
     if (isAppUpdating) return;
     updateTestMode = !!isTest;
+    pendingUpdateFingerprint = fingerprint || '';
 
     const overlay = document.getElementById('appUpdateOverlay');
     const versionText = document.getElementById('updateVersionText');
@@ -2008,8 +2010,8 @@ function openUpdateModal(newVersion, isTest) {
 }
 
 // 兼容别名
-function triggerAppUpdate(newVersion, isTest) {
-    openUpdateModal(newVersion, isTest);
+function triggerAppUpdate(newVersion, isTest, fingerprint) {
+    openUpdateModal(newVersion, isTest, fingerprint);
 }
 
 // 用户点击唯一的 "Update Now" 按钮
@@ -2058,6 +2060,12 @@ function confirmAndUpdateApp() {
             return;
         }
 
+        // 记录已经接受的指纹，刷新后绝不再重复弹窗
+        if (pendingUpdateFingerprint) {
+            sessionStorage.setItem('app_current_fingerprint', pendingUpdateFingerprint);
+            localStorage.setItem('app_last_accepted_fingerprint', pendingUpdateFingerprint);
+        }
+
         // 真实更新：抹除全部 CacheStorage 缓存并强制刷新
         if ('caches' in window) {
             caches.keys().then(names => Promise.all(names.map(n => caches.delete(n))))
@@ -2070,11 +2078,11 @@ function confirmAndUpdateApp() {
     }, 2000);
 }
 
-
 // ==========================================================
 // 全自动文件改动指纹检测（无需手动改版本号，改代码即可触发）
 // ==========================================================
-let currentFileFingerprint = sessionStorage.getItem('app_current_fingerprint') || '';
+let currentFileFingerprint = sessionStorage.getItem('app_current_fingerprint') || 
+                             localStorage.getItem('app_last_accepted_fingerprint') || '';
 
 function calculateSimpleHash(str) {
     let hash = 0;
@@ -2100,7 +2108,7 @@ function checkForAppUpdates() {
                 return headerFingerprint;
             }
 
-            // 备用方案：如果 CDN 未暴露响应头，直接抓取文本比对哈希
+            // 备用方案：抓取文本比对哈希
             return fetch(checkUrl, { cache: 'no-store' })
                 .then(r => r.text())
                 .then(text => calculateSimpleHash(text));
@@ -2112,17 +2120,15 @@ function checkForAppUpdates() {
             if (!currentFileFingerprint) {
                 currentFileFingerprint = latestFingerprint;
                 sessionStorage.setItem('app_current_fingerprint', latestFingerprint);
+                localStorage.setItem('app_last_accepted_fingerprint', latestFingerprint);
                 return;
             }
 
             // 只要发现指纹变了（代表你修改了 index.html 或重新 push 了代码）
             if (latestFingerprint !== currentFileFingerprint) {
                 console.log('[AutoDetect] 检测到代码更新！旧指纹:', currentFileFingerprint, '新指纹:', latestFingerprint);
-                currentFileFingerprint = latestFingerprint;
-                sessionStorage.setItem('app_current_fingerprint', latestFingerprint);
-
-                // 立即弹出 2 秒炫酷升级动画并自动重启
-                triggerAppUpdate('最新版', false);
+                // 弹出英文 Update 模态窗口，等待用户点击 Update Now
+                openUpdateModal('Latest', false, latestFingerprint);
             }
         })
         .catch(err => {
@@ -2132,47 +2138,68 @@ function checkForAppUpdates() {
 
 // 启动更新监听系统
 function initSystemUpdateListener() {
-    // 1. 实时监听 Firebase 云端广播 (无论用户是否刷新，随时随地热推)
     if (typeof db !== 'undefined' && db) {
-        db.ref('system_version').on('value', snap => {
-            const remoteVer = snap.val();
-            if (remoteVer && remoteVer !== CURRENT_APP_VERSION) {
-                console.log('[FirebaseUpdate] 收到云端版本更新信号:', remoteVer);
-                triggerAppUpdate(remoteVer, false);
+        // 关键修复：立即清除之前卡死在 Firebase 里的旧版本死循环残留
+        db.ref('system_version').remove().catch(() => {});
+
+        // 监听安全的基于时间戳的实时广播
+        db.ref('broadcast_update_signal').on('value', snap => {
+            const data = snap.val();
+            // 只有当广播是在本次页面打开之后发出的，才触发一次
+            if (data && data.timestamp && data.timestamp > appSessionStartTime) {
+                const lastHandledTime = Number(localStorage.getItem('app_last_handled_broadcast') || 0);
+                if (data.timestamp > lastHandledTime) {
+                    localStorage.setItem('app_last_handled_broadcast', data.timestamp);
+                    console.log('[BroadcastSignal] 收到新广播更新信号:', data.version);
+                    openUpdateModal(data.version || 'Latest', false);
+                }
             }
         });
     }
 
-    // 2. 页面可见性改变（从后台切回前台 / 老人唤醒手机）时立即检测
+    // 页面可见性改变（从后台切回前台 / 老人唤醒手机）时立即检测
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
             checkForAppUpdates();
         }
     });
 
-    // 3. 启动时立即检测一次静态版本
+    // 启动时立即检测一次
     checkForAppUpdates();
 
-    // 4. 每隔 2 分钟轮询一次
+    // 每隔 2 分钟轮询一次
     setInterval(checkForAppUpdates, 2 * 60 * 1000);
 }
 
 // 管理员面板：测试 2 秒升级动画
 function testUpdateAnimation() {
-    triggerAppUpdate('2.5.1 (Preview)', true);
+    openUpdateModal('v2.5.1', true);
 }
 
-// 管理员面板：一键广播全员升级
+// 管理员面板：一键广播全员升级（安全单次广播，不会死循环）
 function broadcastSystemUpdate() {
     const nextVer = prompt('Enter the new version to broadcast to all users (e.g. 2.5.1):', '2.5.1');
     if (!nextVer) return;
 
-    if (confirm(`Broadcast update [${nextVer}] to all active devices?\nAll users will see the update popup with the Update Now button and reload automatically.`)) {
-        db.ref('system_version').set(nextVer).then(() => {
-            alert('Broadcast sent! Active devices will now show the update prompt.');
+    if (confirm(`Broadcast update [${nextVer}] to all active devices?\nActive devices will see the update popup once and reload safely.`)) {
+        db.ref('broadcast_update_signal').set({
+            version: nextVer,
+            timestamp: Date.now()
+        }).then(() => {
+            alert('Broadcast sent safely! Active devices will now prompt once.');
         }).catch(err => {
             alert('Broadcast failed: ' + err.message);
         });
     }
 }
-
+
+// 应急重置按钮
+function clearAllBroadcasts() {
+    if (typeof db !== 'undefined' && db) {
+        db.ref('broadcast_update_signal').remove();
+        db.ref('system_version').remove();
+        alert('All broadcast update signals cleared successfully!');
+    }
+}
+
+
