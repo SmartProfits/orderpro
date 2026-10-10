@@ -46,7 +46,7 @@
     </script>
 
     <!-- 引入外部样式表（带版本号防缓存） -->
-    <link rel="stylesheet" href="style.css?v=2.5">
+    <link rel="stylesheet" href="style.css?v=2.6.1">
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -92,13 +92,17 @@
             </div>
             <h1 class="splash-title">SmartProfits</h1>
             <div class="splash-subtitle">Stock Request</div>
+            <div id="splashWelcome" class="splash-welcome-pill">
+                <span class="splash-welcome-wave">👋</span>
+                <span class="splash-welcome-label">Welcome, <span id="splashUserName">User</span></span>
+            </div>
             <div class="modern-loader">
                 <span></span><span></span><span></span>
             </div>
         </div>
     </div>
 
-    <!-- 公告横幅 --_>
+    <!-- 公告横幅 -->
     <div id="announcementBanner">
         <div id="announcementScrollText"></div>
     </div>
@@ -161,7 +165,7 @@
 
     <!-- 主要内容区域 -->
     <div id="mainAppContent" style="opacity: 0; transition: opacity 0.5s;">
-        <h1 style="padding-top: 20px;">SmartProfits Stock Request</h1>
+        <h1 style="padding-top: 20px;">SmartProfits Stock</h1>
 
         <!-- 店铺选择 -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px;">
@@ -252,24 +256,24 @@
                 style="color: var(--primary-color)">list_alt</span> Select Items</h3>
         <div id="productList" style="display: none;"></div>
 
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
+        <!-- Bottom Navigation (Native Mobile Tab Bar) -->
+        <nav class="bottom-nav" id="bottomNav">
             <div class="bottom-nav-item" id="menuNavItem" onclick="toggleDashboard()">
-                <span class="material-icons">menu</span>
+                <span class="material-icons-round">menu</span>
                 <span>Menu</span>
             </div>
             <div class="bottom-nav-item" id="previewNavItem" onclick="togglePreview()">
-                <div style="position: relative;">
-                    <span class="material-icons">shopping_cart</span>
+                <div class="nav-icon-wrapper">
+                    <span class="material-icons-round">shopping_cart</span>
                     <span id="orderCountBadge" class="order-count-badge" style="display: none;">0</span>
                 </div>
                 <span>Order</span>
             </div>
             <div class="bottom-nav-item" id="settingsNavItem" onclick="toggleSettings()">
-                <span class="material-icons">settings</span>
+                <span class="material-icons-round">settings</span>
                 <span>Setting</span>
             </div>
-        </div>
+        </nav>
     </div> <!-- End Main Content -->
 
     <!-- Image Detail Modal (Existing) -->
@@ -314,10 +318,23 @@
         </div>
         <div id="preview-content" style="font-size: 0.9rem; line-height: 1.6; max-height: 40vh; overflow-y: auto;">
         </div>
-        <button class="whatsapp-button" onclick="copyAndSendWhatsApp()">
-            <span class="material-icons-round" style="margin-right: 8px;">whatsapp</span>
-            Send to WhatsApp
-        </button>
+        <div class="preview-actions-row">
+            <button class="whatsapp-button" onclick="copyAndSendWhatsApp()" id="btnSendWhatsApp">
+                <div class="whatsapp-icon-circle">
+                    <svg class="whatsapp-svg" viewBox="0 0 24 24" fill="#25D366">
+                        <path d="M12.01 2C6.5 2 2.02 6.48 2.02 12c0 1.83.49 3.55 1.34 5.03L2 22l5.12-1.34c1.43.78 3.07 1.23 4.88 1.23 5.51 0 9.99-4.48 9.99-10S17.52 2 12.01 2zm0 18.25c-1.57 0-3.03-.43-4.3-1.18l-.31-.18-3.19.84.85-3.11-.2-.32a8.217 8.217 0 0 1-1.26-4.3c0-4.55 3.7-8.25 8.25-8.25 4.55 0 8.25 3.7 8.25 8.25s-3.7 8.25-8.25 8.25zm4.53-6.19c-.25-.13-1.47-.72-1.7-.81-.23-.08-.4-.13-.56.13-.17.25-.65.81-.79.98-.15.17-.29.19-.54.06-.25-.13-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.38-.44.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43-.15-.01-.31-.01-.48-.01-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.09s.9 2.43 1.03 2.6c.13.17 1.77 2.7 4.29 3.78.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.17-.48-.29z"/>
+                    </svg>
+                </div>
+                <div class="whatsapp-btn-content">
+                    <span class="whatsapp-btn-title">Send to WhatsApp</span>
+                    <span class="whatsapp-btn-subtitle">Direct order dispatch</span>
+                </div>
+                <span class="material-icons-round whatsapp-btn-arrow">arrow_forward</span>
+            </button>
+            <button class="copy-order-btn" onclick="copyOrderText()" title="Copy Order Text" aria-label="Copy order text">
+                <span class="material-icons-round">content_copy</span>
+            </button>
+        </div>
     </div>
 
     <!-- Fullscreen Confirm -->
@@ -332,16 +349,25 @@
             style="background: var(--surface-color); padding: 20px; border-radius: var(--radius-md); margin-bottom: 20px; line-height: 1.6;">
         </div>
         <div style="display: flex; gap: 12px;">
-            <button onclick="confirmAndSendWhatsApp()"
-                style="flex: 1; background: var(--success-color); color: white; padding: 15px; border-radius: var(--radius-md);">Confirm</button>
+            <button class="whatsapp-button" onclick="confirmAndSendWhatsApp()" style="flex: 1;">
+                <div class="whatsapp-icon-circle">
+                    <svg class="whatsapp-svg" viewBox="0 0 24 24" fill="#25D366">
+                        <path d="M12.01 2C6.5 2 2.02 6.48 2.02 12c0 1.83.49 3.55 1.34 5.03L2 22l5.12-1.34c1.43.78 3.07 1.23 4.88 1.23 5.51 0 9.99-4.48 9.99-10S17.52 2 12.01 2zm0 18.25c-1.57 0-3.03-.43-4.3-1.18l-.31-.18-3.19.84.85-3.11-.2-.32a8.217 8.217 0 0 1-1.26-4.3c0-4.55 3.7-8.25 8.25-8.25 4.55 0 8.25 3.7 8.25 8.25s-3.7 8.25-8.25 8.25zm4.53-6.19c-.25-.13-1.47-.72-1.7-.81-.23-.08-.4-.13-.56.13-.17.25-.65.81-.79.98-.15.17-.29.19-.54.06-.25-.13-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.15-.25-.02-.38.11-.51.11-.11.25-.29.38-.44.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43-.15-.01-.31-.01-.48-.01-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.09s.9 2.43 1.03 2.6c.13.17 1.77 2.7 4.29 3.78.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.1-.23-.17-.48-.29z"/>
+                    </svg>
+                </div>
+                <div class="whatsapp-btn-content">
+                    <span class="whatsapp-btn-title">Confirm & Send WhatsApp</span>
+                </div>
+                <span class="material-icons-round whatsapp-btn-arrow">send</span>
+            </button>
             <button onclick="closeFullscreenConfirm()"
-                style="flex: 1; background: var(--surface-color); border: 1px solid var(--danger-color); color: var(--danger-color); padding: 15px; border-radius: var(--radius-md);">Cancel</button>
+                style="background: var(--surface-color); border: 1px solid var(--danger-color); color: var(--danger-color); padding: 0 20px; border-radius: 18px; font-weight: 600; cursor: pointer;">Cancel</button>
         </div>
     </div>
 
     <!-- Settings Panel -->
     <div id="settings-panel"
-        style="position: fixed; bottom: 80px; right: 20px; width: 260px; background: var(--surface-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 20px; z-index: 1001; display: none; border: 1px solid var(--border-color);">
+        style="position: fixed; bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 12px); right: 16px; width: 260px; background: var(--surface-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 20px; z-index: 4999; display: none; border: 1px solid var(--border-color);">
         <h3 style="margin-top: 0;">Settings</h3>
         <div style="margin-bottom: 15px;">
             <label style="display: block; margin-bottom: 8px; font-size: 0.9rem;">Appearance</label>
@@ -414,17 +440,21 @@
                 </button>
             </div>
             <div class="admin-tabs">
-                <button class="tab-button active" onclick="showAdminTab('users')">
-                    <span class="material-icons-round" style="font-size: 18px; margin-right: 6px;">people</span>Users
+                <button class="tab-button active" onclick="showAdminTab('users')" title="Users" aria-label="Users">
+                    <span class="material-icons-round tab-icon">people</span>
+                    <span class="tab-label">Users</span>
                 </button>
-                <button class="tab-button" onclick="showAdminTab('categories')">
-                    <span class="material-icons-round" style="font-size: 18px; margin-right: 6px;">category</span>Categories
+                <button class="tab-button" onclick="showAdminTab('categories')" title="Categories" aria-label="Categories">
+                    <span class="material-icons-round tab-icon">category</span>
+                    <span class="tab-label">Categories</span>
                 </button>
-                <button class="tab-button" onclick="showAdminTab('products')">
-                    <span class="material-icons-round" style="font-size: 18px; margin-right: 6px;">inventory_2</span>Products
+                <button class="tab-button" onclick="showAdminTab('products')" title="Products" aria-label="Products">
+                    <span class="material-icons-round tab-icon">inventory_2</span>
+                    <span class="tab-label">Products</span>
                 </button>
-                <button class="tab-button" onclick="showAdminTab('announcement')">
-                    <span class="material-icons-round" style="font-size: 18px; margin-right: 6px;">campaign</span>System
+                <button class="tab-button" onclick="showAdminTab('announcement')" title="System" aria-label="System">
+                    <span class="material-icons-round tab-icon">campaign</span>
+                    <span class="tab-label">System</span>
                 </button>
             </div>
 
@@ -509,93 +539,195 @@
                     </div>
                 </div>
 
-                <!-- Announcement & Rest Day Management -->
+                <!-- Announcement & Rest Day Management (Mobile App Native UI) -->
                 <div id="announcement-tab" class="admin-tab-content" style="display: none;">
-                    <!-- Rest Day Setting Section -->
-                    <div style="background: rgba(var(--primary-rgb), 0.05); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 20px;">
-                        <h4 style="margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px;">
-                            <span class="material-icons-round" style="color: var(--primary-color);">event_busy</span>
-                            Warehouse Rest Days
-                        </h4>
-                        <textarea id="restDaysText" rows="2" placeholder="e.g., Every Sunday, Next Monday (28/03)"
-                            style="margin-bottom: 10px; width: 100%; min-height: 60px;"></textarea>
-                        <button onclick="saveRestDays()" class="action-button approve" style="width: 100%; padding: 10px;">Update Rest Days</button>
+                    
+                    <!-- Warehouse Rest Days Card -->
+                    <div class="mobile-app-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-icon" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                                <span class="material-icons-round">event_busy</span>
+                            </div>
+                            <div>
+                                <div class="mobile-card-title">Warehouse Rest Days</div>
+                                <div class="mobile-card-subtitle">Display warehouse holiday schedule on home screen</div>
+                            </div>
+                        </div>
+                        <div class="mobile-field-row">
+                            <label class="mobile-label" for="restDaysText">
+                                <span class="material-icons-round" style="font-size: 14px;">calendar_today</span> Rest Days Schedule
+                            </label>
+                            <textarea id="restDaysText" class="mobile-textarea" rows="2" placeholder="e.g., Every Sunday, Next Monday (28/03)"></textarea>
+                        </div>
+                        <button onclick="saveRestDays()" class="action-button approve" style="width: 100%; height: 44px; border-radius: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <span class="material-icons-round" style="font-size: 18px;">save</span> Save Rest Days
+                        </button>
                     </div>
 
-                    <div style="border-top: 1px solid var(--border-color); margin: 20px 0; padding-top: 20px;">
-                        <h4 style="margin: 0 0 15px 0;">Scrolling Banner Announcement</h4>
-                        <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                            <input type="checkbox" id="announcementEnabled" onchange="toggleAnnouncement()"> Enable
-                            Announcement
-                        </label>
+                    <!-- Scrolling Banner Announcement Card -->
+                    <div class="mobile-app-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-icon">
+                                <span class="material-icons-round">campaign</span>
+                            </div>
+                            <div>
+                                <div class="mobile-card-title">Scrolling Notice Banner</div>
+                                <div class="mobile-card-subtitle">Top marquee announcement for all users</div>
+                            </div>
+                        </div>
+
+                        <!-- iOS/Mobile Style Switch Cell -->
+                        <div class="mobile-cell-switch">
+                            <div>
+                                <div style="font-weight: 600; font-size: 0.92rem; color: var(--text-primary);">Enable Notice Banner</div>
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px;">Turn top scrolling marquee on or off</div>
+                            </div>
+                            <label class="mobile-switch">
+                                <input type="checkbox" id="announcementEnabled" onchange="toggleAnnouncement()">
+                                <span class="switch-slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Settings Container -->
                         <div id="announcementSettings" style="display: none;">
-                            <textarea id="announcementText" rows="3" placeholder="Announcement content..."
-                                style="margin-bottom: 10px;"></textarea>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                                <label style="font-size:0.8rem">Start Time:<input type="datetime-local"
-                                        id="announcementStartTime"></label>
-                                <label style="font-size:0.8rem">End Time:<input type="datetime-local"
-                                        id="announcementEndTime"></label>
-                            </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                                <select id="announcementFontSize">
-                                    <option value="16px">Normal</option>
-                                    <option value="20px">Large</option>
-                                </select>
-                                <input type="color" id="announcementTextColor" value="#ffffff" style="height: 45px;">
-                            </div>
-                            <select id="announcementBgType" onchange="toggleBgSettings()" style="margin-bottom: 10px;">
-                                <option value="gradient">Gradient</option>
-                                <option value="solid">Solid</option>
-                                <option value="custom">Custom Gradient</option>
-                            </select>
-                            <div id="solidColorSettings" style="display: none; margin-bottom: 10px;">
-                                <input type="color" id="announcementBgColor" value="#4285f4" style="height: 45px;">
-                            </div>
-                            <div id="customGradientSettings" style="display: none; margin-bottom: 10px;">
-                                <input type="color" id="announcementGradientStart" value="#ff6b6b">
-                                <input type="color" id="announcementGradientEnd" value="#4ecdc4">
-                            </div>
-                            <select id="announcementSpeed" style="margin-bottom: 10px;">
-                                <option value="15s">Normal Speed</option>
-                                <option value="10s">Fast</option>
-                            </select>
-                            <div style="display: flex; gap: 10px;">
-                                <button onclick="previewAnnouncement()"
-                                    style="flex: 1; padding: 12px; background: var(--primary-color); color: white;">Preview</button>
-                                <button onclick="saveAnnouncementSettings()"
-                                    style="flex: 1; padding: 12px; background: var(--success-color); color: white;">Save</button>
+                            
+                            <!-- Notice Content -->
+                            <div class="mobile-field-row">
+                                <label class="mobile-label" for="announcementText">
+                                    <span class="material-icons-round" style="font-size: 14px;">edit_note</span> Notice Content
+                                </label>
+                                <textarea id="announcementText" class="mobile-textarea" rows="3" placeholder="Type notice message to display..."></textarea>
                             </div>
 
-                            <!-- Preview Area -->
-                            <div style="margin-top: 15px;">
-                                <label>Preview:</label>
-                                <div id="announcementPreview"
-                                    style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); padding: 10px; border-radius: 8px; overflow: hidden; white-space: nowrap; color: white; margin-top: 5px;">
-                                    <div>Announcement Text</div>
+                            <!-- Schedule (Optional) -->
+                            <div class="mobile-field-row">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <span class="mobile-label" style="margin-bottom: 0;">
+                                        <span class="material-icons-round" style="font-size: 14px;">schedule</span> Active Window (Optional)
+                                    </span>
+                                    <button type="button" onclick="setAnnouncementImmediate()" style="background: none; border: none; color: var(--primary-color); font-size: 0.75rem; font-weight: 600; cursor: pointer; padding: 2px 6px;">
+                                        Clear (Instant)
+                                    </button>
+                                </div>
+                                <div class="mobile-grid-2">
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Start Time</div>
+                                        <input type="datetime-local" id="announcementStartTime" class="mobile-input">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">End Time</div>
+                                        <input type="datetime-local" id="announcementEndTime" class="mobile-input">
+                                    </div>
                                 </div>
                             </div>
 
-                            <div id="currentAnnouncementStatus"
-                                style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 8px;">
-                                <div id="announcementStatusContent">Checking...</div>
+                            <!-- Typography & Speed -->
+                            <div class="mobile-grid-2">
+                                <div>
+                                    <label class="mobile-label" for="announcementFontSize">
+                                        <span class="material-icons-round" style="font-size: 14px;">format_size</span> Font Size
+                                    </label>
+                                    <select id="announcementFontSize" class="mobile-select">
+                                        <option value="16px">Normal (16px)</option>
+                                        <option value="20px">Large (20px)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="mobile-label" for="announcementSpeed">
+                                        <span class="material-icons-round" style="font-size: 14px;">speed</span> Scroll Speed
+                                    </label>
+                                    <select id="announcementSpeed" class="mobile-select">
+                                        <option value="22s">Slow (22s)</option>
+                                        <option value="15s" selected>Normal (15s)</option>
+                                        <option value="10s">Fast (10s)</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- System Version &Broadcast Update Section -->
-                    <div style="background: rgba(var(--primary-rgb), 0.05); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 20px;">
-                        <h4 style="margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px;">
-                            <span class="material-icons-round" style="color: var(--primary-color);">system_update</span>
-                            System Version & Force Update
-                        </h4>
-                        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
-                            Current Client Version: <b id="currentClientVerDisplay" style="color: var(--primary-color); font-size: 1rem;">2.5.0</b>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button onclick="testUpdateAnimation()" class="action-button" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.08); color: white;">Test 2s Animation</button>
-                            <button onclick="broadcastSystemUpdate()" class="action-button approve" style="flex: 1; padding: 10px;">Broadcast Update</button>
-                            <button onclick="clearAllBroadcasts()" class="action-button delete" style="padding: 10px 14px;" title="Clear Broadcast Signals">Clear</button>
+                            <!-- Colors & Themes -->
+                            <div class="mobile-field-row">
+                                <label class="mobile-label">
+                                    <span class="material-icons-round" style="font-size: 14px;">palette</span> Theme & Colors
+                                </label>
+                                <div class="mobile-grid-2">
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Background Style</div>
+                                        <select id="announcementBgType" onchange="toggleBgSettings()" class="mobile-select">
+                                            <option value="gradient">Purple Gradient</option>
+                                            <option value="solid">Solid Color</option>
+                                            <option value="custom">Custom Gradient</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Text Color</div>
+                                        <div class="mobile-color-chip-row">
+                                            <input type="color" id="announcementTextColor" value="#ffffff" class="mobile-color-input" onchange="syncColorPreview()">
+                                            <span id="textColorHexLabel">White (#ffffff)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Solid Color Picker -->
+                            <div id="solidColorSettings" style="display: none;" class="mobile-field-row">
+                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Solid Background Color</div>
+                                <div class="mobile-color-chip-row">
+                                    <input type="color" id="announcementBgColor" value="#4285f4" class="mobile-color-input">
+                                    <span>Select Color</span>
+                                </div>
+                            </div>
+
+                            <!-- Custom Gradient Color Pickers -->
+                            <div id="customGradientSettings" style="display: none;" class="mobile-field-row">
+                                <div class="mobile-grid-2">
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Gradient Start</div>
+                                        <div class="mobile-color-chip-row">
+                                            <input type="color" id="announcementGradientStart" value="#ff6b6b" class="mobile-color-input">
+                                            <span>Start Color</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px;">Gradient End</div>
+                                        <div class="mobile-color-chip-row">
+                                            <input type="color" id="announcementGradientEnd" value="#4ecdc4" class="mobile-color-input">
+                                            <span>End Color</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Live Notification Preview -->
+                            <div class="mobile-preview-frame">
+                                <div class="mobile-preview-label">
+                                    <span>Live Preview</span>
+                                    <span class="mobile-preview-live-tag">
+                                        <span class="mobile-preview-live-dot"></span> Live
+                                    </span>
+                                </div>
+                                <div id="announcementPreview"
+                                    style="position: relative; height: 38px; display: flex; align-items: center; background: linear-gradient(45deg, #6366f1, #a855f7); border-radius: 10px; overflow: hidden; white-space: nowrap; color: white; padding: 0 12px; box-shadow: var(--shadow-sm);">
+                                    <div id="announcementPreviewText" style="position: absolute; left: 0; white-space: nowrap; will-change: transform;">Announcement Text</div>
+                                </div>
+                            </div>
+
+                            <!-- Current Status Card -->
+                            <div id="currentAnnouncementStatus" style="margin-top: 14px;">
+                                <div id="announcementStatusContent">Checking status...</div>
+                            </div>
+
+                            <!-- Mobile Action Buttons -->
+                            <div class="mobile-action-bar">
+                                <button type="button" onclick="previewAnnouncement()" class="action-button"
+                                    style="flex: 1; background: var(--surface-color); color: var(--text-primary); border: 1px solid var(--border-color);">
+                                    <span class="material-icons-round" style="font-size: 18px;">visibility</span> Preview
+                                </button>
+                                <button type="button" onclick="saveAnnouncementSettings()" class="action-button approve"
+                                    style="flex: 2; background: var(--primary-gradient); color: white; border: none; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);">
+                                    <span class="material-icons-round" style="font-size: 18px;">publish</span> Save & Publish
+                                </button>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -607,7 +739,8 @@
 
     <!-- 引入外部脚本（带版本号防缓存） -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="script.js?v=2.5"></script>
+    <script src="script.js?v=2.6.1"></script>
 </body>
+
 
 </html>

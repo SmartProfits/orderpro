@@ -50,12 +50,23 @@ function playEffect(type) {
             // Low pitch short beep (Decrease)
             playTone(440, 0.1, 'sine');
         } else if (type === 'select') {
-            // Soft pop (Selection)
-            playTone(600, 0.05, 'triangle');
+            // Crisp modern tactile snap
+            playTone(520, 0.04, 'sine');
+            setTimeout(() => playTone(820, 0.05, 'triangle'), 30);
+            if (localStorage.getItem('vibration-enabled') !== 'disabled' && window.navigator.vibrate) {
+                window.navigator.vibrate(15);
+            }
+            return;
         } else if (type === 'success') {
-            // Success chime (WhatsApp)
-            playTone(523.25, 0.1, 'sine'); // C5
-            setTimeout(() => playTone(659.25, 0.2, 'sine'), 100); // E5
+            // Uplifting celebration arpeggio chime (C5 -> E5 -> G5 -> C6)
+            playTone(523.25, 0.08, 'sine');
+            setTimeout(() => playTone(659.25, 0.08, 'sine'), 80);
+            setTimeout(() => playTone(783.99, 0.1, 'sine'), 160);
+            setTimeout(() => playTone(1046.50, 0.25, 'triangle'), 240);
+            if (localStorage.getItem('vibration-enabled') !== 'disabled' && window.navigator.vibrate) {
+                window.navigator.vibrate([20, 40, 30]);
+            }
+            return;
         } else {
             // Default click
             playTone(800, 0.03, 'sine');
@@ -242,9 +253,22 @@ function loadCategoriesFromFirebase() {
 // ==========================================
 // SPLASH SCREEN LOGIC
 // ==========================================
+function updateSplashUserName(name) {
+    const el = document.getElementById('splashUserName');
+    if (el && name) {
+        el.textContent = name;
+    }
+}
+
 function playOpeningAnimation(callback) {
     const splash = document.getElementById('splashScreen');
     const mainContent = document.getElementById('mainAppContent');
+
+    // Pre-populate username if cached
+    const cachedName = localStorage.getItem('cached-user-name');
+    if (cachedName) {
+        updateSplashUserName(cachedName);
+    }
 
     splash.style.display = 'flex';
     mainContent.style.opacity = '0';
@@ -345,7 +369,7 @@ function loadProducts(products) {
             const isChecked = selectedItems[product.id] ? 'checked' : '';
             const defaultQuantity = product.defaultQuantity || 1;
             const currentQuantity = selectedItems[product.id] || defaultQuantity;
-            const newBadge = isStillNew ? `<span class="product-new-badge">NEW</span>` : '';
+            const newBadge = isStillNew ? `<span class="product-new-badge"><span class="badge-fire-dot"></span>NEW</span>` : '';
 
             if (currentView === 'grid') {
                 // Grid View with Image Support
@@ -602,7 +626,7 @@ function loadProductsForAdmin() {
                             <div style="font-weight:800; color:var(--text-primary); margin-bottom:4px;">${p.name}</div>
                             <div style="font-size:0.75rem; color:var(--text-secondary);">ID: <span style="color:var(--primary-color);font-weight:700;">${p.id}</span> | Unit: ${unit} | Default: ${defaultQty}</div>
                         </div>
-                        ${isStillNew ? '<span style="background:var(--danger-color); color:white; font-size:10px; padding:2px 8px; border-radius:10px; font-weight:800; box-shadow:0 0 10px rgba(239, 68, 68, 0.3);">NEW</span>' : ''}
+                        ${isStillNew ? '<span class="product-new-badge small-badge"><span class="badge-fire-dot"></span>NEW</span>' : ''}
                     </div>
                     
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px; background: var(--bg-color); padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);">
@@ -995,33 +1019,117 @@ function toggleBgSettings() {
     document.getElementById('customGradientSettings').style.display = type === 'custom' ? 'block' : 'none';
 }
 
+function formatDateTimeLocal(timestamp) {
+    if (!timestamp) return '';
+    const d = new Date(timestamp);
+    if (isNaN(d.getTime())) return '';
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function setAnnouncementImmediate() {
+    const s = document.getElementById('announcementStartTime');
+    const e = document.getElementById('announcementEndTime');
+    if (s) s.value = '';
+    if (e) e.value = '';
+    try { playEffect('click'); } catch (err) {}
+}
+
+function syncColorPreview() {
+    const colorInput = document.getElementById('announcementTextColor');
+    const label = document.getElementById('textColorHexLabel');
+    if (colorInput && label) {
+        label.textContent = colorInput.value.toUpperCase();
+    }
+}
+
 function loadAnnouncementSettings() {
     db.ref('announcement').once('value').then(snap => {
         const data = snap.val();
         const statusDiv = document.getElementById('announcementStatusContent');
+        if (!statusDiv) return;
 
         if (data && data.enabled) {
             document.getElementById('announcementEnabled').checked = true;
             document.getElementById('announcementSettings').style.display = 'block';
             document.getElementById('announcementText').value = data.text || '';
-            document.getElementById('announcementStartTime').value = data.startTime ? new Date(data.startTime).toISOString().slice(0, 16) : '';
-            document.getElementById('announcementEndTime').value = data.endTime ? new Date(data.endTime).toISOString().slice(0, 16) : '';
+            document.getElementById('announcementStartTime').value = data.startTime ? formatDateTimeLocal(data.startTime) : '';
+            document.getElementById('announcementEndTime').value = data.endTime ? formatDateTimeLocal(data.endTime) : '';
+
+            if (data.fontSize) document.getElementById('announcementFontSize').value = data.fontSize;
+            if (data.textColor) {
+                document.getElementById('announcementTextColor').value = data.textColor;
+                syncColorPreview();
+            }
+            if (data.speed) document.getElementById('announcementSpeed').value = data.speed;
+            if (data.background) {
+                if (data.background.type) document.getElementById('announcementBgType').value = data.background.type;
+                if (data.background.color) document.getElementById('announcementBgColor').value = data.background.color;
+                if (data.background.startColor) document.getElementById('announcementGradientStart').value = data.background.startColor;
+                if (data.background.endColor) document.getElementById('announcementGradientEnd').value = data.background.endColor;
+                toggleBgSettings();
+            }
 
             // Status Display
             const now = Date.now();
-            let status = 'Expired';
-            let color = 'grey';
-            if (now < data.startTime) { status = 'Pending'; color = 'orange'; }
-            else if (now <= data.endTime) { status = 'Active'; color = 'green'; }
+            let status = 'Active';
+            let color = '#10b981';
+            let icon = 'check_circle';
+            let actionBtn = '';
 
-            const creator = data.createdByName ? `<br>By: ${data.createdByName}` : '';
-            statusDiv.innerHTML = `<b style="color:${color}">${status}</b><br>Text: ${data.text}${creator}<br><button onclick="cancelCurrentAnnouncement()" class="action-button delete" style="margin-top:5px;">Cancel</button>`;
+            const startTimeNum = Number(data.startTime) || (data.startTime ? new Date(data.startTime).getTime() : 0);
+            const endTimeNum = Number(data.endTime) || (data.endTime ? new Date(data.endTime).getTime() : 0);
+
+            if (startTimeNum && now < startTimeNum) {
+                status = 'Scheduled (Pending)';
+                color = '#f59e0b';
+                icon = 'schedule';
+                actionBtn = `<button onclick="startAnnouncementNow()" class="action-button approve" style="padding:6px 10px; font-size:0.8rem; margin-right:6px;">Start Now</button>`;
+            } else if (endTimeNum && now > endTimeNum) {
+                status = 'Expired';
+                color = '#ef4444';
+                icon = 'cancel';
+                actionBtn = `<button onclick="reactivateAnnouncement()" class="action-button approve" style="padding:6px 10px; font-size:0.8rem; margin-right:6px;">Reactivate</button>`;
+            }
+
+            const creator = data.createdByName ? `<br><small style="color:var(--text-secondary);">By: ${data.createdByName}</small>` : '';
+            statusDiv.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <b style="color:${color}; display:inline-flex; align-items:center; gap:4px;">
+                            <span class="material-icons-round" style="font-size:16px;">${icon}</span>
+                            ${status}
+                        </b>
+                        <div style="margin-top:4px; font-size:0.9rem;">${data.text || ''}</div>
+                        ${creator}
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        ${actionBtn}
+                        <button onclick="cancelCurrentAnnouncement()" class="action-button delete" style="padding:6px 12px; font-size:0.8rem;">Disable</button>
+                    </div>
+                </div>
+            `;
         } else {
             document.getElementById('announcementEnabled').checked = false;
             document.getElementById('announcementSettings').style.display = 'none';
-            statusDiv.innerHTML = 'No active announcement.';
+            statusDiv.innerHTML = '<span style="color:var(--text-secondary);">No active announcement banner.</span>';
         }
+    }).catch(err => {
+        console.error('Error loading announcement settings:', err);
+    });
+}
 
+function startAnnouncementNow() {
+    db.ref('announcement').update({ startTime: 0, enabled: true }).then(() => {
+        alert('Announcement is now active and live!');
+        loadAnnouncementSettings();
+    });
+}
+
+function reactivateAnnouncement() {
+    db.ref('announcement').update({ enabled: true, startTime: 0, endTime: 0 }).then(() => {
+        alert('Announcement reactivated and live!');
+        loadAnnouncementSettings();
     });
 }
 
@@ -1029,61 +1137,102 @@ function saveAnnouncementSettings() {
     playEffect('success');
     const enabled = document.getElementById('announcementEnabled').checked;
     if (!enabled) {
-        db.ref('announcement').set({ enabled: false }).then(() => alert('Announcement disabled'));
+        db.ref('announcement').set({ enabled: false }).then(() => {
+            alert('Announcement disabled');
+            loadAnnouncementSettings();
+        }).catch(err => {
+            alert('Error: ' + err.message);
+        });
         return;
     }
 
-    // Get creator name from dashboard or user object
-    const creatorName = document.getElementById('dashboardUserName').textContent || "Admin";
+    const text = document.getElementById('announcementText').value.trim();
+    if (!text) {
+        alert('Please enter announcement content');
+        return;
+    }
+
+    const startVal = document.getElementById('announcementStartTime').value;
+    const endVal = document.getElementById('announcementEndTime').value;
+
+    const startTime = startVal ? new Date(startVal).getTime() : 0;
+    const endTime = endVal ? new Date(endVal).getTime() : 0;
+
+    const creatorName = (typeof currentUser !== 'undefined' && currentUser && currentUser.displayName) ?
+        currentUser.displayName :
+        (document.getElementById('dashboardUserName')?.textContent || "Admin");
 
     const data = {
         enabled: true,
-        text: document.getElementById('announcementText').value,
-        startTime: new Date(document.getElementById('announcementStartTime').value).getTime(),
-        endTime: new Date(document.getElementById('announcementEndTime').value).getTime(),
-        fontSize: document.getElementById('announcementFontSize').value,
-        textColor: document.getElementById('announcementTextColor').value,
-        speed: document.getElementById('announcementSpeed').value,
+        text: text,
+        startTime: isNaN(startTime) ? 0 : startTime,
+        endTime: isNaN(endTime) ? 0 : endTime,
+        fontSize: document.getElementById('announcementFontSize').value || '16px',
+        textColor: document.getElementById('announcementTextColor').value || '#ffffff',
+        speed: document.getElementById('announcementSpeed').value || '15s',
         background: {
-            type: document.getElementById('announcementBgType').value,
-            color: document.getElementById('announcementBgColor').value,
-            startColor: document.getElementById('announcementGradientStart').value,
-            endColor: document.getElementById('announcementGradientEnd').value
+            type: document.getElementById('announcementBgType').value || 'gradient',
+            color: document.getElementById('announcementBgColor').value || '#4285f4',
+            startColor: document.getElementById('announcementGradientStart').value || '#ff6b6b',
+            endColor: document.getElementById('announcementGradientEnd').value || '#4ecdc4'
         },
-        createdBy: currentUser.uid,
-        createdByName: creatorName // Store the name
+        createdBy: (typeof currentUser !== 'undefined' && currentUser) ? currentUser.uid : 'admin',
+        createdByName: creatorName,
+        updatedAt: Date.now()
     };
 
-    db.ref('announcement').set(data).then(() => { alert('Saved'); loadAnnouncementSettings(); });
+    db.ref('announcement').set(data)
+        .then(() => {
+            alert('Announcement saved successfully!');
+            loadAnnouncementSettings();
+        })
+        .catch(err => {
+            console.error('Failed to save announcement:', err);
+            alert('Save failed: ' + err.message);
+        });
 }
 
 function cancelCurrentAnnouncement() {
-    if (confirm('Cancel?')) db.ref('announcement').update({ enabled: false }).then(() => loadAnnouncementSettings());
+    if (confirm('Disable current announcement?')) {
+        db.ref('announcement').update({ enabled: false })
+            .then(() => {
+                alert('Announcement disabled');
+                loadAnnouncementSettings();
+            })
+            .catch(err => {
+                alert('Failed to disable: ' + err.message);
+            });
+    }
 }
 
 function previewAnnouncement() {
     playEffect('click');
-    const text = document.getElementById('announcementText').value;
-    const creatorName = document.getElementById('dashboardUserName').textContent || "Admin";
+    const text = document.getElementById('announcementText').value.trim();
+    if (!text) return alert('Please enter announcement text to preview');
+    const creatorName = (typeof currentUser !== 'undefined' && currentUser && currentUser.displayName) ?
+        currentUser.displayName :
+        (document.getElementById('dashboardUserName')?.textContent || "Admin");
     const prev = document.getElementById('announcementPreview');
     const inner = prev.querySelector('div');
     inner.textContent = `[${creatorName}]: ${text}`;
 
     const bgType = document.getElementById('announcementBgType').value;
-    if (bgType === 'solid') prev.style.background = document.getElementById('announcementBgColor').value;
-    else if (bgType === 'custom') prev.style.background = `linear-gradient(45deg, ${document.getElementById('announcementGradientStart').value}, ${document.getElementById('announcementGradientEnd').value})`;
-    else prev.style.background = 'linear-gradient(90deg, #6366f1, #a855f7)';
+    if (bgType === 'solid') {
+        prev.style.background = document.getElementById('announcementBgColor').value;
+    } else if (bgType === 'custom') {
+        prev.style.background = `linear-gradient(45deg, ${document.getElementById('announcementGradientStart').value}, ${document.getElementById('announcementGradientEnd').value})`;
+    } else {
+        prev.style.background = 'linear-gradient(45deg, #6366f1, #a855f7)';
+    }
 
     prev.style.color = document.getElementById('announcementTextColor').value;
     prev.style.fontSize = document.getElementById('announcementFontSize').value;
 
-    // Add marquee to preview too
+    // Reset and animate the text element inside preview
     inner.style.animation = 'none';
     inner.offsetHeight; /* reflow */
-    inner.style.display = 'inline-block';
-    inner.style.paddingLeft = '100%';
-    inner.style.whiteSpace = 'nowrap';
-    prev.style.animation = `marquee ${document.getElementById('announcementSpeed').value || '15s'} linear infinite`;
+    const speed = document.getElementById('announcementSpeed').value || '15s';
+    inner.style.animation = `marquee-preview ${speed} linear infinite`;
 }
 
 // --- Bulletin Board & Rest Days Logic ---
@@ -1377,44 +1526,74 @@ function toggleVibration(enable) {
     }
 }
 
+function triggerShopSelectBurst(element) {
+    if (typeof confetti !== 'function') return;
+    const rect = element.getBoundingClientRect();
+    const x = (rect.left + rect.width / 2) / window.innerWidth;
+    const y = (rect.top + rect.height / 2) / window.innerHeight;
+
+    // Fast snappy particle burst centered on the tapped card
+    confetti({
+        particleCount: 35,
+        spread: 85,
+        origin: { x, y },
+        colors: ['#6366f1', '#8b5cf6', '#38bdf8', '#ffffff'],
+        startVelocity: 22,
+        ticks: 90,
+        gravity: 0.9,
+        scalar: 0.8,
+        shapes: ['circle'],
+        zIndex: 9999
+    });
+
+    // Secondary subtle sparkle ring
+    setTimeout(() => {
+        confetti({
+            particleCount: 16,
+            spread: 110,
+            origin: { x, y },
+            colors: ['#f59e0b', '#fbbf24', '#ffffff'],
+            startVelocity: 14,
+            ticks: 80,
+            gravity: 0.7,
+            scalar: 0.65,
+            zIndex: 9999
+        });
+    }, 60);
+}
+
 function selectShop(element, value) {
     playEffect('select');
 
-    // Angelic magic dust
-    if (typeof confetti === 'function') {
-        const rect = element.getBoundingClientRect();
-        const originX = (rect.left + rect.width / 2) / window.innerWidth;
-        const originY = (rect.top + rect.height / 2) / window.innerHeight;
+    // Trigger modern micro-burst confetti
+    triggerShopSelectBurst(element);
 
-        confetti({
-            particleCount: 60,
-            spread: 120,
-            origin: { x: originX, y: originY },
-            colors: ['#ffffff', '#fde047', '#fef08a'], // White & Gold
-            ticks: 200,
-            gravity: -0.1, // Float upwards magically
-            startVelocity: 15,
-            shapes: ['circle'],
-            scalar: 0.8,
-            zIndex: 9999
-        });
-    }
-
-    document.querySelectorAll('.shop-card').forEach(card => card.classList.remove('selected'));
+    document.querySelectorAll('.shop-card').forEach(card => {
+        card.classList.remove('selected');
+        const oldBadge = card.querySelector('.shop-selected-badge');
+        if (oldBadge) oldBadge.remove();
+    });
     element.classList.add('selected');
+
+    // Add animated checkmark badge
+    const badge = document.createElement('div');
+    badge.className = 'shop-selected-badge';
+    badge.innerHTML = '<span class="material-icons-round">check</span>';
+    element.appendChild(badge);
+
     element.querySelector('input[type="radio"]').checked = true;
     document.querySelector('.shop-container').classList.add('single-selected');
     if (!document.querySelector('.reselect-btn')) {
         const btn = document.createElement('button');
         btn.className = 'reselect-btn';
-        btn.innerHTML = '<span class="material-icons-round" style="font-size:16px; margin-right:4px;">arrow_back</span> Change Shop';
+        btn.innerHTML = '<span class="material-icons-round" style="font-size:18px;">storefront</span> Change Outlet';
         btn.onclick = reselectShop;
         document.querySelector('.shop-container').appendChild(btn);
     }
     document.getElementById('categoryTitle').style.display = 'block';
     document.getElementById('categoryContainer').style.display = 'grid';
     document.getElementById('searchContainer').style.display = 'flex';
-    setTimeout(() => { document.getElementById('categoryTitle').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+    setTimeout(() => { document.getElementById('categoryTitle').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 120);
     toggleItems();
     updatePreview();
 }
@@ -1422,7 +1601,11 @@ function selectShop(element, value) {
 function reselectShop() {
     playEffect('click');
     document.querySelector('.shop-container').classList.remove('single-selected');
-    document.querySelectorAll('.shop-card').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.shop-card').forEach(c => {
+        c.classList.remove('selected');
+        const b = c.querySelector('.shop-selected-badge');
+        if (b) b.remove();
+    });
     const btn = document.querySelector('.reselect-btn');
     if (btn) btn.remove();
     document.getElementById('categoryTitle').style.display = 'none';
@@ -1482,31 +1665,30 @@ function generateText(forWhatsApp) {
         if (nameEl && nameEl.textContent !== 'Not logged in') userName = nameEl.textContent;
     } catch (e) { }
 
-    // --- 新增：日期和时间逻辑 ---
+    // --- 日期和时间逻辑 ---
     const now = new Date();
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = now.getDate();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthStr = months[now.getMonth()];
     const year = now.getFullYear();
-    const dateStr = `${day}/${month}/${year}`;
 
     let hours = now.getHours();
     const minutes = String(now.getMinutes()).padStart(2, '0');
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    hours = hours % 12;
-    hours = hours ? hours : 12; // 0点显示为12点
-    const timeStr = `${String(hours).padStart(2, '0')}:${minutes}${ampm}`;
+    const ampm = hours >= 12 ? 'AM' : 'PM';
+    hours = hours % 12 || 12;
+    const timeStr = `${hours}:${minutes} ${ampm}`;
+    const dateStr = `${day} ${monthStr} ${year} · ${timeStr}`;
     // ---------------------------
 
     // 构建头部信息
-    if (selectedStore) {
-        // 去除value中可能自带的星号，防止重复
-        let storeName = selectedStore.value.replace(/\*/g, '');
-
-        result += `🏪 *(${storeName})* ${hasAddOn ? '💥(ADD ON)' : ''}\n`;
-        result += `👤 *(${userName})*\n`;
-        result += `📅 ${dateStr}\n`;
-        result += `🕠 ${timeStr}\n\n`;
+    const storeName = selectedStore ? selectedStore.value.replace(/\*/g, '').trim() : '';
+    const addOnTag = hasAddOn ? ' 💥(ADD ON)' : '';
+    if (storeName) {
+        result += `🏪 ${storeName}${addOnTag}  |  👤 ${userName}\n`;
+    } else {
+        result += `👤 ${userName}${addOnTag}\n`;
     }
+    result += `📅 ${dateStr}\n`;
 
     // 处理商品分类和计数
     const categorizedItems = {};
@@ -1532,8 +1714,7 @@ function generateText(forWhatsApp) {
     // 构建商品列表
     for (const [cat, items] of Object.entries(categorizedItems)) {
         if (items.length > 0) {
-            const icon = categoryIcons[cat] ? ` ${categoryIcons[cat]}` : '';
-            result += `\n🔹🔸🔹 ${cat}${icon} 🔹🔸🔹\n`;
+            result += `\n🔹🔸🔹 ${cat}  🔹🔸🔹\n`;
 
             items.forEach(item => {
                 const unit = item.unit || 'ctn'; // 默认单位 ctn
@@ -1761,6 +1942,10 @@ auth.onAuthStateChanged(user => {
         // Load categories if not already loaded
         loadCategoriesFromFirebase();
 
+        // Immediately update splash screen with cached name or fallback
+        const initialName = localStorage.getItem('cached-user-name') || user.displayName || (user.email ? user.email.split('@')[0] : 'User');
+        updateSplashUserName(initialName);
+
         if (!splashShown) {
             // Play animation if first load
             playOpeningAnimation(() => {
@@ -1773,7 +1958,10 @@ auth.onAuthStateChanged(user => {
             const val = snap.val();
             if (val) {
                 userRole = val.role;
-                document.getElementById('dashboardUserName').textContent = val.name;
+                const finalName = val.name || initialName;
+                updateSplashUserName(finalName);
+                localStorage.setItem('cached-user-name', finalName);
+                document.getElementById('dashboardUserName').textContent = finalName;
                 document.getElementById('dashboardUserRole').textContent = val.role;
                 if (val.role === 'Admin' || val.role === 'SAdmin') {
                     document.getElementById('dashboardAdminButton').style.display = 'flex';
@@ -1871,25 +2059,155 @@ function switchToLogin() {
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('authTitle').textContent = 'Welcome Back';
 }
-function logout() { auth.signOut(); window.location.reload(); }
+function logout() {
+    localStorage.removeItem('cached-user-name');
+    auth.signOut();
+    window.location.reload();
+}
 function backToLogin() { logout(); }
+
+function triggerWhatsAppCelebration() {
+    if (typeof confetti !== 'function') return;
+
+    const colors = ['#25D366', '#128C7E', '#34D399', '#ffffff', '#f59e0b'];
+
+    // Dual-cannon fireworks blasting upwards from bottom corners
+    confetti({
+        particleCount: 65,
+        angle: 60,
+        spread: 65,
+        origin: { x: 0.05, y: 0.88 },
+        colors: colors,
+        startVelocity: 45,
+        ticks: 200,
+        gravity: 1,
+        scalar: 0.9,
+        zIndex: 100000
+    });
+
+    confetti({
+        particleCount: 65,
+        angle: 120,
+        spread: 65,
+        origin: { x: 0.95, y: 0.88 },
+        colors: colors,
+        startVelocity: 45,
+        ticks: 200,
+        gravity: 1,
+        scalar: 0.9,
+        zIndex: 100000
+    });
+
+    // Secondary mid-air shower at 180ms
+    setTimeout(() => {
+        confetti({
+            particleCount: 55,
+            spread: 100,
+            origin: { x: 0.5, y: 0.55 },
+            colors: ['#25D366', '#ffffff', '#fef08a'],
+            startVelocity: 26,
+            ticks: 160,
+            gravity: 0.8,
+            shapes: ['circle', 'square'],
+            scalar: 0.85,
+            zIndex: 100000
+        });
+    }, 180);
+}
 
 function copyAndSendWhatsApp() {
     playEffect('success');
 
-    if (typeof confetti === 'function') {
-        confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#6366f1', '#10b981', '#14b8a6', '#f59e0b'],
-            zIndex: 10000
-        });
+    // Trigger celebratory WhatsApp dual fireworks
+    triggerWhatsAppCelebration();
+
+    // Visual button state
+    const btn = document.getElementById('btnSendWhatsApp');
+    let titleEl = null;
+    let oldTitle = '';
+    if (btn) {
+        btn.classList.add('sending');
+        titleEl = btn.querySelector('.whatsapp-btn-title');
+        if (titleEl) {
+            oldTitle = titleEl.textContent;
+            titleEl.textContent = '🚀 Sending Order...';
+        }
     }
+
+    showOrderNotice('🚀 Dispatching to WhatsApp...');
 
     const text = generateText(true);
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    setTimeout(() => { window.open(url, '_blank'); }, 800);
+    setTimeout(() => {
+        if (btn) {
+            btn.classList.remove('sending');
+            if (titleEl && oldTitle) titleEl.textContent = oldTitle;
+        }
+        window.open(url, '_blank');
+    }, 850);
+}
+
+function copyOrderText() {
+    playEffect('click');
+    const text = generateText(true);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            showOrderNotice('📋 Order copied to clipboard!');
+        }).catch(() => {
+            fallbackCopy(text);
+        });
+    } else {
+        fallbackCopy(text);
+    }
+}
+
+function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+        document.execCommand('copy');
+        showOrderNotice('📋 Order copied to clipboard!');
+    } catch (e) {
+        alert('Copied failed');
+    }
+    ta.remove();
+}
+
+function showOrderNotice(msg) {
+    let toast = document.getElementById('orderNoticeToast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'orderNoticeToast';
+        toast.style.cssText = `
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #1e293b;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            z-index: 100000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        `;
+        document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-20px)';
+    }, 2000);
 }
 
 function confirmAndSendWhatsApp() {
@@ -1913,38 +2231,76 @@ window.addEventListener('load', () => {
         toggleVibration(localStorage.getItem('vibration-enabled') !== 'disabled');
     });
 
-    db.ref('announcement').on('value', snap => {
-        const data = snap.val();
-        const banner = document.getElementById('announcementBanner');
-        const textEl = document.getElementById('announcementScrollText');
+    let activeAnnouncementData = null;
 
-        if (data && data.enabled) {
-            if (data.text) {
-                const name = data.createdByName ? `[${data.createdByName}]: ` : '';
-                textEl.textContent = name + data.text;
-                banner.style.display = 'flex';
-                document.body.style.paddingTop = '62px'; // 38px banner + 24px normal padding
+    function renderAnnouncementBanner(data) {
+        activeAnnouncementData = data;
+        let banner = document.getElementById('announcementBanner');
+        let textEl = document.getElementById('announcementScrollText');
 
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'announcementBanner';
+            textEl = document.createElement('div');
+            textEl.id = 'announcementScrollText';
+            banner.appendChild(textEl);
+            document.body.prepend(banner);
+        } else if (!textEl) {
+            textEl = document.createElement('div');
+            textEl.id = 'announcementScrollText';
+            banner.appendChild(textEl);
+        }
 
-                // Apply styles
-                banner.style.background = data.background && data.background.color ? data.background.color :
-                    (data.background && data.background.type === 'custom' ?
-                        `linear-gradient(45deg, ${data.background.startColor}, ${data.background.endColor})` :
-                        'linear-gradient(45deg, #6366f1, #a855f7)');
+        if (!data || !data.enabled || !data.text) {
+            banner.style.display = 'none';
+            document.body.style.paddingTop = '24px';
+            return;
+        }
 
-                banner.style.fontSize = data.fontSize || '14px';
-                banner.style.color = data.textColor || 'white';
+        const now = Date.now();
+        const startTimeNum = Number(data.startTime) || (data.startTime ? new Date(data.startTime).getTime() : 0);
+        const endTimeNum = Number(data.endTime) || (data.endTime ? new Date(data.endTime).getTime() : 0);
 
-                // Reset animation
-                textEl.style.animation = 'none';
-                textEl.offsetHeight; // trigger reflow
-                textEl.style.animation = `marquee ${data.speed || '15s'} linear infinite`;
+        const hasStarted = !startTimeNum || now >= startTimeNum;
+        const notExpired = !endTimeNum || now <= endTimeNum;
+
+        if (hasStarted && notExpired) {
+            const name = data.createdByName ? `[${data.createdByName}]: ` : '';
+            textEl.textContent = name + data.text;
+            banner.style.display = 'flex';
+            document.body.style.paddingTop = '62px'; // 38px banner + 24px normal padding
+
+            // Apply background
+            if (data.background && data.background.type === 'solid' && data.background.color) {
+                banner.style.background = data.background.color;
+            } else if (data.background && data.background.type === 'custom' && data.background.startColor && data.background.endColor) {
+                banner.style.background = `linear-gradient(45deg, ${data.background.startColor}, ${data.background.endColor})`;
+            } else {
+                banner.style.background = 'linear-gradient(45deg, #6366f1, #a855f7)';
             }
+
+            banner.style.fontSize = data.fontSize || '16px';
+            banner.style.color = data.textColor || '#ffffff';
+
+            // Reset animation
+            textEl.style.animation = 'none';
+            textEl.offsetHeight; // trigger reflow
+            const speed = data.speed || '15s';
+            textEl.style.animation = `marquee ${speed} linear infinite`;
         } else {
             banner.style.display = 'none';
             document.body.style.paddingTop = '24px'; // Reset to default
         }
+    }
+
+    db.ref('announcement').on('value', snap => {
+        renderAnnouncementBanner(snap.val());
     });
+
+    // Periodic check for scheduled announcement start / expiration
+    setInterval(() => {
+        if (activeAnnouncementData) renderAnnouncementBanner(activeAnnouncementData);
+    }, 30000);
 
 
     // Periodic check for new product expiration
